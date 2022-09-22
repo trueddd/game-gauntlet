@@ -41,6 +41,7 @@ sealed class Dependency(
 
     sealed class Koin(notation: String) : Dependency(notation) {
         object Core : Koin("io.insert-koin:koin-core:${Versions.Koin}")
+        object Ktor : Koin("io.insert-koin:koin-ktor:${Versions.Koin}")
     }
 
     sealed class Exposed(notation: String) : Dependency(notation) {

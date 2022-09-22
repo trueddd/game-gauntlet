@@ -33,6 +33,8 @@ dependencies {
     implementation(Dependency.Ktor.Server.HtmlBuilder)
     implementation(Dependency.HtmlJvm)
     implementation(Dependency.CssJvm)
+    implementation(Dependency.Koin.Core)
+    implementation(Dependency.Koin.Ktor)
     testImplementation(Dependency.Ktor.Server.Tests)
     testImplementation(Dependency.Junit)
 }
