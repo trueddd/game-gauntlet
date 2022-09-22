@@ -1,1 +1,1 @@
-rootProject.name = "com.github.trueddd.game-gauntlet-backend"
+rootProject.name = "game-gauntlet-backend"

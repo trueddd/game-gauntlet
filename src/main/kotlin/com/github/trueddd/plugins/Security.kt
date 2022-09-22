@@ -8,19 +8,19 @@ import io.ktor.server.auth.jwt.*
 
 fun Application.configureSecurity() {
     authentication {
-//        jwt {
-//            val jwtAudience = this@configureSecurity.environment.config.property("jwt.audience").getString()
-//            realm = this@configureSecurity.environment.config.property("jwt.realm").getString()
-//            verifier(
-//                JWT
-//                    .require(Algorithm.HMAC256("secret"))
-//                    .withAudience(jwtAudience)
-//                    .withIssuer(this@configureSecurity.environment.config.property("jwt.domain").getString())
-//                    .build()
-//            )
-//            validate { credential ->
-//                if (credential.payload.audience.contains(jwtAudience)) JWTPrincipal(credential.payload) else null
-//            }
-//        }
+        jwt {
+            val jwtAudience = System.getenv("JWT_AUDIENCE").toString()
+            realm = System.getenv("JWT_REALM").toString()
+            verifier(
+                JWT
+                    .require(Algorithm.HMAC256(System.getenv("secret").toString()))
+                    .withAudience(jwtAudience)
+                    .withIssuer(System.getenv("JWT_DOMAIN").toString())
+                    .build()
+            )
+            validate { credential ->
+                if (credential.payload.audience.contains(jwtAudience)) JWTPrincipal(credential.payload) else null
+            }
+        }
     }
 }

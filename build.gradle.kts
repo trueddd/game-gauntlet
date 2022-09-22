@@ -10,8 +10,6 @@ version = Config.Version
 
 application {
     mainClass.set("com.github.trueddd.ApplicationKt")
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
 repositories {
