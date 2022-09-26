@@ -1,12 +1,11 @@
 package com.github.trueddd.core.handler
 
-import com.github.trueddd.core.Action
-import com.github.trueddd.core.ActionConsumer
+import com.github.trueddd.core.events.Action
 import com.github.trueddd.data.GlobalState
 
-class PlayerForwardMoveHandler : ActionConsumer<Action.DiceRoll.BoardMoveAhead> {
+class PlayerBoardMoveHandler : ActionConsumer<Action.BoardMove> {
 
-    override suspend fun consume(action: Action.DiceRoll.BoardMoveAhead, currentState: GlobalState): GlobalState {
+    override suspend fun consume(action: Action.BoardMove, currentState: GlobalState): GlobalState {
         val newPlayersState = currentState.players
             .mapValues { (participant, playerState) ->
                 if (action.rolledBy == participant) {

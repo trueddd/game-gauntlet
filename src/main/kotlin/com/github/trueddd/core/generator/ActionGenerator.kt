@@ -1,6 +1,6 @@
 package com.github.trueddd.core.generator
 
-import com.github.trueddd.core.Action
+import com.github.trueddd.core.events.Action
 
 interface ActionGenerator<A : Action> {
 

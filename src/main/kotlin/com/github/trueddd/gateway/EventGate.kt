@@ -23,8 +23,10 @@ fun Routing.setupEventGate() {
                 val text = frame.readText()
                 outgoing.send(Frame.Text("YOU SAID: $text"))
                 inputParser.parse(text)?.let { eventManager.consumeAction(it) }
-                if (text.equals("bye", ignoreCase = true)) {
-                    close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
+                when (text) {
+                    "bye" -> close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
+                    "save" -> eventManager.save()
+                    "restore" -> eventManager.restore()
                 }
             }
         }
