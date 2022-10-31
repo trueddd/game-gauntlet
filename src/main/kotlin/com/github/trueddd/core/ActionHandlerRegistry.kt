@@ -1,15 +1,15 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.core.events.Action
-import com.github.trueddd.core.handler.ActionConsumer
-import com.github.trueddd.core.handler.GameDropHandler
-import com.github.trueddd.core.handler.PlayerBoardMoveHandler
+import com.github.trueddd.core.handler.*
 
 class ActionHandlerRegistry {
 
+    // TODO: provide list of handlers using annotations
     private val handlers = mapOf(
         Action.Keys.BoardMove to PlayerBoardMoveHandler(),
         Action.Keys.GameDrop to GameDropHandler(),
+        Action.Keys.ItemReceive to ItemReceiveHandler(),
     )
 
     @Suppress("UNCHECKED_CAST")

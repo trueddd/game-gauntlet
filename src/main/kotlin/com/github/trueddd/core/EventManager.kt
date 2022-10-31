@@ -55,7 +55,9 @@ class EventManager(
             .onEach { action ->
                 val handler = actionHandlerRegistry.handlerOf(action) ?: return@onEach
                 _globalStateFlow.update { handler.consume(action, it) }
-                eventHistoryHolder.pushEvent(action)
+                if (!action.singleShot) {
+                    eventHistoryHolder.pushEvent(action)
+                }
             }
             .onCompletion { println("Finishing EventManager") }
             .launchIn(this)

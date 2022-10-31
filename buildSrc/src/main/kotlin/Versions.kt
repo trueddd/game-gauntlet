@@ -1,5 +1,5 @@
 object Versions {
-    const val Kotlin = "1.7.10"
+    const val Kotlin = "1.7.20"
     const val Ktor = "2.1.1"
     const val Logback = "1.2.11"
     const val Exposed = "0.38.2"

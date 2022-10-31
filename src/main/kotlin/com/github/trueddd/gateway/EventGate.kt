@@ -1,7 +1,7 @@
 package com.github.trueddd.gateway
 
 import com.github.trueddd.core.EventManager
-import com.github.trueddd.core.generator.InputParser
+import com.github.trueddd.core.InputParser
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*

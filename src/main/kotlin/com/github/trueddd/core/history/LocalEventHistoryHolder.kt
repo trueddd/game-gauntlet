@@ -52,12 +52,12 @@ class LocalEventHistoryHolder(
             val events = eventsContent
                 .filter { it.isNotBlank() }
                 .map { Json.decodeFromString(Action.serializer(), it) }
-            var initialState = GlobalState.default()
-            events.forEach {
-                val handler = actionHandlerRegistry.handlerOf(it) ?: return@forEach
-                initialState = handler.consume(it, initialState)
+            events.fold(GlobalState.default()) { state, action ->
+                actionHandlerRegistry
+                    .handlerOf(action)
+                    ?.consume(action, state)
+                    ?: state
             }
-            initialState
         }
     }
 }
