@@ -10,6 +10,10 @@ fun DependencyHandler.testImplementation(dependency: Dependency) {
     add("testImplementation", create(dependency.notation))
 }
 
+fun DependencyHandler.ksp(dependency: Dependency) {
+    add("ksp", create(dependency.notation))
+}
+
 sealed class Dependency(
     open val notation: String,
 ) {
@@ -42,6 +46,8 @@ sealed class Dependency(
     sealed class Koin(notation: String) : Dependency(notation) {
         object Core : Koin("io.insert-koin:koin-core:${Versions.Koin}")
         object Ktor : Koin("io.insert-koin:koin-ktor:${Versions.Koin}")
+        object Annotations : Koin("io.insert-koin:koin-annotations:${Versions.KoinKsp}")
+        object Compiler : Koin("io.insert-koin:koin-ksp-compiler:${Versions.KoinKsp}")
     }
 
     sealed class Exposed(notation: String) : Dependency(notation) {

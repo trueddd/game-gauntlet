@@ -5,7 +5,9 @@ import com.github.trueddd.core.history.EventHistoryHolder
 import com.github.trueddd.data.GlobalState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.koin.core.annotation.Single
 
+@Single
 class EventManager(
     private val actionHandlerRegistry: ActionHandlerRegistry,
     private val eventHistoryHolder: EventHistoryHolder,

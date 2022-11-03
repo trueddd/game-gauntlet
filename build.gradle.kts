@@ -3,6 +3,7 @@ plugins {
     kotlin("jvm") version Versions.Kotlin
     id("io.ktor.plugin") version Versions.Ktor
     id("org.jetbrains.kotlin.plugin.serialization") version Versions.Kotlin
+    id("com.google.devtools.ksp") version Versions.KotlinKsp
 }
 
 group = Config.PackageName
@@ -10,6 +11,9 @@ version = Config.Version
 
 application {
     mainClass.set("com.github.trueddd.ApplicationKt")
+    sourceSets.main {
+        java.srcDir("build/generated/ksp/main/kotlin")
+    }
 }
 
 repositories {
@@ -35,6 +39,8 @@ dependencies {
     implementation(Dependency.CssJvm)
     implementation(Dependency.Koin.Core)
     implementation(Dependency.Koin.Ktor)
+    implementation(Dependency.Koin.Annotations)
+    ksp(Dependency.Koin.Compiler)
     testImplementation(Dependency.Ktor.Server.Tests)
     testImplementation(Dependency.Junit)
 }

@@ -7,9 +7,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.koin.core.annotation.Single
 import java.io.File
 import java.util.LinkedList
 
+@Single(binds = [EventHistoryHolder::class])
 class LocalEventHistoryHolder(
     private val actionHandlerRegistry: ActionHandlerRegistry,
 ) : EventHistoryHolder {

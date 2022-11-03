@@ -2,7 +2,9 @@ package com.github.trueddd.core
 
 import com.github.trueddd.core.events.Action
 import com.github.trueddd.core.handler.*
+import org.koin.core.annotation.Single
 
+@Single
 class ActionHandlerRegistry {
 
     // TODO: provide list of handlers using annotations

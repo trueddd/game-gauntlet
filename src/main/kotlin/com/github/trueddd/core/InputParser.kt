@@ -9,16 +9,18 @@ import com.github.trueddd.data.GlobalState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Single
 
+@Single
 class InputParser(
-    globalStateFlow: StateFlow<GlobalState>,
+    eventManager: EventManager,
     itemRoller: ItemRoller,
 ) {
 
     // TODO: provide list of available generators using annotations
     private val generators = listOf<ActionGenerator<*>>(
         GameDropGenerator(),
-        MoveForwardGenerator(globalStateFlow),
+        MoveForwardGenerator(eventManager.globalStateFlow),
         ItemReceiveGenerator(itemRoller),
     )
 

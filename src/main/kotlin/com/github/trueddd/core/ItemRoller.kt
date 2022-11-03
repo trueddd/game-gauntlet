@@ -4,7 +4,9 @@ import com.github.trueddd.data.items.InventoryItem
 import com.github.trueddd.data.items.PowerThrow
 import com.github.trueddd.data.items.WeakThrow
 import com.github.trueddd.data.items.YouDoNotNeedThis
+import org.koin.core.annotation.Single
 
+@Single
 class ItemRoller {
 
     // TODO: provide list of available items using annotations
