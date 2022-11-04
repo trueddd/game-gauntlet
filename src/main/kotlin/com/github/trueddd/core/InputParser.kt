@@ -13,14 +13,14 @@ import org.koin.core.annotation.Single
 
 @Single
 class InputParser(
-    eventManager: EventManager,
+    stateHolder: StateHolder,
     itemRoller: ItemRoller,
 ) {
 
     // TODO: provide list of available generators using annotations
     private val generators = listOf<ActionGenerator<*>>(
         GameDropGenerator(),
-        MoveForwardGenerator(eventManager.globalStateFlow),
+        MoveForwardGenerator(stateHolder),
         ItemReceiveGenerator(itemRoller),
     )
 

@@ -3,7 +3,9 @@ package com.github.trueddd.core.generator
 import com.github.trueddd.core.events.Action
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.rollDice
+import org.koin.core.annotation.Factory
 
+@Factory
 class GameDropGenerator : ActionGenerator<Action.GameDrop> {
 
     override val inputMatcher by lazy {

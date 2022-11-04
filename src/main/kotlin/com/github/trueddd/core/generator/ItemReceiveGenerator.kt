@@ -3,7 +3,9 @@ package com.github.trueddd.core.generator
 import com.github.trueddd.core.ItemRoller
 import com.github.trueddd.core.events.Action
 import com.github.trueddd.data.Participant
+import org.koin.core.annotation.Factory
 
+@Factory
 class ItemReceiveGenerator(
     private val itemRoller: ItemRoller,
 ) : ActionGenerator<Action.ItemReceive> {

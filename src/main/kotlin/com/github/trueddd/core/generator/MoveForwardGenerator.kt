@@ -1,13 +1,14 @@
 package com.github.trueddd.core.generator
 
+import com.github.trueddd.core.StateHolder
 import com.github.trueddd.core.events.Action
-import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.rollDice
-import kotlinx.coroutines.flow.StateFlow
+import org.koin.core.annotation.Factory
 
+@Factory
 class MoveForwardGenerator(
-    private val globalState: StateFlow<GlobalState>,
+    private val stateHolder: StateHolder,
 ) : ActionGenerator<Action.BoardMove> {
 
     override val inputMatcher by lazy {
@@ -16,7 +17,7 @@ class MoveForwardGenerator(
 
     override fun generate(input: String): Action.BoardMove {
         val actor = inputMatcher.matchEntire(input)?.groupValues?.lastOrNull()!!
-        val modifier = globalState.value.players[Participant(actor)]?.diceModifier ?: 0
+        val modifier = stateHolder.globalStateFlow.value.players[Participant(actor)]?.diceModifier ?: 0
         val dice = rollDice()
         return Action.BoardMove(Participant(actor), dice, modifier)
     }

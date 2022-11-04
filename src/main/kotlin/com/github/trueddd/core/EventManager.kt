@@ -1,24 +1,21 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.core.events.Action
-import com.github.trueddd.core.history.EventHistoryHolder
 import com.github.trueddd.data.GlobalState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.sync.Semaphore
 import org.koin.core.annotation.Single
 
 @Single
 class EventManager(
     private val actionHandlerRegistry: ActionHandlerRegistry,
-    private val eventHistoryHolder: EventHistoryHolder,
+    private val stateHolder: StateHolder,
 ) : CoroutineScope {
 
     override val coroutineContext by lazy {
         SupervisorJob() + Dispatchers.Default
     }
-
-    private val _globalStateFlow = MutableStateFlow(GlobalState.default())
-    val globalStateFlow = _globalStateFlow.asStateFlow()
 
     private val actionsPipe = MutableSharedFlow<Action>()
 
@@ -28,23 +25,20 @@ class EventManager(
         }
     }
 
-    fun save() {
-        launch {
-            eventHistoryHolder.save()
+    private var eventHandlingJob: Job? = null
+
+    private val eventHandlingMonitor = Semaphore(1)
+
+    fun stopHandling() {
+        if (eventHandlingJob?.isActive == true) {
+            eventHandlingJob?.cancel()
+            eventHandlingJob = null
         }
     }
 
-    private var eventHandlingJob: Job? = null
-
-    suspend fun restore() {
-        withContext(coroutineContext) {
-            if (eventHandlingJob?.isActive == true) {
-                eventHandlingJob?.cancel()
-                eventHandlingJob = null
-            }
-            _globalStateFlow.value = eventHistoryHolder.load()
-            startEventHandling()
-        }
+    fun startHandling(initState: GlobalState = GlobalState.default()) {
+        stateHolder.update { initState }
+        startEventHandling()
     }
 
     private fun startEventHandling() {
@@ -56,10 +50,10 @@ class EventManager(
             .onStart { println("Starting EventManager") }
             .onEach { action ->
                 val handler = actionHandlerRegistry.handlerOf(action) ?: return@onEach
-                _globalStateFlow.update { handler.consume(action, it) }
-                if (!action.singleShot) {
-                    eventHistoryHolder.pushEvent(action)
-                }
+                eventHandlingMonitor.acquire()
+                val result = handler.consume(action, stateHolder.globalStateFlow.value)
+                stateHolder.update { result }
+                eventHandlingMonitor.release()
             }
             .onCompletion { println("Finishing EventManager") }
             .launchIn(this)
