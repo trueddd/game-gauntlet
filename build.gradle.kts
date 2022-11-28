@@ -11,9 +11,10 @@ version = Config.Version
 
 application {
     mainClass.set("com.github.trueddd.ApplicationKt")
-    sourceSets.main {
-        java.srcDir("build/generated/ksp/main/kotlin")
-    }
+}
+
+kotlin.sourceSets.main {
+    kotlin.srcDirs(file("$buildDir/generated/ksp/main/kotlin"))
 }
 
 repositories {
@@ -22,6 +23,8 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":di"))
+    ksp(project(":di"))
     implementation(Dependency.Logging)
     implementation(Dependency.Ktor.Server.Core)
     implementation(Dependency.Ktor.Server.Netty)
@@ -37,9 +40,6 @@ dependencies {
     implementation(Dependency.Ktor.Server.HtmlBuilder)
     implementation(Dependency.HtmlJvm)
     implementation(Dependency.CssJvm)
-    implementation(Dependency.Koin.Core)
-    implementation(Dependency.Koin.Ktor)
-    implementation(Dependency.Koin.Annotations)
     ksp(Dependency.Koin.Compiler)
     testImplementation(Dependency.Ktor.Server.Tests)
     testImplementation(Dependency.Junit)
