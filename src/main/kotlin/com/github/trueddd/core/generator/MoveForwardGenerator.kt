@@ -5,10 +5,8 @@ import com.github.trueddd.core.events.Action
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.rollDice
 import com.trueddd.github.annotations.IntoSet
-import org.koin.core.annotation.Factory
 
 @IntoSet(ActionGenerator::class)
-@Factory
 class MoveForwardGenerator(
     private val stateHolder: StateHolder,
 ) : ActionGenerator<Action.BoardMove> {
