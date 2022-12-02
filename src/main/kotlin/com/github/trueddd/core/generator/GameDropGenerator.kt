@@ -5,7 +5,7 @@ import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.rollDice
 import com.trueddd.github.annotations.IntoSet
 
-@IntoSet(ActionGenerator::class)
+@IntoSet(ActionGenerator.TAG)
 class GameDropGenerator : ActionGenerator<Action.GameDrop> {
 
     override val inputMatcher by lazy {

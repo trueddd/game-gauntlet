@@ -5,5 +5,9 @@ import com.github.trueddd.data.GlobalState
 
 interface ActionConsumer<A : Action> {
 
+    companion object {
+        const val TAG = "ActionConsumer"
+    }
+
     suspend fun consume(action: A, currentState: GlobalState): GlobalState
 }

@@ -5,7 +5,7 @@ import com.github.trueddd.core.events.Action
 import com.github.trueddd.data.Participant
 import com.trueddd.github.annotations.IntoSet
 
-@IntoSet(ActionGenerator::class)
+@IntoSet(ActionGenerator.TAG)
 class ItemReceiveGenerator(
     private val itemRoller: ItemRoller,
 ) : ActionGenerator<Action.ItemReceive> {

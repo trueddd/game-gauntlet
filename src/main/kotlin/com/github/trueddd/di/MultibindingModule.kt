@@ -5,4 +5,6 @@ import org.koin.dsl.module
 val multibindingModule = module {
 
     single { getActionGenerators(get(), get()) }
+
+    single { getActionConsumers() }
 }

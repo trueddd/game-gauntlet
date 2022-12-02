@@ -1,16 +1,12 @@
-package com.trueddd.github
+package com.trueddd.github.declarations
 
-import com.google.devtools.ksp.symbol.KSAnnotation
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterSpec
 import java.util.*
 
-data class IntoSetClassDeclaration(
-    val setType: KSAnnotation,
-    val className: String,
-    val packageName: String,
-    val dependencies: List<String>,
-) {
+interface ClassDeclaration {
+
+    val dependencies: List<String>
 
     private fun String.decapitalize(): String {
         return replaceFirstChar { it.lowercase(Locale.getDefault()) }

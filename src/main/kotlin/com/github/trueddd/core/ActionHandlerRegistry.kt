@@ -5,14 +5,9 @@ import com.github.trueddd.core.handler.*
 import org.koin.core.annotation.Single
 
 @Single
-class ActionHandlerRegistry {
-
-    // TODO: provide list of handlers using annotations
-    private val handlers = mapOf(
-        Action.Keys.BoardMove to PlayerBoardMoveHandler(),
-        Action.Keys.GameDrop to GameDropHandler(),
-        Action.Keys.ItemReceive to ItemReceiveHandler(),
-    )
+class ActionHandlerRegistry(
+    private val handlers: Map<Int, ActionConsumer<*>>,
+) {
 
     @Suppress("UNCHECKED_CAST")
     fun <A : Action> handlerOf(action: A): ActionConsumer<A>? {

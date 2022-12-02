@@ -6,7 +6,7 @@ import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.rollDice
 import com.trueddd.github.annotations.IntoSet
 
-@IntoSet(ActionGenerator::class)
+@IntoSet(ActionGenerator.TAG)
 class MoveForwardGenerator(
     private val stateHolder: StateHolder,
 ) : ActionGenerator<Action.BoardMove> {
