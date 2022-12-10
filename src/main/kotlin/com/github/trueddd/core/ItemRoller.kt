@@ -1,22 +1,14 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.data.items.InventoryItem
-import com.github.trueddd.data.items.PowerThrow
-import com.github.trueddd.data.items.WeakThrow
-import com.github.trueddd.data.items.YouDoNotNeedThis
 import org.koin.core.annotation.Single
 
 @Single
-class ItemRoller {
-
-    // TODO: provide list of available items using annotations
-    private val allItems = listOf(
-        { PowerThrow() },
-        { WeakThrow() },
-        { YouDoNotNeedThis() },
-    )
+class ItemRoller(
+    private val allItemsFactories: Set<InventoryItem.Factory>,
+) {
 
     fun pick(): InventoryItem {
-        return allItems.random().invoke()
+        return allItemsFactories.random().create()
     }
 }

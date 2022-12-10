@@ -62,4 +62,7 @@ sealed class Dependency(
     }
 
     object H2 : Dependency("com.h2database:h2:${Versions.H2}")
+
+    object KotlinPoet : Dependency("com.squareup:kotlinpoet:1.12.0")
+    object SymbolProcessingApi : Dependency("com.google.devtools.ksp:symbol-processing-api:${Versions.KotlinKsp}")
 }

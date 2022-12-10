@@ -28,8 +28,8 @@ class IntoSetProcessor(
                     ?: return@mapNotNull null
                 IntoSetClassDeclaration(
                     setName,
-                    declaration.simpleName.asString(),
-                    declaration.packageName.asString(),
+                    declaration.qualifiedName?.asString() ?: declaration.simpleName.asString(),
+                    if (declaration.qualifiedName == null) declaration.packageName.asString() else "",
                     declaration.primaryConstructor?.parameters?.mapNotNull { it.type.resolve().declaration.qualifiedName?.asString() } ?: emptyList(),
                     declaration.containingFile,
                 )
@@ -41,15 +41,9 @@ class IntoSetProcessor(
             .groupBy { it.setName }
             .forEach { (type, declarations) ->
                 environment.logger.info("type: $type")
-                val items = declarations
-                    .joinToString { declaration ->
-                        "${declaration.packageName}.${declaration.className}(${declaration.dependencyNames.joinToString()})"
-                    }
-                val funName = type
-                    .filter { it.isLetterOrDigit() }
-                    .plus("s")
+                val items = declarations.joinToString { it.callConstructor }
                 fileSpec.addFunction(
-                    FunSpec.builder("get$funName")
+                    FunSpec.builder("get${type}Set")
                         .addParameters(declarations.flatMap { it.dependenciesAsParameters })
                         .addStatement("return setOf(${items})")
                         .build()

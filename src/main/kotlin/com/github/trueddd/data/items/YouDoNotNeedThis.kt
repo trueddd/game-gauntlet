@@ -2,6 +2,7 @@ package com.github.trueddd.data.items
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.trueddd.github.annotations.IntoSet
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -27,5 +28,10 @@ class YouDoNotNeedThis : InventoryItem.Event(), InTimeEvent {
             }
         }
         return globalState.copy(players = players)
+    }
+
+    @IntoSet(setName = Factory.SET_NAME)
+    class YouDoNotNeedThisFactory : Factory() {
+        override fun create() = YouDoNotNeedThis()
     }
 }

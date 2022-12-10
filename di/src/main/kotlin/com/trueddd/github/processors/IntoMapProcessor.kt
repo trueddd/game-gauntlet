@@ -33,8 +33,8 @@ class IntoMapProcessor(
                 IntoMapClassDeclaration(
                     mapName,
                     key,
-                    declaration.simpleName.asString(),
-                    declaration.packageName.asString(),
+                    declaration.qualifiedName?.asString() ?: declaration.simpleName.asString(),
+                    if (declaration.qualifiedName == null) declaration.packageName.asString() else "",
                     declaration.primaryConstructor?.parameters?.mapNotNull { it.type.resolve().declaration.qualifiedName?.asString() } ?: emptyList(),
                     declaration.containingFile,
                 )
@@ -46,15 +46,9 @@ class IntoMapProcessor(
             .groupBy { it.mapName }
             .forEach { (map, declarations) ->
                 environment.logger.info("Writing map $map")
-                val items = declarations
-                    .joinToString { declaration ->
-                        "${declaration.key} to ${declaration.packageName}.${declaration.className}(${declaration.dependencyNames.joinToString()})"
-                    }
-                val funName = map
-                    .filter { it.isLetterOrDigit() }
-                    .plus("s")
+                val items = declarations.joinToString { "${it.key} to ${it.callConstructor}" }
                 fileSpec.addFunction(
-                    FunSpec.builder("get$funName")
+                    FunSpec.builder("get${map}Map")
                         .addParameters(declarations.flatMap { it.dependenciesAsParameters })
                         .addStatement("return mapOf(${items})")
                         .build()

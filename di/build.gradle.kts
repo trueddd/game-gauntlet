@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    implementation("com.google.devtools.ksp:symbol-processing-api:${Versions.KotlinKsp}")
-    implementation("com.squareup:kotlinpoet:1.12.0")
+    implementation(Dependency.SymbolProcessingApi)
+    implementation(Dependency.KotlinPoet)
     api(Dependency.Koin.Core)
     api(Dependency.Koin.Ktor)
     api(Dependency.Koin.Annotations)

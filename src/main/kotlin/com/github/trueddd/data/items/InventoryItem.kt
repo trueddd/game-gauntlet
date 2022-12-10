@@ -8,6 +8,15 @@ sealed class InventoryItem {
     abstract val id: Int
     abstract val name: String
 
+    abstract class Factory {
+
+        companion object {
+            const val SET_NAME = "ItemFactory"
+        }
+
+        abstract fun create(): InventoryItem
+    }
+
     object Id {
         const val PowerThrow = 1
         const val WeakThrow = 2
