@@ -22,6 +22,10 @@ repositories {
     maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-js-wrappers") }
 }
 
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation(project(":di"))
     ksp(project(":di"))
@@ -42,5 +46,7 @@ dependencies {
     implementation(Dependency.CssJvm)
     ksp(Dependency.Koin.Compiler)
     testImplementation(Dependency.Ktor.Server.Tests)
-    testImplementation(Dependency.Junit)
+    testImplementation(Dependency.Tests.Junit)
+    testImplementation(Dependency.Tests.JupiterApi)
+    testImplementation(Dependency.Tests.JupiterEngine)
 }

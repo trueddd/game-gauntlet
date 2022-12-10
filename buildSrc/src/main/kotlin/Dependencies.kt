@@ -45,7 +45,11 @@ sealed class Dependency(
     object CssJvm : Dependency("org.jetbrains:kotlin-css-jvm:1.0.0-pre.129-kotlin-1.4.20")
     object HtmlJvm : Dependency("org.jetbrains.kotlinx:kotlinx-html-jvm:${Versions.HtmlJvm}")
 
-    object Junit : Dependency("org.jetbrains.kotlin:kotlin-test-junit:${Versions.Kotlin}")
+    sealed class Tests(notation: String) : Dependency(notation) {
+        object Junit : Dependency("org.jetbrains.kotlin:kotlin-test-junit:${Versions.Kotlin}")
+        object JupiterApi : Dependency("org.junit.jupiter:junit-jupiter-api:5.9.1")
+        object JupiterEngine : Dependency("org.junit.jupiter:junit-jupiter-engine:5.9.1")
+    }
 
     sealed class Koin(notation: String) : Dependency(notation) {
         object Core : Koin("io.insert-koin:koin-core:${Versions.Koin}")
