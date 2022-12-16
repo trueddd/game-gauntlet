@@ -1,6 +1,6 @@
 package com.github.trueddd.core
 
-import com.github.trueddd.core.events.Action
+import com.github.trueddd.core.events.*
 import com.github.trueddd.provideInputParser
 import com.github.trueddd.utils.d6Range
 import org.junit.jupiter.api.Test
@@ -31,20 +31,20 @@ internal class InputParserTest {
 
     @Test
     fun `roll movement dice - board move`() {
-        val parsed = inputParser.parse("roll player") as? Action.BoardMove
+        val parsed = inputParser.parse("roll player") as? BoardMove
         assertEquals("player", parsed?.rolledBy?.name)
         assertTrue(parsed?.diceValue in d6Range)
     }
 
     @Test
     fun `roll movement dice - item roll`() {
-        val parsed = inputParser.parse("item player") as? Action.ItemReceive
+        val parsed = inputParser.parse("item player") as? ItemReceive
         assertEquals("player", parsed?.receivedBy?.name)
     }
 
     @Test
     fun `roll movement dice - game drop`() {
-        val parsed = inputParser.parse("drop player") as? Action.GameDrop
+        val parsed = inputParser.parse("drop player") as? GameDrop
         assertEquals("player", parsed?.rolledBy?.name)
         assertTrue(parsed?.diceValue in d6Range)
     }
