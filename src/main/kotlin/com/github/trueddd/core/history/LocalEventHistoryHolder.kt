@@ -14,10 +14,12 @@ import java.util.LinkedList
 @Single(binds = [EventHistoryHolder::class])
 class LocalEventHistoryHolder(
     private val actionHandlerRegistry: ActionHandlerRegistry,
+    private val saveLocation: String = ".\\src\\main\\resources\\history",
+    private val overwrite: Boolean = false,
 ) : EventHistoryHolder {
 
     private val historyHolderFile by lazy {
-        File(".\\src\\main\\resources\\history")
+        File(saveLocation)
             .also { it.createNewFile() }
     }
 
@@ -36,12 +38,15 @@ class LocalEventHistoryHolder(
         monitor.acquire()
         val eventsToSave = latestEvents.toList()
         monitor.release()
+        val encoded = eventsToSave
+            .asReversed()
+            .joinToString("\n", postfix = "\n") { Json.encodeToString(it) }
         withContext(Dispatchers.IO) {
-            historyHolderFile.appendText(
-                eventsToSave
-                    .asReversed()
-                    .joinToString("\n", postfix = "\n") { Json.encodeToString(it) }
-            )
+            if (overwrite) {
+                historyHolderFile.writeText(encoded)
+            } else {
+                historyHolderFile.appendText(encoded)
+            }
         }
         println("Global state saved")
     }

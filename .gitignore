@@ -3,7 +3,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-src/main/kotlin/com/github/trueddd/resources/history
+src/**/resources/*
 
 ### STS ###
 .apt_generated

@@ -19,15 +19,19 @@ class EventManager(
 
     private val actionsPipe = MutableSharedFlow<Action>()
 
+    private var eventHandlingJob: Job? = null
+
+    private val eventHandlingMonitor = Semaphore(1)
+
+    init {
+        startEventHandling()
+    }
+
     fun consumeAction(action: Action) {
         launch {
             actionsPipe.emit(action)
         }
     }
-
-    private var eventHandlingJob: Job? = null
-
-    private val eventHandlingMonitor = Semaphore(1)
 
     fun stopHandling() {
         if (eventHandlingJob?.isActive == true) {
@@ -57,9 +61,5 @@ class EventManager(
             }
             .onCompletion { println("Finishing EventManager") }
             .launchIn(this)
-    }
-
-    init {
-        startEventHandling()
     }
 }
