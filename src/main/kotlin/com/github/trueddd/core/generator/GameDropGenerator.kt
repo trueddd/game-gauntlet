@@ -12,8 +12,8 @@ class GameDropGenerator : ActionGenerator<GameDrop> {
         Regex("drop ([a-z]+)", RegexOption.DOT_MATCHES_ALL)
     }
 
-    override fun generate(input: String): GameDrop {
-        val actor = inputMatcher.matchEntire(input)?.groupValues?.lastOrNull()!!
+    override fun generate(matchResult: MatchResult): GameDrop {
+        val actor = matchResult.groupValues.lastOrNull()!!
         val dice = rollDice()
         return GameDrop(Participant(actor), dice)
     }

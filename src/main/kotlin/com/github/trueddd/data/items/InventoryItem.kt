@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class InventoryItem {
 
+    abstract val uid: Long
     abstract val id: Int
     abstract val name: String
 
@@ -21,27 +22,29 @@ sealed class InventoryItem {
         const val PowerThrow = 1
         const val WeakThrow = 2
         const val YouDoNotNeedThis = 3
+        const val SamuraiLunge = 4
     }
 
     override fun equals(other: Any?): Boolean {
-        return id == (other as? InventoryItem)?.id
+        return id == (other as? InventoryItem)?.id && uid == (other as? InventoryItem)?.uid
     }
 
     override fun hashCode(): Int {
-        var result = id
+        var result = uid.hashCode()
+        result = 31 * result + id
         result = 31 * result + name.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "($id/$name)"
+        return "($id-$uid/$name)"
     }
 
     @Serializable
-    sealed class Item(
-        val maxChargesAmount: Int,
-        val chargesAmount: Int,
-    ) : InventoryItem()
+    sealed class Item : InventoryItem(), Usable {
+        abstract val maxChargesAmount: Int
+        abstract val chargesAmount: Int
+    }
 
     @Serializable
     sealed class Event : InventoryItem()

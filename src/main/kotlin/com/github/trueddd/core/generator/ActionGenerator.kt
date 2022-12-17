@@ -10,5 +10,5 @@ interface ActionGenerator<A : Action> {
 
     val inputMatcher: Regex
 
-    fun generate(input: String): A
+    fun generate(matchResult: MatchResult): A
 }

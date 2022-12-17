@@ -6,6 +6,7 @@ import com.github.trueddd.data.items.InventoryItem
 data class PlayerState(
     val position: Int = 0,
     val inventory: List<InventoryItem> = emptyList(),
+    val dropPenaltyReversed: Boolean = false,
 ) {
 
     val diceModifier: Int

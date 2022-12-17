@@ -18,5 +18,6 @@ sealed class Action(
         const val BoardMove = 1
         const val GameDrop = 2
         const val ItemReceive = 3
+        const val ItemUse = 4
     }
 }

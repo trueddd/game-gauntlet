@@ -4,7 +4,7 @@ import com.github.trueddd.data.Participant
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class BoardMove(
-    val rolledBy: Participant,
-    val diceValue: Int,
-) : Action(Keys.BoardMove)
+data class ItemUse(
+    val usedBy: Participant,
+    val itemUid: Long,
+) : Action(Keys.ItemUse)

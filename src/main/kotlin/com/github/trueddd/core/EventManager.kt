@@ -2,6 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.core.events.Action
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.utils.Log
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Semaphore
@@ -12,6 +13,10 @@ class EventManager(
     private val actionHandlerRegistry: ActionHandlerRegistry,
     private val stateHolder: StateHolder,
 ) : CoroutineScope {
+
+    companion object {
+        const val TAG = "EventManager"
+    }
 
     override val coroutineContext by lazy {
         SupervisorJob() + Dispatchers.Default
@@ -29,6 +34,7 @@ class EventManager(
 
     fun consumeAction(action: Action) {
         launch {
+            Log.info(TAG, "Consuming action: $action")
             actionsPipe.emit(action)
         }
     }
@@ -47,11 +53,11 @@ class EventManager(
 
     private fun startEventHandling() {
         if (eventHandlingJob?.isActive == true) {
-            println("EventManager is already running; skip start")
+            Log.error(TAG, "EventManager is already running; skip start")
             return
         }
         eventHandlingJob = actionsPipe
-            .onStart { println("Starting EventManager") }
+            .onStart { Log.info(TAG, "Starting") }
             .onEach { action ->
                 val handler = actionHandlerRegistry.handlerOf(action) ?: return@onEach
                 eventHandlingMonitor.acquire()
@@ -59,7 +65,7 @@ class EventManager(
                 stateHolder.update { result }
                 eventHandlingMonitor.release()
             }
-            .onCompletion { println("Finishing EventManager") }
+            .onCompletion { Log.info(TAG, "Finishing") }
             .launchIn(this)
     }
 }

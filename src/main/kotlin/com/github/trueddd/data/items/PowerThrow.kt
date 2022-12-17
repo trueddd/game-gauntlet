@@ -4,13 +4,13 @@ import com.trueddd.github.annotations.IntoSet
 import kotlinx.serialization.Serializable
 
 @Serializable
-class PowerThrow(
-    override val modifier: Int = 1,
-) : InventoryItem.Effect.Buff(), DiceRollModifier {
+class PowerThrow(override val uid: Long) : InventoryItem.Effect.Buff(), DiceRollModifier {
 
     override val id = Id.PowerThrow
 
     override val name = "Мощный бросок"
+
+    override val modifier: Int = 1
 
     override fun toString(): String {
         return "${super.toString()}[mod=$modifier]"
@@ -18,6 +18,6 @@ class PowerThrow(
 
     @IntoSet(setName = Factory.SET_NAME)
     class PowerThrowFactory : Factory() {
-        override fun create() = PowerThrow()
+        override fun create() = PowerThrow(uid = System.currentTimeMillis())
     }
 }

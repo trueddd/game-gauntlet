@@ -12,11 +12,13 @@ import java.io.File
 import java.util.LinkedList
 
 @Single(binds = [EventHistoryHolder::class])
-class LocalEventHistoryHolder(
+open class LocalEventHistoryHolder(
     private val actionHandlerRegistry: ActionHandlerRegistry,
-    private val saveLocation: String = ".\\src\\main\\resources\\history",
-    private val overwrite: Boolean = false,
 ) : EventHistoryHolder {
+
+    protected open val saveLocation = ".\\src\\main\\resources\\history"
+
+    protected open val overwrite = false
 
     private val historyHolderFile by lazy {
         File(saveLocation)

@@ -14,8 +14,8 @@ class ItemReceiveGenerator(
         Regex("item ([a-z]+)", RegexOption.DOT_MATCHES_ALL)
     }
 
-    override fun generate(input: String): ItemReceive {
-        val actor = inputMatcher.matchEntire(input)?.groupValues?.lastOrNull()!!
+    override fun generate(matchResult: MatchResult): ItemReceive {
+        val actor = matchResult.groupValues.lastOrNull()!!
         val item = itemRoller.pick()
         return ItemReceive(Participant(actor), item)
     }

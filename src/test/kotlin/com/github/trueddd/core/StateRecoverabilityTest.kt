@@ -4,26 +4,28 @@ import com.github.trueddd.provideActionHandlerRegistry
 import com.github.trueddd.provideHistoryHolder
 import com.github.trueddd.provideInputParser
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class StateRecoverabilityTest {
 
     private val stateHolder = StateHolder()
     private val actionHandlerRegistry = provideActionHandlerRegistry()
-    private val inputParser = provideInputParser(stateHolder)
+    private val inputParser = provideInputParser()
     private val eventManager = EventManager(actionHandlerRegistry, stateHolder)
     private val historyHolder = provideHistoryHolder(actionHandlerRegistry)
 
-    @Test
-    fun `test 1`() {
+    @RepeatedTest(10)
+    fun `save, load & compare`() {
         runBlocking {
             val actionsSequence = sequenceOf(
                 "roll shizov",
                 "roll solll",
                 "item shizov",
+                "drop shizov",
+                "roll shizov",
                 "roll keli",
             )
             eventManager.startHandling()

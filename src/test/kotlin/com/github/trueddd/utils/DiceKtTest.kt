@@ -1,14 +1,12 @@
 package com.github.trueddd.utils
 
-import org.junit.jupiter.api.Test
-import kotlin.test.assertTrue
+import org.junit.jupiter.api.RepeatedTest
+import kotlin.test.assertContains
 
 internal class DiceKtTest {
 
-    @Test
+    @RepeatedTest(20)
     fun `roll dice`() {
-        repeat(20) {
-            assertTrue(rollDice() in d6Range)
-        }
+        assertContains(d6Range, rollDice())
     }
 }
