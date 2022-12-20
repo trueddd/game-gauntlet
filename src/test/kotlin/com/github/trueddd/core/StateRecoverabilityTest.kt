@@ -22,11 +22,7 @@ class StateRecoverabilityTest {
             "roll keli",
         )
         actionsSequence.forEach {
-            val action = eventGate.inputParser.parse(it) ?: return@forEach
-            eventGate.eventManager.suspendConsumeAction(action)
-            if (!action.singleShot) {
-                eventGate.historyHolder.pushEvent(action)
-            }
+            eventGate.parseAndHandleSuspend(it)
         }
         eventGate.historyHolder.save()
         eventGate.eventManager.stopHandling()

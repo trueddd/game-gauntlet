@@ -4,7 +4,11 @@ import com.trueddd.github.annotations.IntoSet
 import kotlinx.serialization.Serializable
 
 @Serializable
-class WeakThrow(override val uid: Long) : InventoryItem.Effect.Debuff(), DiceRollModifier {
+class WeakThrow private constructor(override val uid: Long) : InventoryItem.Effect.Debuff(), DiceRollModifier {
+
+    companion object {
+        fun create() = WeakThrow(uid = System.currentTimeMillis())
+    }
 
     override val id = Id.WeakThrow
 
@@ -18,6 +22,6 @@ class WeakThrow(override val uid: Long) : InventoryItem.Effect.Debuff(), DiceRol
 
     @IntoSet(setName = Factory.SET_NAME)
     class WeakThrowFactory : Factory() {
-        override fun create() = WeakThrow(uid = System.currentTimeMillis())
+        override fun create() = WeakThrow.create()
     }
 }

@@ -4,7 +4,11 @@ import com.trueddd.github.annotations.IntoSet
 import kotlinx.serialization.Serializable
 
 @Serializable
-class PowerThrow(override val uid: Long) : InventoryItem.Effect.Buff(), DiceRollModifier {
+class PowerThrow private constructor(override val uid: Long) : InventoryItem.Effect.Buff(), DiceRollModifier {
+
+    companion object {
+        fun create() = PowerThrow(uid = System.currentTimeMillis())
+    }
 
     override val id = Id.PowerThrow
 
@@ -18,6 +22,6 @@ class PowerThrow(override val uid: Long) : InventoryItem.Effect.Buff(), DiceRoll
 
     @IntoSet(setName = Factory.SET_NAME)
     class PowerThrowFactory : Factory() {
-        override fun create() = PowerThrow(uid = System.currentTimeMillis())
+        override fun create() = PowerThrow.create()
     }
 }

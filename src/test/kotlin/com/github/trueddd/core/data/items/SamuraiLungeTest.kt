@@ -1,4 +1,4 @@
-package com.github.trueddd.core
+package com.github.trueddd.core.data.items
 
 import com.github.trueddd.core.events.BoardMove
 import com.github.trueddd.core.events.GameDrop
@@ -15,7 +15,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class SamuraiLungeItemTest {
+class SamuraiLungeTest {
 
     private val eventGate = provideEventGate()
 

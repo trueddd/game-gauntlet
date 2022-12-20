@@ -6,7 +6,11 @@ import com.trueddd.github.annotations.IntoSet
 import kotlinx.serialization.Serializable
 
 @Serializable
-class YouDoNotNeedThis(override val uid: Long) : InventoryItem.Event(), InTimeEvent {
+class YouDoNotNeedThis private constructor(override val uid: Long) : InventoryItem.Event(), InTimeEvent {
+
+    companion object {
+        fun create() = YouDoNotNeedThis(uid = System.currentTimeMillis())
+    }
 
     override val id = Id.YouDoNotNeedThis
 
@@ -29,6 +33,6 @@ class YouDoNotNeedThis(override val uid: Long) : InventoryItem.Event(), InTimeEv
 
     @IntoSet(setName = Factory.SET_NAME)
     class YouDoNotNeedThisFactory : Factory() {
-        override fun create() = YouDoNotNeedThis(uid = System.currentTimeMillis())
+        override fun create() = YouDoNotNeedThis.create()
     }
 }

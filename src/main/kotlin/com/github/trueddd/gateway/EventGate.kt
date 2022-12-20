@@ -23,12 +23,7 @@ fun Routing.setupEventGate() {
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 outgoing.send(Frame.Text("YOU SAID: $text"))
-                eventGate.inputParser.parse(text)?.let {
-                    eventGate.eventManager.consumeAction(it)
-                    if (!it.singleShot) {
-                        eventGate.historyHolder.pushEvent(it)
-                    }
-                }
+                eventGate.parseAndHandle(text)
                 when (text) {
                     "start" -> eventGate.eventManager.startHandling()
                     "bye" -> close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
