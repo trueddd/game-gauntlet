@@ -18,8 +18,9 @@ class GameDropHandler : ActionConsumer<GameDrop> {
                     } else {
                         -coerceDiceValue(action.diceValue)
                     }
+                    val finalPosition = (playerState.position + moveValue).coerceAtLeast(0)
                     playerState.copy(
-                        position = playerState.position + moveValue,
+                        position = finalPosition,
                         dropPenaltyReversed = false,
                     )
                 } else {

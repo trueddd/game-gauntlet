@@ -12,5 +12,8 @@ class StateHolder {
     private val _globalStateFlow = MutableStateFlow(GlobalState.default())
     val globalStateFlow = _globalStateFlow.asStateFlow()
 
+    val current: GlobalState
+        get() = _globalStateFlow.value
+
     fun update(block: GlobalState.() -> GlobalState) = _globalStateFlow.update(block)
 }

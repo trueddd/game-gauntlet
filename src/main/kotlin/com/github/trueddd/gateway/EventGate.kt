@@ -1,9 +1,6 @@
 package com.github.trueddd.gateway
 
-import com.github.trueddd.core.EventManager
-import com.github.trueddd.core.InputParser
-import com.github.trueddd.core.StateHolder
-import com.github.trueddd.core.history.EventHistoryHolder
+import com.github.trueddd.core.EventGate
 import com.github.trueddd.utils.Log
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
@@ -16,12 +13,9 @@ import org.koin.ktor.ext.inject
 private const val TAG = "EventGate"
 
 fun Routing.setupEventGate() {
-    val stateHolder by inject<StateHolder>()
-    val eventManager by inject<EventManager>()
-    val inputParser by inject<InputParser>()
-    val eventHistoryHolder by inject<EventHistoryHolder>()
+    val eventGate by inject<EventGate>()
     webSocket("/state") {
-        stateHolder.globalStateFlow
+        eventGate.stateHolder.globalStateFlow
             .onStart { Log.info(TAG, "Listening for global state in session ${this@webSocket}") }
             .onEach { outgoing.send(Frame.Text("New game state: $it")) }
             .launchIn(this)
@@ -29,20 +23,20 @@ fun Routing.setupEventGate() {
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 outgoing.send(Frame.Text("YOU SAID: $text"))
-                inputParser.parse(text)?.let {
-                    eventManager.consumeAction(it)
+                eventGate.inputParser.parse(text)?.let {
+                    eventGate.eventManager.consumeAction(it)
                     if (!it.singleShot) {
-                        eventHistoryHolder.pushEvent(it)
+                        eventGate.historyHolder.pushEvent(it)
                     }
                 }
                 when (text) {
-                    "start" -> eventManager.startHandling()
+                    "start" -> eventGate.eventManager.startHandling()
                     "bye" -> close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
-                    "save" -> eventHistoryHolder.save()
+                    "save" -> eventGate.historyHolder.save()
                     "restore" -> {
-                        eventManager.stopHandling()
-                        val restored = eventHistoryHolder.load()
-                        eventManager.startHandling(initState = restored)
+                        eventGate.eventManager.stopHandling()
+                        val restored = eventGate.historyHolder.load()
+                        eventGate.eventManager.startHandling(initState = restored)
                     }
                 }
             }

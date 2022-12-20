@@ -3,13 +3,14 @@ package com.github.trueddd.core.history
 import com.github.trueddd.core.ActionHandlerRegistry
 import com.github.trueddd.core.events.Action
 import com.github.trueddd.data.GlobalState
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Single
 import java.io.File
-import java.util.LinkedList
+import java.util.*
 
 @Single(binds = [EventHistoryHolder::class])
 open class LocalEventHistoryHolder(
@@ -27,19 +28,19 @@ open class LocalEventHistoryHolder(
 
     private val latestEvents = LinkedList<Action>()
 
-    private val monitor = Semaphore(1)
+    private val monitor = Mutex(locked = false)
 
     override suspend fun pushEvent(action: Action) {
-        monitor.acquire()
+        monitor.lock()
         latestEvents.push(action)
-        monitor.release()
+        monitor.unlock()
     }
 
     override suspend fun save() {
         println("Saving Global state")
-        monitor.acquire()
+        monitor.lock()
         val eventsToSave = latestEvents.toList()
-        monitor.release()
+        monitor.unlock()
         val encoded = eventsToSave
             .asReversed()
             .joinToString("\n", postfix = "\n") { Json.encodeToString(it) }

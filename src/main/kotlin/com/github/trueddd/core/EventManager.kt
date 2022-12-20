@@ -5,7 +5,8 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.utils.Log
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.Mutex
+import org.jetbrains.annotations.TestOnly
 import org.koin.core.annotation.Single
 
 @Single
@@ -26,7 +27,9 @@ class EventManager(
 
     private var eventHandlingJob: Job? = null
 
-    private val eventHandlingMonitor = Semaphore(1)
+    private val eventHandlingMonitor = Mutex(false)
+
+    private val handledActionsFlow = MutableSharedFlow<Int>()
 
     init {
         startEventHandling()
@@ -37,6 +40,21 @@ class EventManager(
             Log.info(TAG, "Consuming action: $action")
             actionsPipe.emit(action)
         }
+    }
+
+    @Suppress("SuspendFunctionOnCoroutineScope")
+    @TestOnly
+    suspend fun suspendConsumeAction(action: Action) {
+        handledActionsFlow
+            .onStart {
+                this@EventManager.launch {
+                    Log.info(TAG, "Consuming action: $action")
+                    actionsPipe.emit(action)
+                }
+            }
+            .filter { it == action.id }
+            .take(1)
+            .collect { Log.info(TAG, "Action(${action.id}) consumed") }
     }
 
     fun stopHandling() {
@@ -60,10 +78,11 @@ class EventManager(
             .onStart { Log.info(TAG, "Starting") }
             .onEach { action ->
                 val handler = actionHandlerRegistry.handlerOf(action) ?: return@onEach
-                eventHandlingMonitor.acquire()
+                eventHandlingMonitor.lock()
                 val result = handler.consume(action, stateHolder.globalStateFlow.value)
                 stateHolder.update { result }
-                eventHandlingMonitor.release()
+                eventHandlingMonitor.unlock()
+                handledActionsFlow.emit(action.id)
             }
             .onCompletion { Log.info(TAG, "Finishing") }
             .launchIn(this)
