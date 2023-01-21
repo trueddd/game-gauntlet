@@ -13,6 +13,12 @@ application {
     mainClass.set("com.github.trueddd.ApplicationKt")
 }
 
+ktor {
+    fatJar {
+        archiveFileName.set("fat.jar")
+    }
+}
+
 kotlin.sourceSets.main {
     kotlin.srcDirs(file("$buildDir/generated/ksp/main/kotlin"))
 }
