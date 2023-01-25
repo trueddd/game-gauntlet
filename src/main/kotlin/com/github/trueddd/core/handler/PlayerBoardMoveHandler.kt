@@ -14,11 +14,18 @@ class PlayerBoardMoveHandler : ActionConsumer<BoardMove> {
             .mapValues { (participant, playerState) ->
                 if (action.rolledBy == participant) {
                     val moveValue = coerceDiceValue(action.diceValue + playerState.diceModifier)
-                    playerState.copy(position = playerState.position + moveValue)
+                    val finalPosition = minOf(playerState.position + moveValue, currentState.boardLength)
+                    playerState.copy(position = finalPosition)
                 } else {
                     playerState
                 }
             }
-        return currentState.copy(players = newPlayersState)
+        val winner = newPlayersState.entries
+            .firstOrNull { (_, state) -> state.position == currentState.boardLength }
+            ?.key
+        return currentState.copy(
+            players = newPlayersState,
+            winner = currentState.winner ?: winner,
+        )
     }
 }
