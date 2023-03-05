@@ -1,9 +1,11 @@
 package com.github.trueddd.data.items
 
+import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.Participant
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class InventoryItem {
+sealed class WheelItem {
 
     abstract val uid: Long
     abstract val id: Int
@@ -15,7 +17,7 @@ sealed class InventoryItem {
             const val SET_NAME = "ItemFactory"
         }
 
-        abstract fun create(): InventoryItem
+        abstract fun create(): WheelItem
     }
 
     object Id {
@@ -26,7 +28,7 @@ sealed class InventoryItem {
     }
 
     override fun equals(other: Any?): Boolean {
-        return id == (other as? InventoryItem)?.id && uid == (other as? InventoryItem)?.uid
+        return id == (other as? WheelItem)?.id && uid == (other as? WheelItem)?.uid
     }
 
     override fun hashCode(): Int {
@@ -41,16 +43,18 @@ sealed class InventoryItem {
     }
 
     @Serializable
-    sealed class Item : InventoryItem(), Usable {
+    sealed class InventoryItem : WheelItem(), Usable {
         abstract val maxChargesAmount: Int
         abstract val chargesAmount: Int
     }
 
     @Serializable
-    sealed class Event : InventoryItem()
+    sealed class Event : WheelItem() {
+        abstract suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState
+    }
 
     @Serializable
-    sealed class Effect : InventoryItem() {
+    sealed class Effect : WheelItem() {
 
         @Serializable
         sealed class Buff : Effect()

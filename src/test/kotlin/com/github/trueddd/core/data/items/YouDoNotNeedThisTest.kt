@@ -2,7 +2,7 @@ package com.github.trueddd.core.data.items
 
 import com.github.trueddd.core.events.ItemReceive
 import com.github.trueddd.data.Participant
-import com.github.trueddd.data.items.InventoryItem
+import com.github.trueddd.data.items.WheelItem
 import com.github.trueddd.data.items.PowerThrow
 import com.github.trueddd.data.items.WeakThrow
 import com.github.trueddd.data.items.YouDoNotNeedThis
@@ -24,8 +24,8 @@ class YouDoNotNeedThisTest {
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, YouDoNotNeedThis.create()))
-        assertEquals(1, eventGate.stateHolder.current.players[user]!!.inventory.size)
-        assertTrue(eventGate.stateHolder.current.players[user]!!.inventory.none { it is InventoryItem.Effect.Buff })
+        assertEquals(1, eventGate.stateHolder.current.players[user]!!.effects.size)
+        assertTrue(eventGate.stateHolder.current.players[user]!!.effects.none { it is WheelItem.Effect.Buff })
     }
 
     @Test
@@ -33,8 +33,8 @@ class YouDoNotNeedThisTest {
         val user = Participant("solll")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, YouDoNotNeedThis.create()))
-        assertEquals(1, eventGate.stateHolder.current.players[user]!!.inventory.size)
-        assertTrue(eventGate.stateHolder.current.players[user]!!.inventory.none { it is InventoryItem.Effect.Buff })
+        assertEquals(1, eventGate.stateHolder.current.players[user]!!.effects.size)
+        assertTrue(eventGate.stateHolder.current.players[user]!!.effects.none { it is WheelItem.Effect.Buff })
     }
 
     @Test
@@ -44,8 +44,8 @@ class YouDoNotNeedThisTest {
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, YouDoNotNeedThis.create()))
-        assertEquals(2, eventGate.stateHolder.current.players[user]!!.inventory.size)
-        assertTrue(eventGate.stateHolder.current.players[user]!!.inventory.any { it is InventoryItem.Effect.Buff })
-        assertTrue(eventGate.stateHolder.current.players[user]!!.inventory.any { it is InventoryItem.Effect.Debuff })
+        assertEquals(2, eventGate.stateHolder.current.players[user]!!.effects.size)
+        assertTrue(eventGate.stateHolder.current.players[user]!!.effects.any { it is WheelItem.Effect.Buff })
+        assertTrue(eventGate.stateHolder.current.players[user]!!.effects.any { it is WheelItem.Effect.Debuff })
     }
 }

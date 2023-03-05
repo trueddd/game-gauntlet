@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 class SamuraiLunge private constructor(
     override val uid: Long,
     override val chargesAmount: Int,
-) : InventoryItem.Item() {
+) : WheelItem.InventoryItem() {
 
     companion object {
         fun create() = SamuraiLunge(uid = System.currentTimeMillis(), chargesAmount = 1)
@@ -28,22 +28,16 @@ class SamuraiLunge private constructor(
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState): GlobalState {
         Log.info(name, "Using item by ${usedBy.name}")
-        return globalState.copy(
-            players = globalState.players.mapValues { (user, state) ->
-                if (user == usedBy) {
-                    state.copy(
-                        dropPenaltyReversed = true,
-                        inventory = state.inventory.filter { it.uid != uid },
-                    )
-                } else {
-                    state
-                }
-            }
-        )
+        return globalState.updatePlayer(usedBy) { state ->
+            state.copy(
+                dropPenaltyReversed = true,
+                inventory = state.inventory.filter { it.uid != uid },
+            )
+        }
     }
 
-    @IntoSet(setName = InventoryItem.Factory.SET_NAME)
-    class Factory : InventoryItem.Factory() {
+    @IntoSet(setName = WheelItem.Factory.SET_NAME)
+    class Factory : WheelItem.Factory() {
         override fun create() = SamuraiLunge.create()
     }
 }

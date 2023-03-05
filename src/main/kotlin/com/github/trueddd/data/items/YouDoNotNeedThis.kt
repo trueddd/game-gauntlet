@@ -6,7 +6,7 @@ import com.trueddd.github.annotations.IntoSet
 import kotlinx.serialization.Serializable
 
 @Serializable
-class YouDoNotNeedThis private constructor(override val uid: Long) : InventoryItem.Event(), InTimeEvent {
+class YouDoNotNeedThis private constructor(override val uid: Long) : WheelItem.Event() {
 
     companion object {
         fun create() = YouDoNotNeedThis(uid = System.currentTimeMillis())
@@ -17,18 +17,13 @@ class YouDoNotNeedThis private constructor(override val uid: Long) : InventoryIt
     override val name = "Тебе это и не нужно"
 
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
-        val players = globalState.players.mapValues { (player, state) ->
-            if (player == rolledBy) {
-                val buff = state.inventory
-                    .filterIsInstance<Effect.Buff>()
-                    .randomOrNull()
-                    ?: return globalState
-                state.copy(inventory = state.inventory - buff)
-            } else {
-                state
-            }
+        return globalState.updatePlayer(rolledBy) { state ->
+            val buff = state.effects
+                .filterIsInstance<Effect.Buff>()
+                .randomOrNull()
+                ?: return@updatePlayer state
+            state.copy(effects = state.effects - buff)
         }
-        return globalState.copy(players = players)
     }
 
     @IntoSet(setName = Factory.SET_NAME)

@@ -1,11 +1,11 @@
 package com.github.trueddd.core.events
 
 import com.github.trueddd.data.Participant
-import com.github.trueddd.data.items.InventoryItem
+import com.github.trueddd.data.items.WheelItem
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ItemReceive(
     val receivedBy: Participant,
-    val item: InventoryItem,
+    val item: WheelItem,
 ) : Action(Keys.ItemReceive)

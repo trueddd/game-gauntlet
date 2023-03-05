@@ -16,6 +16,16 @@ data class GlobalState(
         return players[Participant(playerName)]
     }
 
+    fun updatePlayer(participant: Participant, block: (PlayerState) -> PlayerState): GlobalState {
+        return this.copy(players = players.mapValues { (player, playerState) ->
+            if (player == participant) {
+                block(playerState)
+            } else {
+                playerState
+            }
+        })
+    }
+
     companion object {
 
         private const val GENRES = 6

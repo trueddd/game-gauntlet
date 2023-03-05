@@ -4,7 +4,7 @@ import com.trueddd.github.annotations.IntoSet
 import kotlinx.serialization.Serializable
 
 @Serializable
-class WeakThrow private constructor(override val uid: Long) : InventoryItem.Effect.Debuff(), DiceRollModifier {
+class WeakThrow private constructor(override val uid: Long) : WheelItem.Effect.Debuff(), DiceRollModifier {
 
     companion object {
         fun create() = WeakThrow(uid = System.currentTimeMillis())
