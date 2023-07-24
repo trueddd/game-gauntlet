@@ -1,6 +1,6 @@
 package com.github.trueddd.core.data.items
 
-import com.github.trueddd.core.events.ItemReceive
+import com.github.trueddd.core.actions.ItemReceive
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.WheelItem
 import com.github.trueddd.data.items.PowerThrow

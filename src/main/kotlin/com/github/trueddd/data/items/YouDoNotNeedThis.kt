@@ -27,7 +27,7 @@ class YouDoNotNeedThis private constructor(override val uid: Long) : WheelItem.E
     }
 
     @IntoSet(setName = Factory.SET_NAME)
-    class YouDoNotNeedThisFactory : Factory() {
+    class YouDoNotNeedThisFactory : Factory {
         override fun create() = YouDoNotNeedThis.create()
     }
 }

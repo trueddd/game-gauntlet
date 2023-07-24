@@ -1,6 +1,6 @@
 package com.github.trueddd.core.history
 
-import com.github.trueddd.core.events.Action
+import com.github.trueddd.core.actions.Action
 import com.github.trueddd.data.GlobalState
 
 interface EventHistoryHolder {

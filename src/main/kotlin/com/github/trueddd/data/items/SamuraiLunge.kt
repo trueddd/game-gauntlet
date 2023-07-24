@@ -30,14 +30,14 @@ class SamuraiLunge private constructor(
         Log.info(name, "Using item by ${usedBy.name}")
         return globalState.updatePlayer(usedBy) { state ->
             state.copy(
-                dropPenaltyReversed = true,
+                effects = state.effects + DropReverse.create(),
                 inventory = state.inventory.filter { it.uid != uid },
             )
         }
     }
 
     @IntoSet(setName = WheelItem.Factory.SET_NAME)
-    class Factory : WheelItem.Factory() {
+    class Factory : WheelItem.Factory {
         override fun create() = SamuraiLunge.create()
     }
 }

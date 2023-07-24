@@ -23,7 +23,10 @@ fun Routing.setupEventGate() {
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 outgoing.send(Frame.Text("YOU SAID: $text"))
-                eventGate.parseAndHandle(text)
+                val handled = eventGate.parseAndHandle(text)
+                if (handled) {
+                    continue
+                }
                 when (text) {
                     "start" -> eventGate.eventManager.startHandling()
                     "bye" -> close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
@@ -33,6 +36,7 @@ fun Routing.setupEventGate() {
                         val restored = eventGate.historyHolder.load()
                         eventGate.eventManager.startHandling(initState = restored)
                     }
+                    else -> outgoing.send(Frame.Text("Unrecognised command: $text"))
                 }
             }
         }

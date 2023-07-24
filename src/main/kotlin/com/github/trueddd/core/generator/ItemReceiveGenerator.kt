@@ -1,7 +1,7 @@
 package com.github.trueddd.core.generator
 
 import com.github.trueddd.core.ItemRoller
-import com.github.trueddd.core.events.ItemReceive
+import com.github.trueddd.core.actions.ItemReceive
 import com.github.trueddd.data.Participant
 import com.trueddd.github.annotations.IntoSet
 

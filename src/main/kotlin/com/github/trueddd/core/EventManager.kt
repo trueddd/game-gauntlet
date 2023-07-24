@@ -1,6 +1,6 @@
 package com.github.trueddd.core
 
-import com.github.trueddd.core.events.Action
+import com.github.trueddd.core.actions.Action
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.utils.Log
 import kotlinx.coroutines.*
@@ -9,6 +9,15 @@ import kotlinx.coroutines.sync.Mutex
 import org.jetbrains.annotations.TestOnly
 import org.koin.core.annotation.Single
 
+/**
+ * Event manager is a main component of the system.
+ * Flow of handling game events:
+ * 1. Parsing input commands and generating an action out of input with an [action generator][com.github.trueddd.core.generator.ActionGenerator].
+ * 2. Event manager looks up the [handler][com.github.trueddd.core.handler.ActionConsumer] for the generated action.
+ * 3. Found handler mutates the current state.
+ * 4. Applied action is recorded to the [event history holder][com.github.trueddd.core.history.EventHistoryHolder],
+ * so whole state can be recreated later after server reboot.
+ */
 @Single
 class EventManager(
     private val actionHandlerRegistry: ActionHandlerRegistry,

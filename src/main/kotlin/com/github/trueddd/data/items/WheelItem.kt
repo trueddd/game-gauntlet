@@ -4,27 +4,38 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import kotlinx.serialization.Serializable
 
+/**
+ * Wheel item is an item that can be rolled on the wheel and somehow affect player state.
+ * It can be an inventory item (that can be used later), an effect or a one-time event (that immediately affects state).
+ * @param uid is an unique identifier for each item
+ * @param id is an identifier of item - two items of the same type will have the same id
+ */
 @Serializable
 sealed class WheelItem {
 
     abstract val uid: Long
-    abstract val id: Int
+    abstract val id: Id
     abstract val name: String
 
-    abstract class Factory {
+    interface Factory {
 
         companion object {
             const val SET_NAME = "ItemFactory"
         }
 
-        abstract fun create(): WheelItem
+        fun create(): WheelItem
     }
 
-    object Id {
-        const val PowerThrow = 1
-        const val WeakThrow = 2
-        const val YouDoNotNeedThis = 3
-        const val SamuraiLunge = 4
+    @Serializable
+    @JvmInline
+    value class Id(val value: Int) {
+        companion object {
+            val PowerThrow = Id(1)
+            val WeakThrow = Id(2)
+            val YouDoNotNeedThis = Id(3)
+            val SamuraiLunge = Id(4)
+            val DropReverse = Id(5)
+        }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -33,13 +44,13 @@ sealed class WheelItem {
 
     override fun hashCode(): Int {
         var result = uid.hashCode()
-        result = 31 * result + id
+        result = 31 * result + id.value
         result = 31 * result + name.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "($id-$uid/$name)"
+        return "(${id.value}-$uid/$name)"
     }
 
     @Serializable

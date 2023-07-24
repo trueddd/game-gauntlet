@@ -1,6 +1,6 @@
 package com.github.trueddd.core.generator
 
-import com.github.trueddd.core.events.ItemUse
+import com.github.trueddd.core.actions.ItemUse
 import com.github.trueddd.data.Participant
 import com.trueddd.github.annotations.IntoSet
 

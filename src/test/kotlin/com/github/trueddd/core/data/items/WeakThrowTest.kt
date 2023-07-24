@@ -1,7 +1,7 @@
 package com.github.trueddd.core.data.items
 
-import com.github.trueddd.core.events.BoardMove
-import com.github.trueddd.core.events.ItemReceive
+import com.github.trueddd.core.actions.BoardMove
+import com.github.trueddd.core.actions.ItemReceive
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.WeakThrow
 import com.github.trueddd.provideEventGate

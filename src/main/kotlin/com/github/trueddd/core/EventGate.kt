@@ -12,22 +12,22 @@ class EventGate(
     val historyHolder: EventHistoryHolder,
 ) {
 
-    suspend fun parseAndHandle(input: String) {
-        inputParser.parse(input)?.let {
-            eventManager.consumeAction(it)
-            if (!it.singleShot) {
-                historyHolder.pushEvent(it)
-            }
+    suspend fun parseAndHandle(input: String): Boolean {
+        val action = inputParser.parse(input) ?: return false
+        eventManager.consumeAction(action)
+        if (!action.singleShot) {
+            historyHolder.pushEvent(action)
         }
+        return true
     }
 
     @TestOnly
-    suspend fun parseAndHandleSuspend(input: String) {
-        inputParser.parse(input)?.let {
-            eventManager.suspendConsumeAction(it)
-            if (!it.singleShot) {
-                historyHolder.pushEvent(it)
-            }
+    suspend fun parseAndHandleSuspend(input: String): Boolean {
+        val action = inputParser.parse(input) ?: return false
+        eventManager.suspendConsumeAction(action)
+        if (!action.singleShot) {
+            historyHolder.pushEvent(action)
         }
+        return true
     }
 }

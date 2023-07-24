@@ -1,6 +1,6 @@
 package com.github.trueddd.core.generator
 
-import com.github.trueddd.core.events.BoardMove
+import com.github.trueddd.core.actions.BoardMove
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.rollDice
 import com.trueddd.github.annotations.IntoSet

@@ -1,6 +1,6 @@
 package com.github.trueddd.core
 
-import com.github.trueddd.core.events.Action
+import com.github.trueddd.core.actions.Action
 import com.github.trueddd.core.generator.ActionGenerator
 import com.github.trueddd.utils.Log
 import org.koin.core.annotation.Named

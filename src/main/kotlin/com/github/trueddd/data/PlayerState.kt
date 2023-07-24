@@ -7,7 +7,6 @@ data class PlayerState(
     val position: Int = 0,
     val inventory: List<WheelItem.InventoryItem> = emptyList(),
     val effects: List<WheelItem.Effect> = emptyList(),
-    val dropPenaltyReversed: Boolean = false,
 ) {
 
     val diceModifier: Int

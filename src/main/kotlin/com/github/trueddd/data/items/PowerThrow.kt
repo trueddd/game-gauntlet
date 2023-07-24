@@ -21,7 +21,7 @@ class PowerThrow private constructor(override val uid: Long) : WheelItem.Effect.
     }
 
     @IntoSet(setName = Factory.SET_NAME)
-    class PowerThrowFactory : Factory() {
+    class PowerThrowFactory : Factory {
         override fun create() = PowerThrow.create()
     }
 }

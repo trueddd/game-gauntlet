@@ -21,7 +21,7 @@ class WeakThrow private constructor(override val uid: Long) : WheelItem.Effect.D
     }
 
     @IntoSet(setName = Factory.SET_NAME)
-    class WeakThrowFactory : Factory() {
+    class WeakThrowFactory : Factory {
         override fun create() = WeakThrow.create()
     }
 }

@@ -1,6 +1,6 @@
 package com.github.trueddd.core
 
-import com.github.trueddd.core.events.*
+import com.github.trueddd.core.actions.*
 import com.github.trueddd.provideInputParser
 import com.github.trueddd.utils.d6Range
 import org.junit.jupiter.api.Test

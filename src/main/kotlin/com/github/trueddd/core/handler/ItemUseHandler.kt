@@ -1,7 +1,7 @@
 package com.github.trueddd.core.handler
 
-import com.github.trueddd.core.events.Action
-import com.github.trueddd.core.events.ItemUse
+import com.github.trueddd.core.actions.Action
+import com.github.trueddd.core.actions.ItemUse
 import com.github.trueddd.data.GlobalState
 import com.trueddd.github.annotations.IntoMap
 

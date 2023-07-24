@@ -1,4 +1,4 @@
-package com.github.trueddd.core.events
+package com.github.trueddd.core.actions
 
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.WheelItem

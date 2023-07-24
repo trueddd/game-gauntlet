@@ -1,7 +1,7 @@
 package com.github.trueddd.core.handler
 
-import com.github.trueddd.core.events.Action
-import com.github.trueddd.core.events.BoardMove
+import com.github.trueddd.core.actions.Action
+import com.github.trueddd.core.actions.BoardMove
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.utils.coerceDiceValue
 import com.trueddd.github.annotations.IntoMap
@@ -10,21 +10,15 @@ import com.trueddd.github.annotations.IntoMap
 class PlayerBoardMoveHandler : ActionConsumer<BoardMove> {
 
     override suspend fun consume(action: BoardMove, currentState: GlobalState): GlobalState {
-        val newPlayersState = currentState.players
-            .mapValues { (participant, playerState) ->
-                if (action.rolledBy == participant) {
-                    val moveValue = coerceDiceValue(action.diceValue + playerState.diceModifier)
-                    val finalPosition = minOf(playerState.position + moveValue, currentState.boardLength)
-                    playerState.copy(position = finalPosition)
-                } else {
-                    playerState
-                }
-            }
-        val winner = newPlayersState.entries
+        val newState = currentState.updatePlayer(action.rolledBy) { playerState ->
+            val moveValue = coerceDiceValue(action.diceValue + playerState.diceModifier)
+            val finalPosition = minOf(playerState.position + moveValue, currentState.boardLength)
+            playerState.copy(position = finalPosition)
+        }
+        val winner = newState.players.entries
             .firstOrNull { (_, state) -> state.position == currentState.boardLength }
             ?.key
-        return currentState.copy(
-            players = newPlayersState,
+        return newState.copy(
             winner = currentState.winner ?: winner,
         )
     }

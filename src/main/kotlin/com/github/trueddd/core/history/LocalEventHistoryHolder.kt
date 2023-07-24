@@ -1,7 +1,7 @@
 package com.github.trueddd.core.history
 
 import com.github.trueddd.core.ActionHandlerRegistry
-import com.github.trueddd.core.events.Action
+import com.github.trueddd.core.actions.Action
 import com.github.trueddd.data.GlobalState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
