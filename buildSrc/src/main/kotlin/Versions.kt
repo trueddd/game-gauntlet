@@ -1,3 +1,4 @@
+// todo: upgrade versions
 object Versions {
     const val Kotlin = "1.7.20"
     const val Ktor = "2.2.1"

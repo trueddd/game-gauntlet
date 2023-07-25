@@ -20,8 +20,8 @@ class WeakThrow private constructor(override val uid: Long) : WheelItem.Effect.D
         return "${super.toString()}[mod=$modifier]"
     }
 
-    @IntoSet(setName = Factory.SET_NAME)
-    class WeakThrowFactory : Factory {
+    @IntoSet(setName = WheelItem.Factory.SET_NAME)
+    class Factory : WheelItem.Factory {
         override fun create() = WeakThrow.create()
     }
 }

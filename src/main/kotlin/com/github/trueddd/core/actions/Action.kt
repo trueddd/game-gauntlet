@@ -1,5 +1,6 @@
 package com.github.trueddd.core.actions
 
+import com.github.trueddd.data.GlobalState
 import com.github.trueddd.utils.DateSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -25,5 +26,36 @@ sealed class Action(
         const val GameDrop = 2
         const val ItemReceive = 3
         const val ItemUse = 4
+        const val GameStatusChange = 5
+        const val GameRoll = 6
+    }
+
+    /**
+     * Action generator is a component that creates actions from entered command by any of participants.
+     */
+    interface Generator<out A : Action> {
+
+        // todo: extract action commands to constants
+        companion object {
+            const val SetTag = "ActionGenerators"
+            const val ParticipantGroup = "([a-z]+)"
+            const val NumberGroup = "(\\d+)"
+        }
+
+        val inputMatcher: Regex
+
+        fun generate(matchResult: MatchResult): A
+    }
+
+    /**
+     * Action handler applies changes to the global state of the game according to the passed action.
+     */
+    interface Handler<in A : Action> {
+
+        companion object {
+            const val MapTag = "ActionHandlers"
+        }
+
+        suspend fun handle(action: A, currentState: GlobalState): GlobalState
     }
 }

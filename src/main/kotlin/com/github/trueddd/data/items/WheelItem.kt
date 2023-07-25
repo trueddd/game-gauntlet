@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 /**
  * Wheel item is an item that can be rolled on the wheel and somehow affect player state.
  * It can be an inventory item (that can be used later), an effect or a one-time event (that immediately affects state).
- * @param uid is an unique identifier for each item
- * @param id is an identifier of item - two items of the same type will have the same id
+ * @property uid is an unique identifier for each item
+ * @property id is an identifier of item - two items of the same type will have the same id
  */
 @Serializable
 sealed class WheelItem {

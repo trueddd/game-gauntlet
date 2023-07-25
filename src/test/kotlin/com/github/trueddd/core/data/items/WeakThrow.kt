@@ -11,7 +11,7 @@ import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class WeakThrowTest {
+class WeakThrow {
 
     private val eventGate = provideEventGate()
 

@@ -3,7 +3,7 @@ package com.github.trueddd.utils
 import org.junit.jupiter.api.RepeatedTest
 import kotlin.test.assertContains
 
-internal class DiceKtTest {
+internal class Dice {
 
     @RepeatedTest(20)
     fun `roll dice`() {

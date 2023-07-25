@@ -65,7 +65,7 @@ open class LocalEventHistoryHolder(
             events.fold(GlobalState.default()) { state, action ->
                 actionHandlerRegistry
                     .handlerOf(action)
-                    ?.consume(action, state)
+                    ?.handle(action, state)
                     ?: state
             }
         }

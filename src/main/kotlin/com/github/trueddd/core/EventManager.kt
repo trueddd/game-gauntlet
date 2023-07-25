@@ -3,6 +3,7 @@ package com.github.trueddd.core
 import com.github.trueddd.core.actions.Action
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.utils.Log
+import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
@@ -12,8 +13,8 @@ import org.koin.core.annotation.Single
 /**
  * Event manager is a main component of the system.
  * Flow of handling game events:
- * 1. Parsing input commands and generating an action out of input with an [action generator][com.github.trueddd.core.generator.ActionGenerator].
- * 2. Event manager looks up the [handler][com.github.trueddd.core.handler.ActionConsumer] for the generated action.
+ * 1. Parsing input commands and generating an action out of input with an [action generator][com.github.trueddd.core.actions.Action.Generator].
+ * 2. Event manager looks up the [handler][com.github.trueddd.core.actions.Action.Handler] for the generated action.
  * 3. Found handler mutates the current state.
  * 4. Applied action is recorded to the [event history holder][com.github.trueddd.core.history.EventHistoryHolder],
  * so whole state can be recreated later after server reboot.
@@ -38,7 +39,7 @@ class EventManager(
 
     private val eventHandlingMonitor = Mutex(false)
 
-    private val handledActionsFlow = MutableSharedFlow<Int>()
+    private val handledActionsFlow = MutableSharedFlow<Pair<Int, Exception?>>()
 
     init {
         startEventHandling()
@@ -61,7 +62,7 @@ class EventManager(
                     actionsPipe.emit(action)
                 }
             }
-            .filter { it == action.id }
+            .filter { (id, error) -> id == action.id }
             .take(1)
             .collect { Log.info(TAG, "Action(${action.id}) consumed") }
     }
@@ -88,10 +89,15 @@ class EventManager(
             .onEach { action ->
                 val handler = actionHandlerRegistry.handlerOf(action) ?: return@onEach
                 eventHandlingMonitor.lock()
-                val result = handler.consume(action, stateHolder.globalStateFlow.value)
-                stateHolder.update { result }
-                eventHandlingMonitor.unlock()
-                handledActionsFlow.emit(action.id)
+                try {
+                    val result = handler.handle(action, stateHolder.globalStateFlow.value)
+                    stateHolder.update { result }
+                    handledActionsFlow.emit(action.id to null)
+                } catch (error: StateModificationException) {
+                    handledActionsFlow.emit(action.id to error)
+                } finally {
+                    eventHandlingMonitor.unlock()
+                }
             }
             .onCompletion { Log.info(TAG, "Finishing") }
             .launchIn(this)

@@ -7,19 +7,22 @@ import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class StateRecoverabilityTest {
+class StateRecoverability {
 
     private val eventGate = provideEventGate()
 
     @RepeatedTest(10)
     fun `save, load & compare`() = runBlocking {
         val actionsSequence = sequenceOf(
-            "roll shizov",
-            "roll solll",
+            "move shizov",
+            "roll-game shizov",
+            "move solll",
             "item shizov",
             "drop shizov",
-            "roll shizov",
-            "roll keli",
+            "roll-game shizov",
+            "game shizov 1",
+            "move shizov",
+            "move keli",
         )
         actionsSequence.forEach {
             eventGate.parseAndHandleSuspend(it)

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class PowerThrowTest {
+class PowerThrow {
 
     private val eventGate = provideEventGate()
 

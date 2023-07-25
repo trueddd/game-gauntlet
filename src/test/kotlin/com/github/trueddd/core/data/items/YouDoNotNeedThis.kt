@@ -14,7 +14,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class YouDoNotNeedThisTest {
+class YouDoNotNeedThis {
 
     private val eventGate = provideEventGate()
 

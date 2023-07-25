@@ -6,11 +6,12 @@ import com.github.trueddd.utils.d6Range
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class InputParserTest {
+internal class InputParsing {
 
     private val inputParser = provideInputParser()
 
@@ -31,21 +32,24 @@ internal class InputParserTest {
 
     @Test
     fun `roll movement dice - board move`() {
-        val parsed = inputParser.parse("roll player") as? BoardMove
-        assertEquals("player", parsed?.rolledBy?.name)
-        assertTrue(parsed?.diceValue in d6Range)
+        val parsed = inputParser.parse("move player")
+        assertIs<BoardMove>(parsed)
+        assertEquals("player", parsed.rolledBy.name)
+        assertTrue(parsed.diceValue in d6Range)
     }
 
     @Test
     fun `roll movement dice - item roll`() {
-        val parsed = inputParser.parse("item player") as? ItemReceive
-        assertEquals("player", parsed?.receivedBy?.name)
+        val parsed = inputParser.parse("item player")
+        assertIs<ItemReceive>(parsed)
+        assertEquals("player", parsed.receivedBy.name)
     }
 
     @Test
     fun `roll movement dice - game drop`() {
-        val parsed = inputParser.parse("drop player") as? GameDrop
-        assertEquals("player", parsed?.rolledBy?.name)
-        assertTrue(parsed?.diceValue in d6Range)
+        val parsed = inputParser.parse("drop player")
+        assertIs<GameDrop>(parsed)
+        assertEquals("player", parsed.rolledBy.name)
+        assertTrue(parsed.diceValue in d6Range)
     }
 }
