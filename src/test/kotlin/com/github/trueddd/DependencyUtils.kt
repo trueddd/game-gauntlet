@@ -1,8 +1,12 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.github.trueddd
 
 import com.github.trueddd.core.*
+import com.github.trueddd.core.actions.Action
 import com.github.trueddd.core.history.EventHistoryHolder
 import com.github.trueddd.core.history.MockedLocalEventHistoryHolder
+import com.github.trueddd.data.items.WheelItem
 import com.github.trueddd.di.getActionHandlersMap
 import com.github.trueddd.di.getActionGeneratorsSet
 import com.github.trueddd.di.getItemFactorySet
@@ -20,12 +24,12 @@ internal fun provideEventGate(): EventGate {
 internal fun provideInputParser(gamesProvider: GamesProvider = GamesProvider()) = InputParser(
     getActionGeneratorsSet(
         gamesProvider,
-        ItemRoller(getItemFactorySet()),
-    )
+        ItemRoller(getItemFactorySet() as Set<WheelItem.Factory>),
+    ) as Set<Action.Generator<*>>
 )
 
 private fun provideActionHandlerRegistry(gamesProvider: GamesProvider) = ActionHandlerRegistry(
-    handlers = getActionHandlersMap(gamesProvider)
+    handlers = getActionHandlersMap(gamesProvider) as Map<Int, Action.Handler<*>>
 )
 
 private fun provideHistoryHolder(actionHandlerRegistry: ActionHandlerRegistry): EventHistoryHolder {
