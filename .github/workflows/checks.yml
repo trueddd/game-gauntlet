@@ -17,8 +17,8 @@ jobs:
         java-version: '18'
         distribution: 'temurin'
         cache: gradle
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2.7.0
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
     - name: Build project
       run: ./gradlew assemble
     - name: Run tests
