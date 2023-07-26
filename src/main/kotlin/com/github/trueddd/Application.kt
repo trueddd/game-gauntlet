@@ -9,7 +9,6 @@ fun main() {
         configureDI()
         configureSockets()
         configureSerialization()
-        configureTemplating()
         configureMonitoring()
         configureHTTP()
         configureSecurity()

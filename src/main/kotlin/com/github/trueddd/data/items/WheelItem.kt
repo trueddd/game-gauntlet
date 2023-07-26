@@ -20,7 +20,7 @@ sealed class WheelItem {
     interface Factory {
 
         companion object {
-            const val SET_NAME = "ItemFactory"
+            const val SetTag = "ItemFactory"
         }
 
         fun create(): WheelItem

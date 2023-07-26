@@ -1,18 +1,14 @@
 plugins {
-    kotlin("jvm") version Versions.Kotlin
+    kotlin("jvm") version libs.versions.kotlin
 }
-
-group = Config.PackageName
-version = Config.Version
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation(Dependency.SymbolProcessingApi)
-    implementation(Dependency.KotlinPoet)
-    api(Dependency.Koin.Core)
-    api(Dependency.Koin.Ktor)
-    api(Dependency.Koin.Annotations)
+    implementation(libs.kotlin.ksp.api)
+    implementation(libs.kotlin.poet)
+    api(libs.koin.core)
+    api(libs.koin.annotations)
 }

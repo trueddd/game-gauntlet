@@ -12,9 +12,6 @@ fun Application.configureRouting() {
         get("/") {
             call.respondText("Hello World!")
         }
-        static("/icons") {
-            staticRootFolder = File("src/main/resources/icons")
-            files(".")
-        }
+        staticFiles("/icons", File("src/main/resources/icons"))
     }
 }

@@ -3,8 +3,8 @@ package com.trueddd.github.processors
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.trueddd.github.annotations.IntoMap
 import com.trueddd.github.declarations.IntoMapClassDeclaration
 
@@ -50,6 +50,7 @@ class IntoMapProcessor(
                 fileSpec.addFunction(
                     FunSpec.builder("get${map}Map")
                         .addParameters(declarations.flatMap { it.dependenciesAsParameters })
+                        .returns(MAP.parameterizedBy(listOf(INT, STAR)))
                         .addStatement("return mapOf(${items})")
                         .build()
                 )

@@ -5,6 +5,9 @@ import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.SET
+import com.squareup.kotlinpoet.STAR
 import com.trueddd.github.declarations.IntoSetClassDeclaration
 import com.trueddd.github.annotations.IntoSet
 
@@ -45,6 +48,7 @@ class IntoSetProcessor(
                 fileSpec.addFunction(
                     FunSpec.builder("get${type}Set")
                         .addParameters(declarations.flatMap { it.dependenciesAsParameters })
+                        .returns(SET.parameterizedBy(STAR))
                         .addStatement("return setOf(${items})")
                         .build()
                 )

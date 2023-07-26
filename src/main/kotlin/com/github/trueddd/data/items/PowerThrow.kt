@@ -20,7 +20,7 @@ class PowerThrow private constructor(override val uid: Long) : WheelItem.Effect.
         return "${super.toString()}[mod=$modifier]"
     }
 
-    @IntoSet(setName = WheelItem.Factory.SET_NAME)
+    @IntoSet(setName = WheelItem.Factory.SetTag)
     class Factory : WheelItem.Factory {
         override fun create() = PowerThrow.create()
     }

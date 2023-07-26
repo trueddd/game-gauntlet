@@ -1,13 +1,13 @@
 plugins {
     application
-    kotlin("jvm") version Versions.Kotlin
-    id("io.ktor.plugin") version Versions.Ktor
-    id("org.jetbrains.kotlin.plugin.serialization") version Versions.Kotlin
-    id("com.google.devtools.ksp") version Versions.KotlinKsp
+    kotlin("jvm") version libs.versions.kotlin
+    alias(libs.plugins.ktor)
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.ksp)
 }
 
-group = Config.PackageName
-version = Config.Version
+group = "com.trueddd.github"
+version = "0.0.1"
 
 application {
     mainClass.set("com.github.trueddd.ApplicationKt")
@@ -35,24 +35,22 @@ tasks.withType<Test>().configureEach {
 dependencies {
     implementation(project(":di"))
     ksp(project(":di"))
-    implementation(Dependency.Logging)
-    implementation(Dependency.Ktor.Server.Core)
-    implementation(Dependency.Ktor.Server.Netty)
-    implementation(Dependency.Ktor.Server.WebSockets)
-    implementation(Dependency.Ktor.Server.ContentNegotiation)
-    implementation(Dependency.Ktor.Server.CallLogging)
-    implementation(Dependency.Ktor.Server.Cors)
-    implementation(Dependency.Ktor.Server.DefaultHeaders)
-    implementation(Dependency.Ktor.Server.ConditionalHeaders)
-    implementation(Dependency.Ktor.Server.Auth)
-    implementation(Dependency.Ktor.Server.AuthJwt)
-    implementation(Dependency.Ktor.Serialization)
-    implementation(Dependency.Ktor.Server.HtmlBuilder)
-    implementation(Dependency.HtmlJvm)
-    implementation(Dependency.CssJvm)
-    ksp(Dependency.Koin.Compiler)
-    testImplementation(Dependency.Ktor.Server.Tests)
-    testImplementation(Dependency.Tests.Junit)
-    testImplementation(Dependency.Tests.JupiterApi)
-    testImplementation(Dependency.Tests.JupiterEngine)
+    implementation(libs.logging)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.websockets)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.server.call.logging)
+    implementation(libs.ktor.server.cors)
+    implementation(libs.ktor.server.headers.default)
+    implementation(libs.ktor.server.headers.conditional)
+    implementation(libs.ktor.server.auth.core)
+    implementation(libs.ktor.server.auth.jwt)
+    implementation(libs.ktor.serialization)
+    implementation(libs.koin.ktor)
+    ksp(libs.koin.ksp)
+    testImplementation(libs.ktor.server.tests)
+    testImplementation(libs.test.kotlin)
+    testImplementation(libs.test.jupiter.engine)
+    testImplementation(libs.test.jupiter.api)
 }

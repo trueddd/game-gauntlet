@@ -36,7 +36,7 @@ class SamuraiLunge private constructor(
         }
     }
 
-    @IntoSet(setName = WheelItem.Factory.SET_NAME)
+    @IntoSet(setName = WheelItem.Factory.SetTag)
     class Factory : WheelItem.Factory {
         override fun create() = SamuraiLunge.create()
     }

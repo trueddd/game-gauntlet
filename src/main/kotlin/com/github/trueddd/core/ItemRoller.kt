@@ -6,7 +6,7 @@ import org.koin.core.annotation.Single
 
 @Single
 class ItemRoller(
-    @Named(WheelItem.Factory.SET_NAME)
+    @Named(WheelItem.Factory.SetTag)
     private val allItemsFactories: Set<WheelItem.Factory>,
 ) {
 

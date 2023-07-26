@@ -11,5 +11,5 @@ val multibindingModule = module {
 
     single(named(Action.Handler.MapTag)) { getActionHandlersMap(get()) }
 
-    single(named(WheelItem.Factory.SET_NAME)) { getItemFactorySet() }
+    single(named(WheelItem.Factory.SetTag)) { getItemFactorySet() }
 }
