@@ -18,7 +18,7 @@ data class ItemReceive(
     class Generator(private val itemRoller: ItemRoller) : Action.Generator<ItemReceive> {
 
         override val inputMatcher by lazy {
-            Regex("item ${Action.Generator.ParticipantGroup}", RegexOption.DOT_MATCHES_ALL)
+            Regex("${Commands.ItemReceive} ${Action.Generator.ParticipantGroup}", RegexOption.DOT_MATCHES_ALL)
         }
 
         override fun generate(matchResult: MatchResult): ItemReceive {

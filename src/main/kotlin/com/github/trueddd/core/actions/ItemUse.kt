@@ -17,7 +17,10 @@ data class ItemUse(
     class Generator : Action.Generator<ItemUse> {
 
         override val inputMatcher by lazy {
-            Regex("use ${Action.Generator.ParticipantGroup} ([0-9]+)", RegexOption.DOT_MATCHES_ALL)
+            Regex(
+                pattern = "${Commands.ItemUse} ${Action.Generator.ParticipantGroup} ${Action.Generator.NumberGroup}",
+                option = RegexOption.DOT_MATCHES_ALL
+            )
         }
 
         override fun generate(matchResult: MatchResult): ItemUse {

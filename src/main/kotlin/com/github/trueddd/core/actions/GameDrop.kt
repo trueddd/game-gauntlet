@@ -21,7 +21,7 @@ data class GameDrop(
     class Generator : Action.Generator<GameDrop> {
 
         override val inputMatcher by lazy {
-            Regex("drop ${Action.Generator.ParticipantGroup}", RegexOption.DOT_MATCHES_ALL)
+            Regex("${Commands.GameDrop} ${Action.Generator.ParticipantGroup}", RegexOption.DOT_MATCHES_ALL)
         }
 
         override fun generate(matchResult: MatchResult): GameDrop {

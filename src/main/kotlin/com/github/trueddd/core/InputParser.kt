@@ -1,6 +1,7 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.core.actions.Action
+import com.github.trueddd.utils.ActionGeneratorCreationException
 import com.github.trueddd.utils.Log
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
@@ -19,7 +20,11 @@ class InputParser(
         val action = generators.firstNotNullOfOrNull { actionGenerator ->
             val match = actionGenerator.inputMatcher.matchEntire(input)
             if (match != null) {
-                actionGenerator.generate(match)
+                try {
+                    actionGenerator.generate(match)
+                } catch (error: ActionGeneratorCreationException) {
+                    null
+                }
             } else {
                 null
             }

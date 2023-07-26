@@ -1,5 +1,6 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.core.actions.Action
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.Participant
 import com.github.trueddd.provideEventGate
@@ -16,15 +17,15 @@ class GameStatus {
     @Test
     fun `change status with failure`() = runBlocking {
         val participant = Participant("shizov")
-        eventGate.parseAndHandleSuspend("game shizov 2")
+        eventGate.parseAndHandleSuspend("${Action.Commands.GameStatusChange} ${participant.name} 2")
         assertEquals(expected = true, eventGate.stateHolder.current.players[participant]?.gameHistory?.isEmpty())
     }
 
     @Test
     fun `change status successfully`() = runBlocking {
         val participant = Participant("shizov")
-        eventGate.parseAndHandleSuspend("roll-game shizov")
-        eventGate.parseAndHandleSuspend("game shizov 1")
+        eventGate.parseAndHandleSuspend("${Action.Commands.GameRoll} ${participant.name}")
+        eventGate.parseAndHandleSuspend("${Action.Commands.GameStatusChange} ${participant.name} 1")
         assertEquals(expected = false, eventGate.stateHolder.current.players[participant]?.gameHistory?.isEmpty())
         assertEquals(expected = Game.Status.Finished, eventGate.stateHolder.current.players[participant]?.currentGameEntry?.status)
     }

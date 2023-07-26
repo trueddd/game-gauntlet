@@ -1,5 +1,6 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.core.actions.Action
 import com.github.trueddd.provideEventGate
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.RepeatedTest
@@ -14,15 +15,15 @@ class StateRecoverability {
     @RepeatedTest(10)
     fun `save, load & compare`() = runBlocking {
         val actionsSequence = sequenceOf(
-            "move shizov",
-            "roll-game shizov",
-            "move solll",
-            "item shizov",
-            "drop shizov",
-            "roll-game shizov",
-            "game shizov 1",
-            "move shizov",
-            "move keli",
+            "${Action.Commands.BoardMove} shizov",
+            "${Action.Commands.GameRoll} shizov",
+            "${Action.Commands.BoardMove} solll",
+            "${Action.Commands.ItemReceive} shizov",
+            "${Action.Commands.GameDrop} shizov",
+            "${Action.Commands.GameRoll} shizov",
+            "${Action.Commands.GameStatusChange} shizov 1",
+            "${Action.Commands.BoardMove} shizov",
+            "${Action.Commands.BoardMove} keli",
         )
         actionsSequence.forEach {
             eventGate.parseAndHandleSuspend(it)

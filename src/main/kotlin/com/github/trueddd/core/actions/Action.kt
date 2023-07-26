@@ -30,12 +30,20 @@ sealed class Action(
         const val GameRoll = 6
     }
 
+    object Commands {
+        const val BoardMove = "move"
+        const val GameDrop = "drop"
+        const val ItemReceive = "item"
+        const val ItemUse = "use"
+        const val GameStatusChange = "game"
+        const val GameRoll = "roll-game"
+    }
+
     /**
      * Action generator is a component that creates actions from entered command by any of participants.
      */
     interface Generator<out A : Action> {
 
-        // todo: extract action commands to constants
         companion object {
             const val SetTag = "ActionGenerators"
             const val ParticipantGroup = "([a-z]+)"

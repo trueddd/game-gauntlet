@@ -21,7 +21,7 @@ data class GameRoll(
     class Generator(private val gamesProvider: GamesProvider) : Action.Generator<GameRoll> {
 
         override val inputMatcher by lazy {
-            Regex("roll-game ${Action.Generator.ParticipantGroup}", RegexOption.DOT_MATCHES_ALL)
+            Regex("${Commands.GameRoll} ${Action.Generator.ParticipantGroup}", RegexOption.DOT_MATCHES_ALL)
         }
 
         override fun generate(matchResult: MatchResult): GameRoll {

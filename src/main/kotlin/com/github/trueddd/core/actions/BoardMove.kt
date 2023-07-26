@@ -19,7 +19,7 @@ data class BoardMove(
     class Generator : Action.Generator<BoardMove> {
 
         override val inputMatcher by lazy {
-            Regex("move ${Action.Generator.ParticipantGroup}", RegexOption.DOT_MATCHES_ALL)
+            Regex("${Commands.BoardMove} ${Action.Generator.ParticipantGroup}", RegexOption.DOT_MATCHES_ALL)
         }
 
         override fun generate(matchResult: MatchResult): BoardMove {

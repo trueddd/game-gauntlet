@@ -20,7 +20,7 @@ data class GameStatusChange(
 
         override val inputMatcher by lazy {
             Regex(
-                pattern = "game ${Action.Generator.ParticipantGroup} ${Action.Generator.NumberGroup}",
+                pattern = "${Commands.GameStatusChange} ${Action.Generator.ParticipantGroup} ${Action.Generator.NumberGroup}",
                 option = RegexOption.DOT_MATCHES_ALL
             )
         }
@@ -29,7 +29,7 @@ data class GameStatusChange(
             val participant = matchResult.groupValues.getOrNull(1)?.let { Participant(it) }
                 ?: throw ActionGeneratorCreationException("Couldn't parse participant from input: `${matchResult.value}`")
             val newStatus = matchResult.groupValues.getOrNull(2)?.toIntOrNull()
-                ?.let { Game.Status.values().getOrNull(it) }
+                ?.let { Game.Status.entries.getOrNull(it) }
                 ?: throw ActionGeneratorCreationException("Couldn't parse new status from input: `${matchResult.value}`")
             return GameStatusChange(participant, newStatus)
         }

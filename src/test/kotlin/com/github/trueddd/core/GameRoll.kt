@@ -1,5 +1,6 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.core.actions.Action
 import com.github.trueddd.data.Participant
 import com.github.trueddd.provideEventGate
 import kotlinx.coroutines.runBlocking
@@ -16,16 +17,16 @@ class GameRoll {
     @Test
     fun `roll game once`() = runBlocking {
         val participant = Participant("shizov")
-        eventGate.parseAndHandleSuspend("roll-game shizov")
+        eventGate.parseAndHandleSuspend("${Action.Commands.GameRoll} ${participant.name}")
         assertNotEquals(illegal = null, eventGate.stateHolder.current.players[participant]?.currentGameEntry)
     }
 
     @Test
     fun `roll game twice`() = runBlocking {
         val participant = Participant("shizov")
-        eventGate.parseAndHandleSuspend("roll-game shizov")
+        eventGate.parseAndHandleSuspend("${Action.Commands.GameRoll} ${participant.name}")
         val currentGame = eventGate.stateHolder.current.players[participant]?.currentGameEntry
-        eventGate.parseAndHandleSuspend("roll-game shizov")
+        eventGate.parseAndHandleSuspend("${Action.Commands.GameRoll} ${participant.name}")
         assertEquals(expected = currentGame, eventGate.stateHolder.current.players[participant]?.currentGameEntry)
     }
 }
