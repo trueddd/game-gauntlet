@@ -3,7 +3,7 @@ package com.github.trueddd.core
 import com.github.trueddd.core.actions.Action
 import com.github.trueddd.data.Participant
 import com.github.trueddd.provideEventGate
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
@@ -14,7 +14,7 @@ class GameWinner {
     private val eventGate = provideEventGate()
 
     @Test
-    fun `basic winner test`() = runBlocking {
+    fun `basic winner test`() = runTest {
         while (eventGate.stateHolder.current.winner == null) {
             eventGate.parseAndHandleSuspend("${Action.Commands.BoardMove} shizov")
             eventGate.parseAndHandleSuspend("${Action.Commands.GameRoll} shizov")
@@ -24,7 +24,7 @@ class GameWinner {
     }
 
     @Test
-    fun `single winner test`() = runBlocking {
+    fun `single winner test`() = runTest {
         while (eventGate.stateHolder.current.winner == null) {
             eventGate.parseAndHandleSuspend("${Action.Commands.BoardMove} shizov")
             eventGate.parseAndHandleSuspend("${Action.Commands.GameRoll} shizov")

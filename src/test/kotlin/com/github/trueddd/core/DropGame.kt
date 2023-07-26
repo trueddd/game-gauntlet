@@ -6,7 +6,7 @@ import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.DropReverse
 import com.github.trueddd.data.items.SamuraiLunge
 import com.github.trueddd.provideEventGate
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
@@ -18,7 +18,7 @@ class DropGame {
     private val eventGate = provideEventGate()
 
     @Test
-    fun `drop game with SamuraiLunge`() = runBlocking {
+    fun `drop game with SamuraiLunge`() = runTest {
         val user = Participant("solll")
         val moveDiceValue = 5
         val dropDiceValue = 4

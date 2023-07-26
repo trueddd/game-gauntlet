@@ -39,6 +39,8 @@ dependencyResolutionManagement {
             library("kotlin-ksp-api", "com.google.devtools.ksp", "symbol-processing-api").versionRef(ksp)
 
             plugin("serialization", "org.jetbrains.kotlin.plugin.serialization").versionRef(kotlin)
+
+            library("coroutines-test", "org.jetbrains.kotlinx", "kotlinx-coroutines-test").version("1.7.1")
         }
     }
 }

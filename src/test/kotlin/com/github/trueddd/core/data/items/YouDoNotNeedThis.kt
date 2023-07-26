@@ -2,12 +2,12 @@ package com.github.trueddd.core.data.items
 
 import com.github.trueddd.core.actions.ItemReceive
 import com.github.trueddd.data.Participant
-import com.github.trueddd.data.items.WheelItem
 import com.github.trueddd.data.items.PowerThrow
 import com.github.trueddd.data.items.WeakThrow
+import com.github.trueddd.data.items.WheelItem
 import com.github.trueddd.data.items.YouDoNotNeedThis
 import com.github.trueddd.provideEventGate
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
@@ -19,7 +19,7 @@ class YouDoNotNeedThis {
     private val eventGate = provideEventGate()
 
     @Test
-    fun `drop buff`() = runBlocking {
+    fun `drop buff`() = runTest {
         val user = Participant("solll")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
@@ -29,7 +29,7 @@ class YouDoNotNeedThis {
     }
 
     @Test
-    fun `non-drop buff`() = runBlocking {
+    fun `non-drop buff`() = runTest {
         val user = Participant("solll")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, YouDoNotNeedThis.create()))
@@ -38,7 +38,7 @@ class YouDoNotNeedThis {
     }
 
     @Test
-    fun `drop single buff`() = runBlocking {
+    fun `drop single buff`() = runTest {
         val user = Participant("solll")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))

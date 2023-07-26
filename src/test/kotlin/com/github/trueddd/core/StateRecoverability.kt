@@ -2,7 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.core.actions.Action
 import com.github.trueddd.provideEventGate
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
@@ -13,7 +13,7 @@ class StateRecoverability {
     private val eventGate = provideEventGate()
 
     @RepeatedTest(10)
-    fun `save, load & compare`() = runBlocking {
+    fun `save, load & compare`() = runTest {
         val actionsSequence = sequenceOf(
             "${Action.Commands.BoardMove} shizov",
             "${Action.Commands.GameRoll} shizov",

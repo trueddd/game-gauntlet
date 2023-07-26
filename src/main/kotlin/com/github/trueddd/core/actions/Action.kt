@@ -1,10 +1,8 @@
 package com.github.trueddd.core.actions
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.utils.DateSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import java.util.*
 
 /**
  * Action describes something happening to the global state or player state.
@@ -15,8 +13,7 @@ import java.util.*
 @Serializable
 sealed class Action(
     open val id: Int,
-    @Serializable(with = DateSerializer::class)
-    val issuedAt: Date = Date(),
+    val issuedAt: Long = System.currentTimeMillis(),
     @Transient
     val singleShot: Boolean = false,
 ) {

@@ -5,7 +5,7 @@ import com.github.trueddd.core.actions.ItemReceive
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.WeakThrow
 import com.github.trueddd.provideEventGate
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
@@ -16,7 +16,7 @@ class WeakThrow {
     private val eventGate = provideEventGate()
 
     @Test
-    fun `weak throw on 5`() = runBlocking {
+    fun `weak throw on 5`() = runTest {
         val user = Participant("keli")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
         eventGate.eventManager.suspendConsumeAction(BoardMove(user, 5))
@@ -24,7 +24,7 @@ class WeakThrow {
     }
 
     @Test
-    fun `weak throw on 1`() = runBlocking {
+    fun `weak throw on 1`() = runTest {
         val user = Participant("keli")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
         eventGate.eventManager.suspendConsumeAction(BoardMove(user, 1))

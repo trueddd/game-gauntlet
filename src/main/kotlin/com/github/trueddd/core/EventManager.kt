@@ -29,6 +29,12 @@ class EventManager(
         const val TAG = "EventManager"
     }
 
+    data class HandledAction(
+        val id: Int,
+        val issuedAt: Long,
+        val error: Exception? = null,
+    )
+
     override val coroutineContext by lazy {
         SupervisorJob() + Dispatchers.Default
     }
@@ -39,7 +45,7 @@ class EventManager(
 
     private val eventHandlingMonitor = Mutex(false)
 
-    private val handledActionsFlow = MutableSharedFlow<Pair<Int, Exception?>>()
+    private val handledActionsFlow = MutableSharedFlow<HandledAction>()
 
     init {
         startEventHandling()
@@ -52,19 +58,14 @@ class EventManager(
         }
     }
 
-    @Suppress("SuspendFunctionOnCoroutineScope")
     @TestOnly
-    suspend fun suspendConsumeAction(action: Action) {
-        handledActionsFlow
-            .onStart {
-                this@EventManager.launch {
-                    Log.info(TAG, "Consuming action: $action")
-                    actionsPipe.emit(action)
-                }
-            }
-            .filter { (id, error) -> id == action.id }
-            .take(1)
-            .collect { Log.info(TAG, "Action(${action.id}) consumed") }
+    suspend fun suspendConsumeAction(action: Action): HandledAction {
+        val handledAction = handledActionsFlow
+            .onStart { consumeAction(action) }
+            .filter { (id, issuedAt, _) -> id == action.id && action.issuedAt == issuedAt }
+            .first()
+        Log.info(TAG, "Action(${action.id}) handled")
+        return handledAction
     }
 
     fun stopHandling() {
@@ -92,9 +93,9 @@ class EventManager(
                 try {
                     val result = handler.handle(action, stateHolder.globalStateFlow.value)
                     stateHolder.update { result }
-                    handledActionsFlow.emit(action.id to null)
+                    handledActionsFlow.emit(HandledAction(action.id, action.issuedAt))
                 } catch (error: StateModificationException) {
-                    handledActionsFlow.emit(action.id to error)
+                    handledActionsFlow.emit(HandledAction(action.id, action.issuedAt, error))
                 } finally {
                     eventHandlingMonitor.unlock()
                 }

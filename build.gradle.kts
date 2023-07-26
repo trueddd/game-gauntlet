@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     application
     kotlin("jvm") version libs.versions.kotlin
@@ -19,8 +21,13 @@ ktor {
     }
 }
 
-kotlin.sourceSets.main {
-    kotlin.srcDirs(file("$buildDir/generated/ksp/main/kotlin"))
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_16
+    }
+    sourceSets.main {
+        kotlin.srcDirs(file("$buildDir/generated/ksp/main/kotlin"))
+    }
 }
 
 repositories {
@@ -53,4 +60,5 @@ dependencies {
     testImplementation(libs.test.kotlin)
     testImplementation(libs.test.jupiter.engine)
     testImplementation(libs.test.jupiter.api)
+    testImplementation(libs.coroutines.test)
 }

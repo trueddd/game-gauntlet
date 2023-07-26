@@ -5,7 +5,7 @@ import com.github.trueddd.core.actions.ItemReceive
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.PowerThrow
 import com.github.trueddd.provideEventGate
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
@@ -16,7 +16,7 @@ class PowerThrow {
     private val eventGate = provideEventGate()
 
     @Test
-    fun `power throw on 3`() = runBlocking {
+    fun `power throw on 3`() = runTest {
         val user = Participant("solll")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
         eventGate.eventManager.suspendConsumeAction(BoardMove(user, 3))
@@ -24,7 +24,7 @@ class PowerThrow {
     }
 
     @Test
-    fun `power throw on 6`() = runBlocking {
+    fun `power throw on 6`() = runTest {
         val user = Participant("solll")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
         eventGate.eventManager.suspendConsumeAction(BoardMove(user, 6))
