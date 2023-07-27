@@ -67,7 +67,7 @@ class EventManager(
     @TestOnly
     suspend fun suspendConsumeAction(action: Action): HandledAction {
         val handledAction = handledActionsFlow
-            .onStart { sendAction(action) }
+            .onSubscription { sendAction(action) }
             .filter { (id, issuedAt, _) -> id == action.id && issuedAt == action.issuedAt }
             .first()
         Log.info(TAG, "Action(${action.id}) handled")
