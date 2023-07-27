@@ -3,6 +3,7 @@ package com.github.trueddd.core.history
 import com.github.trueddd.core.ActionHandlerRegistry
 import com.github.trueddd.core.actions.Action
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
@@ -63,11 +64,20 @@ open class LocalEventHistoryHolder(
                 .filter { it.isNotBlank() }
                 .map { Json.decodeFromString(Action.serializer(), it) }
             events.fold(GlobalState.default()) { state, action ->
-                actionHandlerRegistry
-                    .handlerOf(action)
-                    ?.handle(action, state)
-                    ?: state
+                val handler = actionHandlerRegistry.handlerOf(action) ?: return@fold state
+                try {
+                    handler.handle(action, state)
+                } catch (error: StateModificationException) {
+                    System.err.println("Error caught while restoring state at action: $action")
+                    System.err.println("Current state: $state")
+                    error.printStackTrace()
+                    state
+                }
             }
         }
+    }
+
+    override fun drop() {
+        latestEvents.clear()
     }
 }

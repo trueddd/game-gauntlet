@@ -1,18 +1,14 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.EventGateTest
 import com.github.trueddd.core.actions.Action
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.Participant
-import com.github.trueddd.provideEventGate
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class GameStatus {
-
-    private val eventGate = provideEventGate()
+class GameStatus : EventGateTest() {
 
     @Test
     fun `change status with failure`() = runTest {

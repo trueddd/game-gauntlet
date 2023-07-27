@@ -1,16 +1,12 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.EventGateTest
 import com.github.trueddd.core.actions.Action
-import com.github.trueddd.provideEventGate
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.RepeatedTest
-import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class StateRecoverability {
-
-    private val eventGate = provideEventGate()
+class StateRecoverability : EventGateTest() {
 
     @RepeatedTest(10)
     fun `save, load & compare`() = runTest {

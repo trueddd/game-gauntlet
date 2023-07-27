@@ -54,7 +54,8 @@ data class GameDrop(
                 playerState.copy(
                     position = finalPosition,
                     effects = playerState.effects.filter { it !is DropReverse },
-                    gameHistory = newGameHistory
+                    gameHistory = newGameHistory,
+                    boardMoveAvailable = false,
                 )
             }
         }

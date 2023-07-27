@@ -1,21 +1,17 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.EventGateTest
 import com.github.trueddd.core.actions.BoardMove
 import com.github.trueddd.core.actions.GameRoll
 import com.github.trueddd.core.actions.GameStatusChange
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.Participant
-import com.github.trueddd.provideEventGate
 import com.github.trueddd.utils.rollDice
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class BoardSteps {
-
-    private val eventGate = provideEventGate()
+class BoardSteps : EventGateTest() {
 
     @Test
     fun `10 steps at once`() = runTest {

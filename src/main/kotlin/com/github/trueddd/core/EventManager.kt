@@ -47,6 +47,7 @@ class EventManager(
 
     private val handledActionsFlow = MutableSharedFlow<HandledAction>()
 
+    // todo: make it explicit
     init {
         startEventHandling()
     }

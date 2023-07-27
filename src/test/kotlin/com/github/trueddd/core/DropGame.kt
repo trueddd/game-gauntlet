@@ -1,21 +1,17 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.EventGateTest
 import com.github.trueddd.core.actions.*
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.DropReverse
 import com.github.trueddd.data.items.SamuraiLunge
-import com.github.trueddd.provideEventGate
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class DropGame {
-
-    private val eventGate = provideEventGate()
+class DropGame : EventGateTest() {
 
     @Test
     fun `drop game with SamuraiLunge`() = runTest {

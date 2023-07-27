@@ -1,22 +1,18 @@
 package com.github.trueddd.core.data.items
 
+import com.github.trueddd.EventGateTest
 import com.github.trueddd.core.actions.ItemReceive
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.PowerThrow
 import com.github.trueddd.data.items.WeakThrow
 import com.github.trueddd.data.items.WheelItem
 import com.github.trueddd.data.items.YouDoNotNeedThis
-import com.github.trueddd.provideEventGate
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class YouDoNotNeedThis {
-
-    private val eventGate = provideEventGate()
+class YouDoNotNeedThis : EventGateTest() {
 
     @Test
     fun `drop buff`() = runTest {

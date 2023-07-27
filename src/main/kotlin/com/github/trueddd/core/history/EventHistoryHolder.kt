@@ -10,4 +10,6 @@ interface EventHistoryHolder {
     suspend fun save()
 
     suspend fun load(): GlobalState
+
+    fun drop()
 }
