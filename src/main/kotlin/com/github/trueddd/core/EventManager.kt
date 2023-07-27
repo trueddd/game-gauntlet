@@ -5,6 +5,7 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import org.jetbrains.annotations.TestOnly
@@ -39,7 +40,7 @@ class EventManager(
         SupervisorJob() + Dispatchers.Default
     }
 
-    private val actionsPipe = MutableSharedFlow<Action>()
+    private val actionsPipe = Channel<Action>()
 
     private var eventHandlingJob: Job? = null
 
@@ -52,18 +53,22 @@ class EventManager(
         startEventHandling()
     }
 
+    private suspend fun sendAction(action: Action) {
+        Log.info(TAG, "Consuming action: $action")
+        actionsPipe.send(action)
+    }
+
     fun consumeAction(action: Action) {
         launch {
-            Log.info(TAG, "Consuming action: $action")
-            actionsPipe.emit(action)
+            sendAction(action)
         }
     }
 
     @TestOnly
     suspend fun suspendConsumeAction(action: Action): HandledAction {
         val handledAction = handledActionsFlow
-            .onStart { consumeAction(action) }
-            .filter { (id, issuedAt, _) -> id == action.id && action.issuedAt == issuedAt }
+            .onStart { sendAction(action) }
+            .filter { (id, issuedAt, _) -> id == action.id && issuedAt == action.issuedAt }
             .first()
         Log.info(TAG, "Action(${action.id}) handled")
         return handledAction
@@ -86,10 +91,10 @@ class EventManager(
             Log.error(TAG, "EventManager is already running; skip start")
             return
         }
-        eventHandlingJob = actionsPipe
-            .onStart { Log.info(TAG, "Starting") }
-            .onEach { action ->
-                val handler = actionHandlerRegistry.handlerOf(action) ?: return@onEach
+        eventHandlingJob = launch {
+            Log.info(TAG, "Starting")
+            for (action in actionsPipe) {
+                val handler = actionHandlerRegistry.handlerOf(action) ?: continue
                 eventHandlingMonitor.lock()
                 try {
                     val result = handler.handle(action, stateHolder.globalStateFlow.value)
@@ -101,7 +106,6 @@ class EventManager(
                     eventHandlingMonitor.unlock()
                 }
             }
-            .onCompletion { Log.info(TAG, "Finishing") }
-            .launchIn(this)
+        }
     }
 }
