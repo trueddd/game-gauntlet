@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class WheelItem {
 
-    abstract val uid: Long
+    abstract val uid: String
     abstract val id: Id
     abstract val name: String
 
@@ -54,10 +54,7 @@ sealed class WheelItem {
     }
 
     @Serializable
-    sealed class InventoryItem : WheelItem(), Usable {
-        abstract val maxChargesAmount: Int
-        abstract val chargesAmount: Int
-    }
+    sealed class InventoryItem : WheelItem(), Usable
 
     @Serializable
     sealed class Event : WheelItem() {

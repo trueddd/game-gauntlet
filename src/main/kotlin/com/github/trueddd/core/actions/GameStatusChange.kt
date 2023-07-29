@@ -13,14 +13,14 @@ import kotlinx.serialization.Serializable
 data class GameStatusChange(
     val participant: Participant,
     val gameNewStatus: Game.Status,
-) : Action(Keys.GameStatusChange) {
+) : Action(Keys.GAME_STATUS_CHANGE) {
 
-    @IntoSet(Action.Generator.SetTag)
+    @IntoSet(Action.Generator.SET_TAG)
     class Generator : Action.Generator<GameStatusChange> {
 
         override val inputMatcher by lazy {
             Regex(
-                pattern = "${Commands.GameStatusChange} ${Action.Generator.ParticipantGroup} ${Action.Generator.NumberGroup}",
+                pattern = "${Commands.GAME_STATUS_CHANGE} ${Action.Generator.RegExpGroups.USER} ${Action.Generator.RegExpGroups.NUMBER}",
                 option = RegexOption.DOT_MATCHES_ALL
             )
         }
@@ -35,7 +35,7 @@ data class GameStatusChange(
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MapTag, key = Keys.GameStatusChange)
+    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Keys.GAME_STATUS_CHANGE)
     class Handler : Action.Handler<GameStatusChange> {
 
         override suspend fun handle(action: GameStatusChange, currentState: GlobalState): GlobalState {

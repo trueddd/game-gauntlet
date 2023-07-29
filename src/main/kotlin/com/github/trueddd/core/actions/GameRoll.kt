@@ -15,13 +15,13 @@ import kotlinx.serialization.Serializable
 data class GameRoll(
     val participant: Participant,
     val gameId: Game.Id,
-) : Action(Keys.GameRoll) {
+) : Action(Keys.GAME_ROLL) {
 
-    @IntoSet(Action.Generator.SetTag)
+    @IntoSet(Action.Generator.SET_TAG)
     class Generator(private val gamesProvider: GamesProvider) : Action.Generator<GameRoll> {
 
         override val inputMatcher by lazy {
-            Regex("${Commands.GameRoll} ${Action.Generator.ParticipantGroup}", RegexOption.DOT_MATCHES_ALL)
+            Regex("${Commands.GAME_ROLL} ${Action.Generator.RegExpGroups.USER}", RegexOption.DOT_MATCHES_ALL)
         }
 
         override fun generate(matchResult: MatchResult): GameRoll {
@@ -32,7 +32,7 @@ data class GameRoll(
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MapTag, key = Keys.GameRoll)
+    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Keys.GAME_ROLL)
     class Handler(private val gamesProvider: GamesProvider) : Action.Handler<GameRoll> {
 
         override suspend fun handle(action: GameRoll, currentState: GlobalState): GlobalState {

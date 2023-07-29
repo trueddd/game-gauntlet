@@ -19,7 +19,7 @@ class DropGame : EventGateTest() {
         val moveDiceValue = 5
         val dropDiceValue = 4
         eventGate.eventManager.suspendConsumeAction(BoardMove(user, moveDiceValue))
-        eventGate.parseAndHandleSuspend("${Action.Commands.GameRoll} ${user.name}")
+        eventGate.parseAndHandleSuspend("${Action.Commands.GAME_ROLL} ${user.name}")
         val item = SamuraiLunge.create()
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, item))
         eventGate.eventManager.suspendConsumeAction(ItemUse(user, item.uid))

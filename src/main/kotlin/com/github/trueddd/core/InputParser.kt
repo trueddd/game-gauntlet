@@ -8,7 +8,7 @@ import org.koin.core.annotation.Single
 
 @Single
 class InputParser(
-    @Named(Action.Generator.SetTag)
+    @Named(Action.Generator.SET_TAG)
     private val generators: Set<Action.Generator<*>>,
 ) {
 

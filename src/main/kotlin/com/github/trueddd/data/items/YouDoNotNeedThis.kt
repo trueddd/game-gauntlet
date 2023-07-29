@@ -2,14 +2,15 @@ package com.github.trueddd.data.items
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.utils.generateWheelItemUid
 import com.trueddd.github.annotations.IntoSet
 import kotlinx.serialization.Serializable
 
 @Serializable
-class YouDoNotNeedThis private constructor(override val uid: Long) : WheelItem.Event() {
+class YouDoNotNeedThis private constructor(override val uid: String) : WheelItem.Event() {
 
     companion object {
-        fun create() = YouDoNotNeedThis(uid = System.currentTimeMillis())
+        fun create() = YouDoNotNeedThis(uid = generateWheelItemUid())
     }
 
     override val id = Id.YouDoNotNeedThis

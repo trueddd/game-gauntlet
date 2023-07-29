@@ -12,13 +12,13 @@ import kotlinx.serialization.Serializable
 data class ItemReceive(
     val receivedBy: Participant,
     val item: WheelItem,
-) : Action(Keys.ItemReceive) {
+) : Action(Keys.ITEM_RECEIVE) {
 
-    @IntoSet(Action.Generator.SetTag)
+    @IntoSet(Action.Generator.SET_TAG)
     class Generator(private val itemRoller: ItemRoller) : Action.Generator<ItemReceive> {
 
         override val inputMatcher by lazy {
-            Regex("${Commands.ItemReceive} ${Action.Generator.ParticipantGroup}", RegexOption.DOT_MATCHES_ALL)
+            Regex("${Commands.ITEM_RECEIVE} ${Action.Generator.RegExpGroups.USER}", RegexOption.DOT_MATCHES_ALL)
         }
 
         override fun generate(matchResult: MatchResult): ItemReceive {
@@ -28,7 +28,7 @@ data class ItemReceive(
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MapTag, key = Keys.ItemReceive)
+    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Keys.ITEM_RECEIVE)
     class Handler : Action.Handler<ItemReceive> {
 
         override suspend fun handle(action: ItemReceive, currentState: GlobalState): GlobalState {

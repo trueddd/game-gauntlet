@@ -21,9 +21,7 @@ class EventGate(
     suspend fun parseAndHandle(input: String): Boolean {
         val action = inputParser.parse(input) ?: return false
         eventManager.consumeAction(action)
-        if (!action.singleShot) {
-            historyHolder.pushEvent(action)
-        }
+        historyHolder.pushEvent(action)
         return true
     }
 
@@ -31,9 +29,7 @@ class EventGate(
     suspend fun parseAndHandleSuspend(input: String): Boolean {
         val action = inputParser.parse(input) ?: return false
         eventManager.suspendConsumeAction(action)
-        if (!action.singleShot) {
-            historyHolder.pushEvent(action)
-        }
+        historyHolder.pushEvent(action)
         return true
     }
 

@@ -1,6 +1,5 @@
 package com.github.trueddd.data
 
-import com.github.trueddd.data.items.DiceRollModifier
 import com.github.trueddd.data.items.WheelItem
 
 data class PlayerState(
@@ -11,15 +10,6 @@ data class PlayerState(
     val effects: List<WheelItem.Effect> = emptyList(),
     val gameHistory: List<GameHistoryEntry> = emptyList(),
 ) {
-
-    val diceModifier: Int
-        get() = inventory
-            .filterIsInstance<DiceRollModifier>()
-            .sumOf { it.modifier }
-            .plus(effects
-                .filterIsInstance<DiceRollModifier>()
-                .sumOf { it.modifier }
-            )
 
     val currentGameEntry: GameHistoryEntry?
         get() = gameHistory.lastOrNull()

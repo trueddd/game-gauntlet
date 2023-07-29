@@ -6,7 +6,7 @@ import org.koin.core.annotation.Single
 
 @Single
 class ActionHandlerRegistry(
-    @Named(Action.Handler.MapTag)
+    @Named(Action.Handler.MAP_TAG)
     private val handlers: Map<Int, Action.Handler<*>>,
 ) {
 

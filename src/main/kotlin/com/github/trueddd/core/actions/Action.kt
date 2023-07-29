@@ -2,38 +2,34 @@ package com.github.trueddd.core.actions
 
 import com.github.trueddd.data.GlobalState
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 /**
  * Action describes something happening to the global state or player state.
  * For example, receiving of the item by the participant of the game.
  * @param id is a unique ID of the action.
- * @param singleShot defines whether the action should be tracked in history and therefore reapplied on session restore.
  */
 @Serializable
 sealed class Action(
     open val id: Int,
     val issuedAt: Long = System.currentTimeMillis(),
-    @Transient
-    val singleShot: Boolean = false,
 ) {
 
     object Keys {
-        const val BoardMove = 1
-        const val GameDrop = 2
-        const val ItemReceive = 3
-        const val ItemUse = 4
-        const val GameStatusChange = 5
-        const val GameRoll = 6
+        const val BOARD_MOVE = 1
+        const val GAME_DROP = 2
+        const val ITEM_RECEIVE = 3
+        const val ITEM_USE = 4
+        const val GAME_STATUS_CHANGE = 5
+        const val GAME_ROLL = 6
     }
 
     object Commands {
-        const val BoardMove = "move"
-        const val GameDrop = "drop"
-        const val ItemReceive = "item"
-        const val ItemUse = "use"
-        const val GameStatusChange = "game"
-        const val GameRoll = "roll-game"
+        const val BOARD_MOVE = "move"
+        const val GAME_DROP = "drop"
+        const val ITEM_RECEIVE = "item"
+        const val ITEM_USE = "use"
+        const val GAME_STATUS_CHANGE = "game"
+        const val GAME_ROLL = "roll-game"
     }
 
     /**
@@ -42,9 +38,13 @@ sealed class Action(
     interface Generator<out A : Action> {
 
         companion object {
-            const val SetTag = "ActionGenerators"
-            const val ParticipantGroup = "([a-z]+)"
-            const val NumberGroup = "(\\d+)"
+            const val SET_TAG = "ActionGenerators"
+        }
+
+        object RegExpGroups {
+            const val USER = "([a-z]+)"
+            const val NUMBER = "(\\d+)"
+            const val ITEM_UID = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
         }
 
         val inputMatcher: Regex
@@ -58,7 +58,7 @@ sealed class Action(
     interface Handler<in A : Action> {
 
         companion object {
-            const val MapTag = "ActionHandlers"
+            const val MAP_TAG = "ActionHandlers"
         }
 
         suspend fun handle(action: A, currentState: GlobalState): GlobalState

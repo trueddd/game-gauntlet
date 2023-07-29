@@ -5,23 +5,23 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.DropReverse
 import com.github.trueddd.utils.StateModificationException
-import com.github.trueddd.utils.coerceDiceValue
 import com.github.trueddd.utils.rollDice
 import com.trueddd.github.annotations.IntoMap
 import com.trueddd.github.annotations.IntoSet
 import kotlinx.serialization.Serializable
+import kotlin.math.max
 
 @Serializable
 data class GameDrop(
     val rolledBy: Participant,
     val diceValue: Int,
-) : Action(Keys.GameDrop) {
+) : Action(Keys.GAME_DROP) {
 
-    @IntoSet(Action.Generator.SetTag)
+    @IntoSet(Action.Generator.SET_TAG)
     class Generator : Action.Generator<GameDrop> {
 
         override val inputMatcher by lazy {
-            Regex("${Commands.GameDrop} ${Action.Generator.ParticipantGroup}", RegexOption.DOT_MATCHES_ALL)
+            Regex("${Commands.GAME_DROP} ${Action.Generator.RegExpGroups.USER}", RegexOption.DOT_MATCHES_ALL)
         }
 
         override fun generate(matchResult: MatchResult): GameDrop {
@@ -31,7 +31,7 @@ data class GameDrop(
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MapTag, key = Keys.GameDrop)
+    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Keys.GAME_DROP)
     class Handler : Action.Handler<GameDrop> {
 
         override suspend fun handle(action: GameDrop, currentState: GlobalState): GlobalState {
@@ -42,11 +42,11 @@ data class GameDrop(
             }
             return currentState.updatePlayer(action.rolledBy) { playerState ->
                 val moveValue = if (playerState.effects.any { it is DropReverse }) {
-                    coerceDiceValue(action.diceValue + playerState.diceModifier)
+                    action.diceValue
                 } else {
-                    -coerceDiceValue(action.diceValue)
+                    -action.diceValue
                 }
-                val finalPosition = (playerState.position + moveValue).coerceAtLeast(0)
+                val finalPosition = max(playerState.position + moveValue, 0)
                 val newGameHistory = playerState.gameHistory.lastOrNull()
                     ?.copy(status = Game.Status.Dropped)
                     ?.let { playerState.gameHistory.dropLast(1) + it }
