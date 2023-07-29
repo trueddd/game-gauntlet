@@ -3,13 +3,12 @@ package com.trueddd.github.processors
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.SET
-import com.squareup.kotlinpoet.STAR
 import com.trueddd.github.declarations.IntoSetClassDeclaration
 import com.trueddd.github.annotations.IntoSet
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
 class IntoSetProcessor(
     private val environment: SymbolProcessorEnvironment,
@@ -50,6 +49,12 @@ class IntoSetProcessor(
                         .addParameters(declarations.flatMap { it.dependenciesAsParameters })
                         .returns(SET.parameterizedBy(STAR))
                         .addStatement("return setOf(${items})")
+                        .addAnnotation(Single::class)
+                        .addAnnotation(
+                            AnnotationSpec.builder(Named::class)
+                                .addMember("value = %S", type)
+                                .build()
+                        )
                         .build()
                 )
             }

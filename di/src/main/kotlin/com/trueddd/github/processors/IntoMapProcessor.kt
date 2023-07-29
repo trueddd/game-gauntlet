@@ -7,6 +7,8 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.trueddd.github.annotations.IntoMap
 import com.trueddd.github.declarations.IntoMapClassDeclaration
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
 class IntoMapProcessor(
     private val environment: SymbolProcessorEnvironment,
@@ -52,6 +54,12 @@ class IntoMapProcessor(
                         .addParameters(declarations.flatMap { it.dependenciesAsParameters })
                         .returns(MAP.parameterizedBy(listOf(INT, STAR)))
                         .addStatement("return mapOf(${items})")
+                        .addAnnotation(Single::class)
+                        .addAnnotation(
+                            AnnotationSpec.builder(Named::class)
+                                .addMember("value = %S", map)
+                                .build()
+                        )
                         .build()
                 )
             }
