@@ -24,7 +24,7 @@ class StateRecoverability : EventGateTest() {
         actionsSequence.forEach {
             eventGate.parseAndHandleSuspend(it)
         }
-        eventGate.historyHolder.save()
+        eventGate.historyHolder.save(eventGate.stateHolder.current)
         eventGate.eventManager.stopHandling()
         val restored = eventGate.historyHolder.load()
         assertEquals(eventGate.stateHolder.globalStateFlow.value, restored)

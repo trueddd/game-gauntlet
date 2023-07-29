@@ -2,6 +2,7 @@ package com.github.trueddd.core.history
 
 import com.github.trueddd.core.ActionHandlerRegistry
 import com.github.trueddd.core.actions.Action
+import com.github.trueddd.data.GameGenreDistribution
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.Dispatchers
@@ -37,33 +38,41 @@ open class LocalEventHistoryHolder(
         monitor.unlock()
     }
 
-    override suspend fun save() {
+    override suspend fun save(globalState: GlobalState) {
         println("Saving Global state")
         monitor.lock()
         val eventsToSave = latestEvents.toList()
         monitor.unlock()
-        val encoded = eventsToSave
+        val mapLayout = Json.encodeToString(GameGenreDistribution.serializer, globalState.gameGenreDistribution)
+        val events = eventsToSave
             .asReversed()
-            .joinToString("\n", postfix = "\n") { Json.encodeToString(it) }
+            .joinToString("\n") { Json.encodeToString(it) }
+        val text = buildString {
+            appendLine(mapLayout)
+            appendLine(events)
+        }
         withContext(Dispatchers.IO) {
             if (overwrite) {
-                historyHolderFile.writeText(encoded)
+                historyHolderFile.writeText(text)
             } else {
-                historyHolderFile.appendText(encoded)
+                historyHolderFile.appendText(text)
             }
         }
         println("Global state saved")
     }
 
     override suspend fun load(): GlobalState {
-        val eventsContent = withContext(Dispatchers.IO) {
+        val fileContent = withContext(Dispatchers.IO) {
             historyHolderFile.readLines()
         }
         return withContext(Dispatchers.Default) {
-            val events = eventsContent
+            val mapLayout = fileContent.first().let { Json.decodeFromString(GameGenreDistribution.serializer, it) }
+            val events = fileContent
                 .filter { it.isNotBlank() }
+                .drop(1)
                 .map { Json.decodeFromString(Action.serializer(), it) }
-            events.fold(GlobalState.default()) { state, action ->
+            val initialState = GlobalState.default(genreDistribution = mapLayout)
+            events.fold(initialState) { state, action ->
                 val handler = actionHandlerRegistry.handlerOf(action) ?: return@fold state
                 try {
                     handler.handle(action, state)

@@ -30,7 +30,7 @@ fun Routing.setupEventGate() {
                 when (text) {
                     "start" -> eventGate.eventManager.startHandling()
                     "bye" -> close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
-                    "save" -> eventGate.historyHolder.save()
+                    "save" -> eventGate.historyHolder.save(eventGate.stateHolder.current)
                     "restore" -> {
                         eventGate.eventManager.stopHandling()
                         val restored = eventGate.historyHolder.load()

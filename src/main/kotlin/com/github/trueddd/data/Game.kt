@@ -30,4 +30,22 @@ data class Game(
         val allowsNextStep: Boolean
             get() = this == Finished || this == Dropped
     }
+
+    @Serializable
+    enum class Genre {
+        @SerialName("runner")
+        Runner,
+        @SerialName("business")
+        Business,
+        @SerialName("puzzle")
+        Puzzle,
+        @SerialName("point_and_click")
+        PointAndClick,
+        @SerialName("shooter")
+        Shooter,
+        @SerialName("three_in_row")
+        ThreeInRow,
+        @SerialName("special")
+        Special;
+    }
 }

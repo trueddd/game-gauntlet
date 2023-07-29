@@ -7,7 +7,7 @@ interface EventHistoryHolder {
 
     suspend fun pushEvent(action: Action)
 
-    suspend fun save()
+    suspend fun save(globalState: GlobalState)
 
     suspend fun load(): GlobalState
 
