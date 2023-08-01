@@ -13,29 +13,22 @@ import kotlinx.serialization.Serializable
 data class GameStatusChange(
     val participant: Participant,
     val gameNewStatus: Game.Status,
-) : Action(Keys.GAME_STATUS_CHANGE) {
+) : Action(Key.GameStatusChange) {
 
     @IntoSet(Action.Generator.SET_TAG)
     class Generator : Action.Generator<GameStatusChange> {
 
-        override val inputMatcher by lazy {
-            Regex(
-                pattern = "${Commands.GAME_STATUS_CHANGE} ${Action.Generator.RegExpGroups.USER} ${Action.Generator.RegExpGroups.NUMBER}",
-                option = RegexOption.DOT_MATCHES_ALL
-            )
-        }
+        override val actionKey = Key.GameStatusChange
 
-        override fun generate(matchResult: MatchResult): GameStatusChange {
-            val participant = matchResult.groupValues.getOrNull(1)?.let { Participant(it) }
-                ?: throw ActionGeneratorCreationException("Couldn't parse participant from input: `${matchResult.value}`")
-            val newStatus = matchResult.groupValues.getOrNull(2)?.toIntOrNull()
+        override fun generate(userName: String, arguments: List<String>): GameStatusChange {
+            val newStatus = arguments.firstOrNull()?.toIntOrNull()
                 ?.let { Game.Status.entries.getOrNull(it) }
-                ?: throw ActionGeneratorCreationException("Couldn't parse new status from input: `${matchResult.value}`")
-            return GameStatusChange(participant, newStatus)
+                ?: throw ActionGeneratorCreationException("Couldn't parse new status from arguments: `$arguments`")
+            return GameStatusChange(Participant(userName), newStatus)
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Keys.GAME_STATUS_CHANGE)
+    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Key.GameStatusChange)
     class Handler : Action.Handler<GameStatusChange> {
 
         override suspend fun handle(action: GameStatusChange, currentState: GlobalState): GlobalState {

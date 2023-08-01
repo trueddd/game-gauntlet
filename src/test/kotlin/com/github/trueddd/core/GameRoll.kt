@@ -17,7 +17,7 @@ class GameRoll : EventGateTest() {
     @Test
     fun `roll game once`() = runTest {
         val participant = Participant("shizov")
-        eventGate.parseAndHandleSuspend("${Action.Commands.GAME_ROLL} ${participant.name}")
+        eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameRoll}")
         assertNotEquals(illegal = null, eventGate.stateHolder.current.players[participant]?.currentGameEntry)
     }
 

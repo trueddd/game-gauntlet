@@ -15,23 +15,20 @@ import kotlin.math.max
 data class GameDrop(
     val rolledBy: Participant,
     val diceValue: Int,
-) : Action(Keys.GAME_DROP) {
+) : Action(Key.GameDrop) {
 
     @IntoSet(Action.Generator.SET_TAG)
     class Generator : Action.Generator<GameDrop> {
 
-        override val inputMatcher by lazy {
-            Regex("${Commands.GAME_DROP} ${Action.Generator.RegExpGroups.USER}", RegexOption.DOT_MATCHES_ALL)
-        }
+        override val actionKey = Key.GameDrop
 
-        override fun generate(matchResult: MatchResult): GameDrop {
-            val actor = matchResult.groupValues.lastOrNull()!!
+        override fun generate(userName: String, arguments: List<String>): GameDrop {
             val dice = rollDice()
-            return GameDrop(Participant(actor), dice)
+            return GameDrop(Participant(userName), dice)
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Keys.GAME_DROP)
+    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Key.GameDrop)
     class Handler : Action.Handler<GameDrop> {
 
         override suspend fun handle(action: GameDrop, currentState: GlobalState): GlobalState {

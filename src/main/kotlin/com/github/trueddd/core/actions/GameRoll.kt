@@ -5,7 +5,6 @@ import com.github.trueddd.data.Game
 import com.github.trueddd.data.GameHistoryEntry
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
-import com.github.trueddd.utils.ActionGeneratorCreationException
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.IntoMap
 import com.trueddd.github.annotations.IntoSet
@@ -15,24 +14,20 @@ import kotlinx.serialization.Serializable
 data class GameRoll(
     val participant: Participant,
     val gameId: Game.Id,
-) : Action(Keys.GAME_ROLL) {
+) : Action(Key.GameRoll) {
 
     @IntoSet(Action.Generator.SET_TAG)
     class Generator(private val gamesProvider: GamesProvider) : Action.Generator<GameRoll> {
 
-        override val inputMatcher by lazy {
-            Regex("${Commands.GAME_ROLL} ${Action.Generator.RegExpGroups.USER}", RegexOption.DOT_MATCHES_ALL)
-        }
+        override val actionKey = Key.GameRoll
 
-        override fun generate(matchResult: MatchResult): GameRoll {
-            val participant = matchResult.groupValues.getOrNull(1)?.let { Participant(it) }
-                ?: throw ActionGeneratorCreationException("Couldn't parse participant from input: `${matchResult.value}`")
+        override fun generate(userName: String, arguments: List<String>): GameRoll {
             val game = gamesProvider.roll()
-            return GameRoll(participant, game.id)
+            return GameRoll(Participant(userName), game.id)
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Keys.GAME_ROLL)
+    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Key.GameRoll)
     class Handler(private val gamesProvider: GamesProvider) : Action.Handler<GameRoll> {
 
         override suspend fun handle(action: GameRoll, currentState: GlobalState): GlobalState {

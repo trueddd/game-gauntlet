@@ -18,23 +18,20 @@ import kotlin.math.absoluteValue
 data class BoardMove(
     val rolledBy: Participant,
     val diceValue: Int,
-) : Action(Keys.BOARD_MOVE) {
+) : Action(Key.BoardMove) {
 
     @IntoSet(Action.Generator.SET_TAG)
     class Generator : Action.Generator<BoardMove> {
 
-        override val inputMatcher by lazy {
-            Regex("${Commands.BOARD_MOVE} ${Action.Generator.RegExpGroups.USER}", RegexOption.DOT_MATCHES_ALL)
-        }
+        override val actionKey = Key.BoardMove
 
-        override fun generate(matchResult: MatchResult): BoardMove {
-            val actor = matchResult.groupValues.lastOrNull()!!
+        override fun generate(userName: String, arguments: List<String>): BoardMove {
             val dice = rollDice()
-            return BoardMove(Participant(actor), dice)
+            return BoardMove(Participant(userName), dice)
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Keys.BOARD_MOVE)
+    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Key.BoardMove)
     class Handler : Action.Handler<BoardMove> {
 
         override suspend fun handle(action: BoardMove, currentState: GlobalState): GlobalState {

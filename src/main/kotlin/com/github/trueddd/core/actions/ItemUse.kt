@@ -11,28 +11,21 @@ import kotlinx.serialization.Serializable
 data class ItemUse(
     val usedBy: Participant,
     val itemUid: String,
-) : Action(Keys.ITEM_USE) {
+) : Action(Key.ItemUse) {
 
     @IntoSet(Action.Generator.SET_TAG)
     class Generator : Action.Generator<ItemUse> {
 
-        override val inputMatcher by lazy {
-            Regex(
-                pattern = "${Commands.ITEM_USE} ${Action.Generator.RegExpGroups.USER} ${Action.Generator.RegExpGroups.ITEM_UID}",
-                option = RegexOption.DOT_MATCHES_ALL
-            )
-        }
+        override val actionKey = Key.ItemUse
 
-        override fun generate(matchResult: MatchResult): ItemUse {
-            val user = matchResult.groupValues.getOrNull(1)
-                ?: throw ActionGeneratorCreationException("Couldn't parse participant from input `${matchResult.value}`")
-            val itemUid = matchResult.groupValues.getOrNull(2)
-                ?: throw ActionGeneratorCreationException("Couldn't parse itemUid from input `${matchResult.value}`")
-            return ItemUse(Participant(user), itemUid)
+        override fun generate(userName: String, arguments: List<String>): ItemUse {
+            val itemUid = arguments.firstOrNull()
+                ?: throw ActionGeneratorCreationException("Couldn't parse itemUid from arguments: `$arguments`")
+            return ItemUse(Participant(userName), itemUid)
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Keys.ITEM_USE)
+    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Key.ItemUse)
     class Handler : Action.Handler<ItemUse> {
 
         override suspend fun handle(action: ItemUse, currentState: GlobalState): GlobalState {

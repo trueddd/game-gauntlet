@@ -14,22 +14,14 @@ sealed class Action(
     val issuedAt: Long = System.currentTimeMillis(),
 ) {
 
-    object Keys {
-        const val BOARD_MOVE = 1
-        const val GAME_DROP = 2
-        const val ITEM_RECEIVE = 3
-        const val ITEM_USE = 4
-        const val GAME_STATUS_CHANGE = 5
-        const val GAME_ROLL = 6
-    }
-
-    object Commands {
-        const val BOARD_MOVE = "move"
-        const val GAME_DROP = "drop"
-        const val ITEM_RECEIVE = "item"
-        const val ITEM_USE = "use"
-        const val GAME_STATUS_CHANGE = "game"
-        const val GAME_ROLL = "roll-game"
+    @Suppress("ConstPropertyName")
+    object Key {
+        const val BoardMove = 1
+        const val GameDrop = 2
+        const val ItemReceive = 3
+        const val ItemUse = 4
+        const val GameStatusChange = 5
+        const val GameRoll = 6
     }
 
     /**
@@ -41,15 +33,9 @@ sealed class Action(
             const val SET_TAG = "ActionGenerators"
         }
 
-        object RegExpGroups {
-            const val USER = "([a-z]+)"
-            const val NUMBER = "(\\d+)"
-            const val ITEM_UID = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
-        }
+        val actionKey: Int
 
-        val inputMatcher: Regex
-
-        fun generate(matchResult: MatchResult): A
+        fun generate(userName: String, arguments: List<String>): A
     }
 
     /**

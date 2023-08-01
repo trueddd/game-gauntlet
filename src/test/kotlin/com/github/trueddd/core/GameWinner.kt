@@ -13,9 +13,9 @@ import kotlin.test.assertEquals
 class GameWinner : EventGateTest() {
 
     private suspend fun makeMove(userName: String) {
-        eventGate.parseAndHandleSuspend("${Action.Commands.BOARD_MOVE} $userName")
-        eventGate.parseAndHandleSuspend("${Action.Commands.GAME_ROLL} $userName")
-        eventGate.parseAndHandleSuspend("${Action.Commands.GAME_STATUS_CHANGE} $userName 1")
+        eventGate.parseAndHandleSuspend("$userName:${Action.Key.BoardMove}")
+        eventGate.parseAndHandleSuspend("$userName:${Action.Key.GameRoll}")
+        eventGate.parseAndHandleSuspend("$userName:${Action.Key.GameStatusChange}:1")
     }
 
     private suspend fun makeMovesUntilFinish(userName: String) {

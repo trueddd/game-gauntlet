@@ -31,7 +31,7 @@ internal class InputParsing {
 
     @Test
     fun `parsing - board move`() {
-        val parsed = inputParser.parse("move player")
+        val parsed = inputParser.parse("player:1")
         assertIs<BoardMove>(parsed)
         assertEquals("player", parsed.rolledBy.name)
         assertTrue(parsed.diceValue in d6Range)
@@ -39,14 +39,14 @@ internal class InputParsing {
 
     @Test
     fun `parsing - item roll`() {
-        val parsed = inputParser.parse("item player")
+        val parsed = inputParser.parse("player:3")
         assertIs<ItemReceive>(parsed)
         assertEquals("player", parsed.receivedBy.name)
     }
 
     @Test
     fun `parsing - game drop`() {
-        val parsed = inputParser.parse("drop player")
+        val parsed = inputParser.parse("player:2")
         assertIs<GameDrop>(parsed)
         assertEquals("player", parsed.rolledBy.name)
         assertTrue(parsed.diceValue in d6Range)
@@ -54,20 +54,20 @@ internal class InputParsing {
 
     @Test
     fun `parsing - game roll 1`() {
-        val parsed = inputParser.parse("roll-game player")
+        val parsed = inputParser.parse("player:6")
         assertIs<GameRoll>(parsed)
         assertEquals("player", parsed.participant.name)
     }
 
     @Test
     fun `parsing - game roll 2`() {
-        val parsed = inputParser.parse("roll player")
+        val parsed = inputParser.parse("player:1")
         assertIsNot<GameRoll>(parsed)
     }
 
     @Test
     fun `parsing - game status change 1`() {
-        val parsed = inputParser.parse("game player 1")
+        val parsed = inputParser.parse("player:5:1")
         assertIs<GameStatusChange>(parsed)
         assertEquals("player", parsed.participant.name)
         assertEquals(Game.Status.Finished, parsed.gameNewStatus)
@@ -75,7 +75,7 @@ internal class InputParsing {
 
     @Test
     fun `parsing - game status change 2`() {
-        val parsed = inputParser.parse("game player 0")
+        val parsed = inputParser.parse("player:5:0")
         assertIs<GameStatusChange>(parsed)
         assertEquals("player", parsed.participant.name)
         assertEquals(Game.Status.InProgress, parsed.gameNewStatus)
@@ -83,7 +83,7 @@ internal class InputParsing {
 
     @Test
     fun `parsing - game status change 3`() {
-        val parsed = inputParser.parse("game player 2")
+        val parsed = inputParser.parse("player:5:2")
         assertIs<GameStatusChange>(parsed)
         assertEquals("player", parsed.participant.name)
         assertEquals(Game.Status.Dropped, parsed.gameNewStatus)
@@ -91,7 +91,7 @@ internal class InputParsing {
 
     @Test
     fun `parsing - game status change 4`() {
-        val parsed = inputParser.parse("game player 3")
+        val parsed = inputParser.parse("player:5:3")
         assertIs<GameStatusChange>(parsed)
         assertEquals("player", parsed.participant.name)
         assertEquals(Game.Status.Rerolled, parsed.gameNewStatus)
@@ -99,13 +99,13 @@ internal class InputParsing {
 
     @Test
     fun `parsing - game status change 5`() {
-        val parsed = inputParser.parse("game player 10")
+        val parsed = inputParser.parse("player:5:10")
         assertIsNot<GameStatusChange>(parsed)
     }
 
     @Test
     fun `parsing - game status change 6`() {
-        val parsed = inputParser.parse("game 1")
+        val parsed = inputParser.parse("5:1")
         assertIsNot<GameStatusChange>(parsed)
     }
 }
