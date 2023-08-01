@@ -15,17 +15,21 @@ internal fun provideEventGate(): EventGate {
     val stateHolder = StateHolder()
     val gamesProvider = GamesProvider()
     val actionHandlerRegistry = provideActionHandlerRegistry(gamesProvider)
-    val inputParser = provideInputParser(gamesProvider)
+    val inputParser = provideInputParser(stateHolder, gamesProvider)
     val eventManager = EventManager(actionHandlerRegistry, stateHolder)
     val historyHolder = provideHistoryHolder(actionHandlerRegistry)
     return EventGate(stateHolder, inputParser, eventManager, historyHolder)
 }
 
-internal fun provideInputParser(gamesProvider: GamesProvider = GamesProvider()) = InputParser(
+internal fun provideInputParser(
+    stateHolder: StateHolder = StateHolder(),
+    gamesProvider: GamesProvider = GamesProvider()
+) = InputParser(
     getActionGeneratorsSet(
         gamesProvider,
         ItemRoller(getItemFactorySet() as Set<WheelItem.Factory>),
-    ) as Set<Action.Generator<*>>
+    ) as Set<Action.Generator<*>>,
+    stateHolder
 )
 
 private fun provideActionHandlerRegistry(gamesProvider: GamesProvider) = ActionHandlerRegistry(

@@ -3,7 +3,6 @@ package com.github.trueddd.core.data.items
 import com.github.trueddd.EventGateTest
 import com.github.trueddd.core.actions.BoardMove
 import com.github.trueddd.core.actions.ItemReceive
-import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.PowerThrow
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
@@ -13,7 +12,7 @@ class PowerThrow : EventGateTest() {
 
     @Test
     fun `power throw on 3`() = runTest {
-        val user = Participant("solll")
+        val user = requireParticipant("solll")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
         eventGate.eventManager.suspendConsumeAction(BoardMove(user, 3))
         assertEquals(4, eventGate.stateHolder.current.players[user]!!.position)
@@ -21,7 +20,7 @@ class PowerThrow : EventGateTest() {
 
     @Test
     fun `power throw on 6`() = runTest {
-        val user = Participant("solll")
+        val user = requireParticipant("solll")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
         eventGate.eventManager.suspendConsumeAction(BoardMove(user, 6))
         assertEquals(7, eventGate.stateHolder.current.players[user]!!.position)
@@ -29,7 +28,7 @@ class PowerThrow : EventGateTest() {
 
     @Test
     fun `power throw overflow`() = runTest {
-        val user = Participant("solll")
+        val user = requireParticipant("solll")
         repeat(5) {
             eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create(chargesLeft = 1)))
         }
@@ -42,7 +41,7 @@ class PowerThrow : EventGateTest() {
 
     @Test
     fun `power throw removal after move`() = runTest {
-        val user = Participant("solll")
+        val user = requireParticipant("solll")
         repeat(5) {
             eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
         }
@@ -53,7 +52,7 @@ class PowerThrow : EventGateTest() {
 
     @Test
     fun `power throw with charges`() = runTest {
-        val user = Participant("solll")
+        val user = requireParticipant("solll")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create(chargesLeft = 2)))
         eventGate.eventManager.suspendConsumeAction(BoardMove(user, 6))
         assertEquals(7, eventGate.stateHolder.current.players[user]!!.position)

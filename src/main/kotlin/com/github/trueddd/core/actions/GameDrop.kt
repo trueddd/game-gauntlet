@@ -22,9 +22,9 @@ data class GameDrop(
 
         override val actionKey = Key.GameDrop
 
-        override fun generate(userName: String, arguments: List<String>): GameDrop {
+        override fun generate(participant: Participant, arguments: List<String>): GameDrop {
             val dice = rollDice()
-            return GameDrop(Participant(userName), dice)
+            return GameDrop(participant, dice)
         }
     }
 

@@ -2,7 +2,6 @@ package com.github.trueddd.core.data.items
 
 import com.github.trueddd.EventGateTest
 import com.github.trueddd.core.actions.ItemReceive
-import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.PowerThrow
 import com.github.trueddd.data.items.WeakThrow
 import com.github.trueddd.data.items.WheelItem
@@ -16,7 +15,7 @@ class YouDoNotNeedThis : EventGateTest() {
 
     @Test
     fun `drop buff`() = runTest {
-        val user = Participant("solll")
+        val user = requireParticipant("solll")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, YouDoNotNeedThis.create()))
@@ -26,7 +25,7 @@ class YouDoNotNeedThis : EventGateTest() {
 
     @Test
     fun `non-drop buff`() = runTest {
-        val user = Participant("solll")
+        val user = requireParticipant("solll")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, YouDoNotNeedThis.create()))
         assertEquals(1, eventGate.stateHolder.current.players[user]!!.effects.size)
@@ -35,7 +34,7 @@ class YouDoNotNeedThis : EventGateTest() {
 
     @Test
     fun `drop single buff`() = runTest {
-        val user = Participant("solll")
+        val user = requireParticipant("solll")
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))

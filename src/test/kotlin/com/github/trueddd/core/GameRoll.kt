@@ -6,7 +6,6 @@ import com.github.trueddd.core.actions.BoardMove
 import com.github.trueddd.core.actions.GameRoll
 import com.github.trueddd.core.actions.GameStatusChange
 import com.github.trueddd.data.Game
-import com.github.trueddd.data.Participant
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -16,14 +15,14 @@ class GameRoll : EventGateTest() {
 
     @Test
     fun `roll game once`() = runTest {
-        val participant = Participant("shizov")
+        val participant = requireParticipant("shizov")
         eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameRoll}")
         assertNotEquals(illegal = null, eventGate.stateHolder.current.players[participant]?.currentGameEntry)
     }
 
     @Test
     fun `roll game twice`() = runTest {
-        val participant = Participant("shizov")
+        val participant = requireParticipant("shizov")
         eventGate.eventManager.suspendConsumeAction(GameRoll(participant, Game.Id(0)))
         val currentGame = eventGate.stateHolder.current.players[participant]?.currentGameEntry
         eventGate.eventManager.suspendConsumeAction(GameRoll(participant, Game.Id(1)))
@@ -33,7 +32,7 @@ class GameRoll : EventGateTest() {
 
     @Test
     fun `roll game - complete - move & roll game`() = runTest {
-        val participant = Participant("shizov")
+        val participant = requireParticipant("shizov")
         eventGate.eventManager.suspendConsumeAction(BoardMove(participant, 5))
         eventGate.eventManager.suspendConsumeAction(GameRoll(participant, Game.Id(0)))
         val firstGame = eventGate.stateHolder.current.players[participant]?.currentGameEntry

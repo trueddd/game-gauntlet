@@ -25,9 +25,9 @@ data class BoardMove(
 
         override val actionKey = Key.BoardMove
 
-        override fun generate(userName: String, arguments: List<String>): BoardMove {
+        override fun generate(participant: Participant, arguments: List<String>): BoardMove {
             val dice = rollDice()
-            return BoardMove(Participant(userName), dice)
+            return BoardMove(participant, dice)
         }
     }
 

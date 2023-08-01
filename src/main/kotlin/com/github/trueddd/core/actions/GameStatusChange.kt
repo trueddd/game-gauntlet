@@ -20,11 +20,11 @@ data class GameStatusChange(
 
         override val actionKey = Key.GameStatusChange
 
-        override fun generate(userName: String, arguments: List<String>): GameStatusChange {
+        override fun generate(participant: Participant, arguments: List<String>): GameStatusChange {
             val newStatus = arguments.firstOrNull()?.toIntOrNull()
                 ?.let { Game.Status.entries.getOrNull(it) }
                 ?: throw ActionGeneratorCreationException("Couldn't parse new status from arguments: `$arguments`")
-            return GameStatusChange(Participant(userName), newStatus)
+            return GameStatusChange(participant, newStatus)
         }
     }
 

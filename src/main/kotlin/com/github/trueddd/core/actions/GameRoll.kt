@@ -21,9 +21,9 @@ data class GameRoll(
 
         override val actionKey = Key.GameRoll
 
-        override fun generate(userName: String, arguments: List<String>): GameRoll {
+        override fun generate(participant: Participant, arguments: List<String>): GameRoll {
             val game = gamesProvider.roll()
-            return GameRoll(Participant(userName), game.id)
+            return GameRoll(participant, game.id)
         }
     }
 

@@ -3,7 +3,6 @@ package com.github.trueddd.core
 import com.github.trueddd.EventGateTest
 import com.github.trueddd.core.actions.*
 import com.github.trueddd.data.Game
-import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.DropReverse
 import com.github.trueddd.data.items.SamuraiLunge
 import kotlinx.coroutines.test.runTest
@@ -15,7 +14,7 @@ class DropGame : EventGateTest() {
 
     @Test
     fun `drop game with SamuraiLunge`() = runTest {
-        val user = Participant("solll")
+        val user = requireParticipant("solll")
         val moveDiceValue = 5
         val dropDiceValue = 4
         eventGate.eventManager.suspendConsumeAction(BoardMove(user, moveDiceValue))

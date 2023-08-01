@@ -10,6 +10,7 @@ import org.koin.core.annotation.Single
 class InputParser(
     @Named(Action.Generator.SET_TAG)
     private val generators: Set<Action.Generator<*>>,
+    private val participantProvider: ParticipantProvider,
 ) {
 
     companion object {
@@ -27,7 +28,7 @@ class InputParser(
             Log.error(TAG, "Couldn't parse action from input: $input")
             return null
         }
-        val user = parseResult.groupValues.getOrNull(1) ?: run {
+        val user = parseResult.groupValues.getOrNull(1)?.let { participantProvider[it] } ?: run {
             Log.error(TAG, "Couldn't get `user` from input: $input")
             return null
         }

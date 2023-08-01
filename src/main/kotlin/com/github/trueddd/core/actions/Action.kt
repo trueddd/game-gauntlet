@@ -1,6 +1,7 @@
 package com.github.trueddd.core.actions
 
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.Participant
 import kotlinx.serialization.Serializable
 
 /**
@@ -35,7 +36,7 @@ sealed class Action(
 
         val actionKey: Int
 
-        fun generate(userName: String, arguments: List<String>): A
+        fun generate(participant: Participant, arguments: List<String>): A
     }
 
     /**

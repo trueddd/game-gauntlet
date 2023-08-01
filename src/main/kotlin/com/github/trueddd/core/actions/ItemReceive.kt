@@ -19,9 +19,9 @@ data class ItemReceive(
 
         override val actionKey = Key.ItemReceive
 
-        override fun generate(userName: String, arguments: List<String>): ItemReceive {
+        override fun generate(participant: Participant, arguments: List<String>): ItemReceive {
             val item = itemRoller.pick()
-            return ItemReceive(Participant(userName), item)
+            return ItemReceive(participant, item)
         }
     }
 

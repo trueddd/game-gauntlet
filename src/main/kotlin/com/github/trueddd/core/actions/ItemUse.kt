@@ -18,10 +18,10 @@ data class ItemUse(
 
         override val actionKey = Key.ItemUse
 
-        override fun generate(userName: String, arguments: List<String>): ItemUse {
+        override fun generate(participant: Participant, arguments: List<String>): ItemUse {
             val itemUid = arguments.firstOrNull()
                 ?: throw ActionGeneratorCreationException("Couldn't parse itemUid from arguments: `$arguments`")
-            return ItemUse(Participant(userName), itemUid)
+            return ItemUse(participant, itemUid)
         }
     }
 

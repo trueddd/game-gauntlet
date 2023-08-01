@@ -15,7 +15,7 @@ data class GlobalState(
 ) {
 
     operator fun get(playerName: String): PlayerState? {
-        return players[Participant(playerName)]
+        return players.entries.firstOrNull { (key, _) -> key.name == playerName }?.value
     }
 
     fun updatePlayer(participant: Participant, block: (PlayerState) -> PlayerState): GlobalState {

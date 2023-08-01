@@ -10,6 +10,8 @@ abstract class EventGateTest {
 
     protected val eventGate: EventGate = provideEventGate()
 
+    protected fun requireParticipant(userName: String) = eventGate.stateHolder[userName]!!
+
     @BeforeEach
     fun startEventGate() {
         eventGate.start()
