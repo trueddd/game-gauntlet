@@ -18,6 +18,11 @@ class SamuraiLunge private constructor(override val uid: String) : WheelItem.Inv
 
     override val name = "Самурайский выпад"
 
+    override val description = """
+        При выпадении этого пункта позволяет не откатываться назад при дропе игры, 
+        а походить вперед. Имеет 1 заряд.
+    """.trimIndent()
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState): GlobalState {
         Log.info(name, "Using item by ${usedBy.name}")
         return globalState.updatePlayer(usedBy) { state ->
@@ -28,7 +33,7 @@ class SamuraiLunge private constructor(override val uid: String) : WheelItem.Inv
         }
     }
 
-    @IntoSet(setName = WheelItem.Factory.SetTag)
+    @IntoSet(setName = WheelItem.Factory.SET_TAG)
     class Factory : WheelItem.Factory {
         override fun create() = SamuraiLunge.create()
     }

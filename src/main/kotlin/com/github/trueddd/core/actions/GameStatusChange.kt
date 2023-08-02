@@ -3,7 +3,10 @@ package com.github.trueddd.core.actions
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
-import com.github.trueddd.utils.ActionGeneratorCreationException
+import com.github.trueddd.data.items.Gamer
+import com.github.trueddd.data.items.Viewer
+import com.github.trueddd.data.items.WheelItem
+import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.IntoMap
 import com.trueddd.github.annotations.IntoSet
@@ -23,7 +26,7 @@ data class GameStatusChange(
         override fun generate(participant: Participant, arguments: List<String>): GameStatusChange {
             val newStatus = arguments.firstOrNull()?.toIntOrNull()
                 ?.let { Game.Status.entries.getOrNull(it) }
-                ?: throw ActionGeneratorCreationException("Couldn't parse new status from arguments: `$arguments`")
+                ?: throw ActionCreationException("Couldn't parse new status from arguments: `$arguments`")
             return GameStatusChange(participant, newStatus)
         }
     }
@@ -36,9 +39,21 @@ data class GameStatusChange(
                 val currentGame = state.gameHistory.lastOrNull()
                     ?: throw StateModificationException(action, "No game entries")
                 val newGameHistory = state.gameHistory.dropLast(1) + currentGame.copy(status = action.gameNewStatus)
+                val newEffects = if (action.gameNewStatus.allowsNextStep) {
+                    state.effects.mapNotNull { effect ->
+                        when (effect) {
+                            is Gamer -> if (!effect.isActive) effect.setActive(true) else effect.charge() as? WheelItem.Effect
+                            is Viewer -> if (!effect.isActive) effect.setActive(true) else effect.charge() as? WheelItem.Effect
+                            else -> effect
+                        }
+                    }
+                } else {
+                    state.effects
+                }
                 state.copy(
                     gameHistory = newGameHistory,
                     boardMoveAvailable = if (action.gameNewStatus.allowsNextStep) true else state.boardMoveAvailable,
+                    effects = newEffects,
                 )
             }
         }

@@ -1,7 +1,7 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.core.actions.Action
-import com.github.trueddd.utils.ActionGeneratorCreationException
+import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.Log
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
@@ -43,7 +43,7 @@ class InputParser(
         }
         val action = try {
             generator.generate(user, arguments)
-        } catch (error: ActionGeneratorCreationException) {
+        } catch (error: ActionCreationException) {
             error.printStackTrace()
             return null
         }

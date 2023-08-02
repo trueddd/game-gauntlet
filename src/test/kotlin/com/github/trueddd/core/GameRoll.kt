@@ -17,16 +17,16 @@ class GameRoll : EventGateTest() {
     fun `roll game once`() = runTest {
         val participant = requireParticipant("shizov")
         eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameRoll}")
-        assertNotEquals(illegal = null, eventGate.stateHolder.current.players[participant]?.currentGameEntry)
+        assertNotEquals(illegal = null, eventGate.stateHolder.current.players[participant]?.currentGame)
     }
 
     @Test
     fun `roll game twice`() = runTest {
         val participant = requireParticipant("shizov")
         eventGate.eventManager.suspendConsumeAction(GameRoll(participant, Game.Id(0)))
-        val currentGame = eventGate.stateHolder.current.players[participant]?.currentGameEntry
+        val currentGame = eventGate.stateHolder.current.players[participant]?.currentGame
         eventGate.eventManager.suspendConsumeAction(GameRoll(participant, Game.Id(1)))
-        assertEquals(expected = currentGame, eventGate.stateHolder.current.players[participant]?.currentGameEntry)
+        assertEquals(expected = currentGame, eventGate.stateHolder.current.players[participant]?.currentGame)
         assertEquals(expected = Game.Id(0), eventGate.stateHolder.current.players[participant]?.gameHistory?.firstOrNull()?.game?.id)
     }
 
@@ -35,12 +35,12 @@ class GameRoll : EventGateTest() {
         val participant = requireParticipant("shizov")
         eventGate.eventManager.suspendConsumeAction(BoardMove(participant, 5))
         eventGate.eventManager.suspendConsumeAction(GameRoll(participant, Game.Id(0)))
-        val firstGame = eventGate.stateHolder.current.players[participant]?.currentGameEntry
+        val firstGame = eventGate.stateHolder.current.players[participant]?.currentGame
         eventGate.eventManager.suspendConsumeAction(GameStatusChange(participant, Game.Status.Finished))
         eventGate.eventManager.suspendConsumeAction(BoardMove(participant, 3))
         eventGate.eventManager.suspendConsumeAction(GameRoll(participant, Game.Id(2)))
         assertEquals(expected = firstGame?.game?.id, eventGate.stateHolder.current.players[participant]?.gameHistory?.firstOrNull()?.game?.id)
         assertEquals(expected = Game.Status.Finished, eventGate.stateHolder.current.players[participant]?.gameHistory?.firstOrNull()?.status)
-        assertEquals(expected = Game.Status.InProgress, eventGate.stateHolder.current.players[participant]?.currentGameEntry?.status)
+        assertEquals(expected = Game.Status.InProgress, eventGate.stateHolder.current.players[participant]?.currentGame?.status)
     }
 }

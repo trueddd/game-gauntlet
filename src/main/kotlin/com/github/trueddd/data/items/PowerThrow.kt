@@ -9,7 +9,7 @@ import org.jetbrains.annotations.TestOnly
 class PowerThrow private constructor(
     override val uid: String,
     override val chargesLeft: Int
-) : WheelItem.Effect.Buff(), DiceRollModifier, WithCharges {
+) : WheelItem.Effect.Buff(), DiceRollModifier, WithCharges<PowerThrow> {
 
     companion object {
         fun create() = PowerThrow(uid = generateWheelItemUid(), chargesLeft = 1)
@@ -21,11 +21,17 @@ class PowerThrow private constructor(
 
     override val name = "Мощный бросок"
 
+    override val description = """
+        К следующему броску кубика для перехода по секторам прибавьте 1. 
+        Общее значение не может быть больше 10. 
+        В таком случае излишек переносится на следующий бросок кубика.
+    """.trimIndent()
+
     override val modifier: Int = 1
 
     override val maxCharges: Int = 1
 
-    override fun useCharge(): WithCharges {
+    override fun useCharge(): WithCharges<PowerThrow> {
         return PowerThrow(uid, chargesLeft = chargesLeft - 1)
     }
 
@@ -33,7 +39,7 @@ class PowerThrow private constructor(
         return "${super.toString()}[mod=$modifier]"
     }
 
-    @IntoSet(setName = WheelItem.Factory.SetTag)
+    @IntoSet(setName = WheelItem.Factory.SET_TAG)
     class Factory : WheelItem.Factory {
         override fun create() = PowerThrow.create()
     }

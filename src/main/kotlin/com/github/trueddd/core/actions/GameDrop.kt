@@ -32,7 +32,7 @@ data class GameDrop(
     class Handler : Action.Handler<GameDrop> {
 
         override suspend fun handle(action: GameDrop, currentState: GlobalState): GlobalState {
-            val currentGame = currentState[action.rolledBy.name]?.currentGameEntry
+            val currentGame = currentState[action.rolledBy.name]?.currentGame
                 ?: throw StateModificationException(action, "No game to drop")
             if (currentGame.status.isComplete) {
                 throw StateModificationException(action, "Current game is already complete")

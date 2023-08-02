@@ -16,11 +16,12 @@ sealed class WheelItem {
     abstract val uid: String
     abstract val id: Id
     abstract val name: String
+    abstract val description: String
 
     interface Factory {
 
         companion object {
-            const val SetTag = "ItemFactory"
+            const val SET_TAG = "ItemFactory"
         }
 
         fun create(): WheelItem
@@ -35,6 +36,9 @@ sealed class WheelItem {
             val YouDoNotNeedThis = Id(3)
             val SamuraiLunge = Id(4)
             val DropReverse = Id(5)
+            val Reroll = Id(6)
+            val Gamer = Id(7)
+            val Viewer = Id(8)
         }
     }
 

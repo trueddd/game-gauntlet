@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 class WeakThrow private constructor(
     override val uid: String,
     override val chargesLeft: Int
-) : WheelItem.Effect.Debuff(), DiceRollModifier, WithCharges {
+) : WheelItem.Effect.Debuff(), DiceRollModifier, WithCharges<WeakThrow> {
 
     companion object {
         fun create() = WeakThrow(uid = generateWheelItemUid(), chargesLeft = 1)
@@ -18,11 +18,17 @@ class WeakThrow private constructor(
 
     override val name = "Слабый бросок"
 
+    override val description = """
+        От следующего броска кубика для перехода по секторам отнимется 1. 
+        Общее значение не может равно 0. 
+        В таком случае отрицательные эффекты на бросок переносятся на следующий бросок кубика.
+    """.trimIndent()
+
     override val modifier: Int = -1
 
     override val maxCharges: Int = 1
 
-    override fun useCharge(): WithCharges {
+    override fun useCharge(): WithCharges<WeakThrow> {
         return WeakThrow(uid, chargesLeft = chargesLeft - 1)
     }
 
@@ -30,7 +36,7 @@ class WeakThrow private constructor(
         return "${super.toString()}[mod=$modifier]"
     }
 
-    @IntoSet(setName = WheelItem.Factory.SetTag)
+    @IntoSet(setName = WheelItem.Factory.SET_TAG)
     class Factory : WheelItem.Factory {
         override fun create() = WeakThrow.create()
     }

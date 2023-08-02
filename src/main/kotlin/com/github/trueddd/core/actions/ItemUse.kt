@@ -2,7 +2,7 @@ package com.github.trueddd.core.actions
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
-import com.github.trueddd.utils.ActionGeneratorCreationException
+import com.github.trueddd.utils.ActionCreationException
 import com.trueddd.github.annotations.IntoMap
 import com.trueddd.github.annotations.IntoSet
 import kotlinx.serialization.Serializable
@@ -20,7 +20,7 @@ data class ItemUse(
 
         override fun generate(participant: Participant, arguments: List<String>): ItemUse {
             val itemUid = arguments.firstOrNull()
-                ?: throw ActionGeneratorCreationException("Couldn't parse itemUid from arguments: `$arguments`")
+                ?: throw ActionCreationException("Couldn't parse itemUid from arguments: `$arguments`")
             return ItemUse(participant, itemUid)
         }
     }

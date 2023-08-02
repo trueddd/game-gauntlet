@@ -2,13 +2,14 @@ package com.github.trueddd.core
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import org.koin.core.annotation.Single
 
 @Single
-class StateHolder : ParticipantProvider {
+class StateHolder : ParticipantProvider, ParticipantStateProvider {
 
     private val _globalStateFlow = MutableStateFlow(GlobalState.default())
     val globalStateFlow = _globalStateFlow.asStateFlow()
@@ -23,5 +24,9 @@ class StateHolder : ParticipantProvider {
 
     override fun get(name: String): Participant? {
         return current.players.keys.firstOrNull { it.name == name }
+    }
+
+    override fun get(participant: Participant): PlayerState {
+        return current.players[participant]!!
     }
 }

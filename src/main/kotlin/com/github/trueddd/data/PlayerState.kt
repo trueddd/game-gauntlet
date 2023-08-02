@@ -11,6 +11,9 @@ data class PlayerState(
     val gameHistory: List<GameHistoryEntry> = emptyList(),
 ) {
 
-    val currentGameEntry: GameHistoryEntry?
+    val currentGame: GameHistoryEntry?
         get() = gameHistory.lastOrNull()
+
+    val currentActiveGame: GameHistoryEntry?
+        get() = currentGame?.takeUnless { it.status.isComplete }
 }

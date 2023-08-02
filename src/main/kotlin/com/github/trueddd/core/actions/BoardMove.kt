@@ -2,9 +2,7 @@ package com.github.trueddd.core.actions
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
-import com.github.trueddd.data.items.DiceRollModifier
-import com.github.trueddd.data.items.WheelItem
-import com.github.trueddd.data.items.WithCharges
+import com.github.trueddd.data.items.*
 import com.github.trueddd.utils.StateModificationException
 import com.github.trueddd.utils.moveRange
 import com.github.trueddd.utils.rollDice
@@ -56,10 +54,8 @@ data class BoardMove(
                         when (effect) {
                             !is DiceRollModifier -> effect
                             !in modifiers -> effect
-                            is WithCharges -> when (effect.chargesLeft) {
-                                1 -> null
-                                else -> effect.useCharge() as WheelItem.Effect
-                            }
+                            is PowerThrow -> effect.charge() as? WheelItem.Effect
+                            is WeakThrow -> effect.charge() as? WheelItem.Effect
                             else -> null
                         }
                     },

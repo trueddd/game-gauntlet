@@ -24,6 +24,7 @@ ktor {
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_16
+        freeCompilerArgs.add("-Xcontext-receivers")
     }
     sourceSets.main {
         kotlin.srcDirs(file("$buildDir/generated/ksp/main/kotlin"))

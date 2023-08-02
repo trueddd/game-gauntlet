@@ -17,6 +17,8 @@ class YouDoNotNeedThis private constructor(override val uid: String) : WheelItem
 
     override val name = "Тебе это и не нужно"
 
+    override val description = "Сбрасывает случайный бафф."
+
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
         return globalState.updatePlayer(rolledBy) { state ->
             val buff = state.effects
@@ -27,7 +29,7 @@ class YouDoNotNeedThis private constructor(override val uid: String) : WheelItem
         }
     }
 
-    @IntoSet(setName = WheelItem.Factory.SetTag)
+    @IntoSet(setName = WheelItem.Factory.SET_TAG)
     class Factory : WheelItem.Factory {
         override fun create() = YouDoNotNeedThis.create()
     }

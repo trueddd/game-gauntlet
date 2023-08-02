@@ -25,7 +25,7 @@ class DropGame : EventGateTest() {
         eventGate.eventManager.suspendConsumeAction(GameDrop(user, dropDiceValue))
         assertTrue(eventGate.stateHolder.current.players[user]!!.inventory.isEmpty())
         assertTrue(eventGate.stateHolder.current.players[user]!!.effects.none { it is DropReverse })
-        assertEquals(Game.Status.Dropped, eventGate.stateHolder.current.players[user]?.currentGameEntry?.status)
+        assertEquals(Game.Status.Dropped, eventGate.stateHolder.current.players[user]?.currentGame?.status)
         assertEquals(moveDiceValue + dropDiceValue, eventGate.stateHolder.current.players[user]!!.position)
     }
 }

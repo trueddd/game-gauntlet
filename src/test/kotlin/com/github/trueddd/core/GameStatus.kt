@@ -22,6 +22,6 @@ class GameStatus : EventGateTest() {
         eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameRoll}")
         eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameStatusChange}:1")
         assertEquals(expected = false, eventGate.stateHolder.current.players[participant]?.gameHistory?.isEmpty())
-        assertEquals(expected = Game.Status.Finished, eventGate.stateHolder.current.players[participant]?.currentGameEntry?.status)
+        assertEquals(expected = Game.Status.Finished, eventGate.stateHolder.current.players[participant]?.currentGame?.status)
     }
 }

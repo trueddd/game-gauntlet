@@ -13,4 +13,6 @@ class DropReverse private constructor(override val uid: String) : WheelItem.Effe
     override val id = Id.DropReverse
 
     override val name = "Drop penalty reverse"
+
+    override val description = "При дропе игры позволяет не откатываться назад, а походить вперед."
 }
