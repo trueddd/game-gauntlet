@@ -8,8 +8,8 @@ import com.github.trueddd.data.items.Viewer
 import com.github.trueddd.data.items.WheelItem
 import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.StateModificationException
-import com.trueddd.github.annotations.IntoMap
-import com.trueddd.github.annotations.IntoSet
+import com.trueddd.github.annotations.ActionGenerator
+import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,7 +18,7 @@ data class GameStatusChange(
     val gameNewStatus: Game.Status,
 ) : Action(Key.GameStatusChange) {
 
-    @IntoSet(Action.Generator.SET_TAG)
+    @ActionGenerator
     class Generator : Action.Generator<GameStatusChange> {
 
         override val actionKey = Key.GameStatusChange
@@ -31,7 +31,7 @@ data class GameStatusChange(
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Key.GameStatusChange)
+    @ActionHandler(key = Key.GameStatusChange)
     class Handler : Action.Handler<GameStatusChange> {
 
         override suspend fun handle(action: GameStatusChange, currentState: GlobalState): GlobalState {

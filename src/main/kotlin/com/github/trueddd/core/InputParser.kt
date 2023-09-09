@@ -3,12 +3,13 @@ package com.github.trueddd.core
 import com.github.trueddd.core.actions.Action
 import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.Log
+import com.trueddd.github.annotations.ActionGenerator
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 
 @Single
 class InputParser(
-    @Named(Action.Generator.SET_TAG)
+    @Named(ActionGenerator.TAG)
     private val generators: Set<Action.Generator<*>>,
     private val participantProvider: ParticipantProvider,
 ) {

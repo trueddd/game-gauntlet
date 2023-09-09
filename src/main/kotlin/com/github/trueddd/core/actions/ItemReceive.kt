@@ -6,8 +6,8 @@ import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.Gamer
 import com.github.trueddd.data.items.Viewer
 import com.github.trueddd.data.items.WheelItem
-import com.trueddd.github.annotations.IntoMap
-import com.trueddd.github.annotations.IntoSet
+import com.trueddd.github.annotations.ActionGenerator
+import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,7 +16,7 @@ data class ItemReceive(
     val item: WheelItem,
 ) : Action(Key.ItemReceive) {
 
-    @IntoSet(Action.Generator.SET_TAG)
+    @ActionGenerator
     class Generator(private val itemRoller: ItemRoller) : Action.Generator<ItemReceive> {
 
         override val actionKey = Key.ItemReceive
@@ -27,7 +27,7 @@ data class ItemReceive(
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Key.ItemReceive)
+    @ActionHandler(key = Key.ItemReceive)
     class Handler : Action.Handler<ItemReceive> {
 
         override suspend fun handle(action: ItemReceive, currentState: GlobalState): GlobalState {

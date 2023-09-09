@@ -3,7 +3,7 @@ package com.github.trueddd.data.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.generateWheelItemUid
-import com.trueddd.github.annotations.IntoSet
+import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -23,7 +23,7 @@ class Reroll private constructor(override val uid: String) : WheelItem.Event() {
         return globalState
     }
 
-    @IntoSet(setName = WheelItem.Factory.SET_TAG)
+    @ItemFactory
     class Factory : WheelItem.Factory {
         override fun create() = Reroll.create()
     }

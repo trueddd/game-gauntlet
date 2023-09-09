@@ -1,7 +1,7 @@
 package com.github.trueddd.data.items
 
 import com.github.trueddd.utils.generateWheelItemUid
-import com.trueddd.github.annotations.IntoSet
+import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 import org.jetbrains.annotations.TestOnly
 
@@ -39,7 +39,7 @@ class PowerThrow private constructor(
         return "${super.toString()}[mod=$modifier]"
     }
 
-    @IntoSet(setName = WheelItem.Factory.SET_TAG)
+    @ItemFactory
     class Factory : WheelItem.Factory {
         override fun create() = PowerThrow.create()
     }

@@ -6,8 +6,8 @@ import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.DropReverse
 import com.github.trueddd.utils.StateModificationException
 import com.github.trueddd.utils.rollDice
-import com.trueddd.github.annotations.IntoMap
-import com.trueddd.github.annotations.IntoSet
+import com.trueddd.github.annotations.ActionGenerator
+import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.Serializable
 import kotlin.math.max
 
@@ -17,7 +17,7 @@ data class GameDrop(
     val diceValue: Int,
 ) : Action(Key.GameDrop) {
 
-    @IntoSet(Action.Generator.SET_TAG)
+    @ActionGenerator
     class Generator : Action.Generator<GameDrop> {
 
         override val actionKey = Key.GameDrop
@@ -28,7 +28,7 @@ data class GameDrop(
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Key.GameDrop)
+    @ActionHandler(key = Key.GameDrop)
     class Handler : Action.Handler<GameDrop> {
 
         override suspend fun handle(action: GameDrop, currentState: GlobalState): GlobalState {

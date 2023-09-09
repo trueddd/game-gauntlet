@@ -5,8 +5,10 @@ import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.declarations.IntoSetClassDeclaration
 import com.trueddd.github.annotations.IntoSet
+import com.trueddd.github.annotations.ItemFactory
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 
@@ -16,24 +18,37 @@ class IntoSetProcessor(
 ) : MultibindingAnnotationProcessor<IntoSetClassDeclaration> {
 
     override fun findAnnotations(): Sequence<IntoSetClassDeclaration> {
+        val availableAnnotationSimpleNames = listOf(
+            IntoSet::class.simpleName,
+            ActionGenerator::class.simpleName,
+            ItemFactory::class.simpleName,
+        )
         return resolver.getSymbolsWithAnnotation(IntoSet::class.qualifiedName.toString())
+            .plus(resolver.getSymbolsWithAnnotation(ActionGenerator::class.qualifiedName.toString()))
+            .plus(resolver.getSymbolsWithAnnotation(ItemFactory::class.qualifiedName.toString()))
             .onEach { environment.logger.info("Found declaration $it") }
             .filterIsInstance<KSClassDeclaration>()
             .mapNotNull { declaration ->
                 environment.logger.info("Found class declaration $declaration ${declaration.annotations.joinToString { it.shortName.asString() }}")
                 val setName = declaration.annotations
-                    .firstOrNull { it.shortName.asString() == IntoSet::class.simpleName }
-                    ?.arguments
-                    ?.firstOrNull { it.name?.asString() == "setName" }
-                    ?.value?.toString()
+                    .firstOrNull { it.shortName.asString() in availableAnnotationSimpleNames }
+                    ?.let { annotation ->
+                        when (annotation.shortName.asString()) {
+                            ActionGenerator::class.simpleName -> ActionGenerator.TAG
+                            ItemFactory::class.simpleName -> ItemFactory.TAG
+                            else -> annotation.arguments.firstOrNull { it.name?.asString() == "setName" }?.value?.toString()
+                        }
+                    }
                     ?.also { environment.logger.info("setName: $it") }
                     ?: return@mapNotNull null
                 IntoSetClassDeclaration(
-                    setName,
-                    declaration.qualifiedName?.asString() ?: declaration.simpleName.asString(),
-                    if (declaration.qualifiedName == null) declaration.packageName.asString() else "",
-                    declaration.primaryConstructor?.parameters?.mapNotNull { it.type.resolve().declaration.qualifiedName?.asString() } ?: emptyList(),
-                    declaration.containingFile,
+                    setName = setName,
+                    className = declaration.qualifiedName?.asString() ?: declaration.simpleName.asString(),
+                    packageName = if (declaration.qualifiedName == null) declaration.packageName.asString() else "",
+                    dependencies = declaration.primaryConstructor?.parameters?.mapNotNull {
+                        it.type.resolve().declaration.qualifiedName?.asString()
+                    } ?: emptyList(),
+                    containingFile = declaration.containingFile,
                 )
             }
     }

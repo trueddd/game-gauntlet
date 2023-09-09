@@ -1,7 +1,7 @@
 package com.github.trueddd.data.items
 
 import com.github.trueddd.utils.generateWheelItemUid
-import com.trueddd.github.annotations.IntoSet
+import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -36,7 +36,7 @@ class WeakThrow private constructor(
         return "${super.toString()}[mod=$modifier]"
     }
 
-    @IntoSet(setName = WheelItem.Factory.SET_TAG)
+    @ItemFactory
     class Factory : WheelItem.Factory {
         override fun create() = WeakThrow.create()
     }

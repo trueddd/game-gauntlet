@@ -3,8 +3,8 @@ package com.github.trueddd.core.actions
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.ActionCreationException
-import com.trueddd.github.annotations.IntoMap
-import com.trueddd.github.annotations.IntoSet
+import com.trueddd.github.annotations.ActionGenerator
+import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -13,7 +13,7 @@ data class ItemUse(
     val itemUid: String,
 ) : Action(Key.ItemUse) {
 
-    @IntoSet(Action.Generator.SET_TAG)
+    @ActionGenerator
     class Generator : Action.Generator<ItemUse> {
 
         override val actionKey = Key.ItemUse
@@ -25,7 +25,7 @@ data class ItemUse(
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Key.ItemUse)
+    @ActionHandler(key = Key.ItemUse)
     class Handler : Action.Handler<ItemUse> {
 
         override suspend fun handle(action: ItemUse, currentState: GlobalState): GlobalState {

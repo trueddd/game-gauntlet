@@ -30,10 +30,6 @@ sealed class Action(
      */
     interface Generator<out A : Action> {
 
-        companion object {
-            const val SET_TAG = "ActionGenerators"
-        }
-
         val actionKey: Int
 
         fun generate(participant: Participant, arguments: List<String>): A
@@ -43,11 +39,6 @@ sealed class Action(
      * Action handler applies changes to the global state of the game according to the passed action.
      */
     interface Handler<in A : Action> {
-
-        companion object {
-            const val MAP_TAG = "ActionHandlers"
-        }
-
         suspend fun handle(action: A, currentState: GlobalState): GlobalState
     }
 }

@@ -6,8 +6,8 @@ import com.github.trueddd.data.GameHistoryEntry
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.StateModificationException
-import com.trueddd.github.annotations.IntoMap
-import com.trueddd.github.annotations.IntoSet
+import com.trueddd.github.annotations.ActionGenerator
+import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,7 +16,7 @@ data class GameRoll(
     val gameId: Game.Id,
 ) : Action(Key.GameRoll) {
 
-    @IntoSet(Action.Generator.SET_TAG)
+    @ActionGenerator
     class Generator(private val gamesProvider: GamesProvider) : Action.Generator<GameRoll> {
 
         override val actionKey = Key.GameRoll
@@ -27,7 +27,7 @@ data class GameRoll(
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Key.GameRoll)
+    @ActionHandler(key = Key.GameRoll)
     class Handler(private val gamesProvider: GamesProvider) : Action.Handler<GameRoll> {
 
         override suspend fun handle(action: GameRoll, currentState: GlobalState): GlobalState {

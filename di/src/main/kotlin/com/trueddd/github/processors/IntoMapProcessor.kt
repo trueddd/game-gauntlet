@@ -5,6 +5,7 @@ import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.trueddd.github.annotations.ActionHandler
 import com.trueddd.github.annotations.IntoMap
 import com.trueddd.github.declarations.IntoMapClassDeclaration
 import org.koin.core.annotation.Named
@@ -16,29 +17,36 @@ class IntoMapProcessor(
 ) : MultibindingAnnotationProcessor<IntoMapClassDeclaration> {
 
     override fun findAnnotations(): Sequence<IntoMapClassDeclaration> {
+        val availableAnnotationSimpleNames = listOf(
+            IntoMap::class.simpleName,
+            ActionHandler::class.simpleName,
+        )
         return resolver.getSymbolsWithAnnotation(IntoMap::class.qualifiedName.toString())
+            .plus(resolver.getSymbolsWithAnnotation(ActionHandler::class.qualifiedName.toString()))
             .onEach { environment.logger.info("Found declaration $it") }
             .filterIsInstance<KSClassDeclaration>()
             .mapNotNull { declaration ->
                 environment.logger.info("Found class declaration $declaration ${declaration.annotations.joinToString { it.shortName.asString() }}")
                 val annotation = declaration.annotations
-                    .firstOrNull { it.shortName.asString() == IntoMap::class.simpleName }
+                    .firstOrNull { it.shortName.asString() in availableAnnotationSimpleNames }
                     ?: return@mapNotNull null
-                val mapName = annotation.arguments
-                    .firstOrNull { it.name?.asString() == "mapName" }
-                    ?.value?.toString()
-                    ?: return@mapNotNull null
+                val mapName = when (annotation.shortName.asString()) {
+                    ActionHandler::class.simpleName -> ActionHandler.TAG
+                    else -> annotation.arguments.firstOrNull { it.name?.asString() == "mapName" }?.value?.toString()
+                } ?: return@mapNotNull null
                 val key = annotation.arguments
                     .firstOrNull { it.name?.asString() == "key" }
                     ?.value?.toString()?.toIntOrNull()
                     ?: return@mapNotNull null
                 IntoMapClassDeclaration(
-                    mapName,
-                    key,
-                    declaration.qualifiedName?.asString() ?: declaration.simpleName.asString(),
-                    if (declaration.qualifiedName == null) declaration.packageName.asString() else "",
-                    declaration.primaryConstructor?.parameters?.mapNotNull { it.type.resolve().declaration.qualifiedName?.asString() } ?: emptyList(),
-                    declaration.containingFile,
+                    mapName = mapName,
+                    key = key,
+                    className = declaration.qualifiedName?.asString() ?: declaration.simpleName.asString(),
+                    packageName = if (declaration.qualifiedName == null) declaration.packageName.asString() else "",
+                    dependencies = declaration.primaryConstructor?.parameters?.mapNotNull {
+                        it.type.resolve().declaration.qualifiedName?.asString()
+                    } ?: emptyList(),
+                    containingFile = declaration.containingFile,
                 )
             }
     }

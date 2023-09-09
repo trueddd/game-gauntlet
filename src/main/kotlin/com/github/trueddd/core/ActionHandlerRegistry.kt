@@ -1,12 +1,13 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.core.actions.Action
+import com.trueddd.github.annotations.ActionHandler
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 
 @Single
 class ActionHandlerRegistry(
-    @Named(Action.Handler.MAP_TAG)
+    @Named(ActionHandler.TAG)
     private val handlers: Map<Int, Action.Handler<*>>,
 ) {
 

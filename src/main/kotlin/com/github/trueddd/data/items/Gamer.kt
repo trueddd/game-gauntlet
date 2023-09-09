@@ -1,7 +1,7 @@
 package com.github.trueddd.data.items
 
 import com.github.trueddd.utils.generateWheelItemUid
-import com.trueddd.github.annotations.IntoSet
+import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -34,7 +34,7 @@ class Gamer private constructor(
         return Gamer(uid, chargesLeft, isActive = value)
     }
 
-    @IntoSet(setName = WheelItem.Factory.SET_TAG)
+    @ItemFactory
     class Factory : WheelItem.Factory {
         override fun create() = Gamer.create()
     }

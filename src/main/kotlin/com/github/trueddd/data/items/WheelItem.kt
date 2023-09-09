@@ -19,11 +19,6 @@ sealed class WheelItem {
     abstract val description: String
 
     interface Factory {
-
-        companion object {
-            const val SET_TAG = "ItemFactory"
-        }
-
         fun create(): WheelItem
     }
 

@@ -9,7 +9,7 @@ import com.github.trueddd.core.history.MockedLocalEventHistoryHolder
 import com.github.trueddd.data.items.WheelItem
 import com.github.trueddd.di.getActionHandlersMap
 import com.github.trueddd.di.getActionGeneratorsSet
-import com.github.trueddd.di.getItemFactorySet
+import com.github.trueddd.di.getItemFactoriesSet
 
 internal fun provideEventGate(): EventGate {
     val stateHolder = StateHolder()
@@ -27,7 +27,7 @@ internal fun provideInputParser(
 ) = InputParser(
     getActionGeneratorsSet(
         gamesProvider,
-        ItemRoller(getItemFactorySet() as Set<WheelItem.Factory>),
+        ItemRoller(getItemFactoriesSet() as Set<WheelItem.Factory>),
     ) as Set<Action.Generator<*>>,
     stateHolder
 )

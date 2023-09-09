@@ -2,12 +2,15 @@ package com.github.trueddd.core.actions
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
-import com.github.trueddd.data.items.*
+import com.github.trueddd.data.items.DiceRollModifier
+import com.github.trueddd.data.items.PowerThrow
+import com.github.trueddd.data.items.WeakThrow
+import com.github.trueddd.data.items.WheelItem
 import com.github.trueddd.utils.StateModificationException
 import com.github.trueddd.utils.moveRange
 import com.github.trueddd.utils.rollDice
-import com.trueddd.github.annotations.IntoMap
-import com.trueddd.github.annotations.IntoSet
+import com.trueddd.github.annotations.ActionGenerator
+import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.Serializable
 import java.util.*
 import kotlin.math.absoluteValue
@@ -18,7 +21,7 @@ data class BoardMove(
     val diceValue: Int,
 ) : Action(Key.BoardMove) {
 
-    @IntoSet(Action.Generator.SET_TAG)
+    @ActionGenerator
     class Generator : Action.Generator<BoardMove> {
 
         override val actionKey = Key.BoardMove
@@ -29,7 +32,7 @@ data class BoardMove(
         }
     }
 
-    @IntoMap(mapName = Action.Handler.MAP_TAG, key = Key.BoardMove)
+    @ActionHandler(key = Key.BoardMove)
     class Handler : Action.Handler<BoardMove> {
 
         override suspend fun handle(action: BoardMove, currentState: GlobalState): GlobalState {
