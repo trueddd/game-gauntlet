@@ -34,6 +34,7 @@ sealed class WheelItem {
             val Reroll = Id(6)
             val Gamer = Id(7)
             val Viewer = Id(8)
+            val ChargedDice = Id(9)
         }
     }
 

@@ -26,7 +26,7 @@ sealed class Action(
     }
 
     /**
-     * Action generator is a component that creates actions from entered command by any of participants.
+     * Action generator is a component that creates actions from entered command by any participant.
      */
     interface Generator<out A : Action> {
 

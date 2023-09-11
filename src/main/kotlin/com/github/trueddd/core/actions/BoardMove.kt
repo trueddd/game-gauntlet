@@ -2,10 +2,7 @@ package com.github.trueddd.core.actions
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
-import com.github.trueddd.data.items.DiceRollModifier
-import com.github.trueddd.data.items.PowerThrow
-import com.github.trueddd.data.items.WeakThrow
-import com.github.trueddd.data.items.WheelItem
+import com.github.trueddd.data.items.*
 import com.github.trueddd.utils.StateModificationException
 import com.github.trueddd.utils.moveRange
 import com.github.trueddd.utils.rollDice
@@ -47,14 +44,16 @@ data class BoardMove(
                 while (modifiers.sumOf { it.modifier } + action.diceValue !in moveRange && modifiers.isNotEmpty()) {
                     modifiers.removeAt(0)
                 }
-                val moveValue = modifiers.sumOf { it.modifier } + action.diceValue
-                val finalPosition = minOf(playerState.position + moveValue, currentState.boardLength)
+                val moveValue = (modifiers.sumOf { it.modifier } + action.diceValue)
+                    .let { value -> if (playerState.effects.any { it is ChargedDice }) -value else value }
+                val finalPosition = (playerState.position + moveValue).coerceIn(0, currentState.boardLength)
                 playerState.copy(
                     position = finalPosition,
                     stepsCount = playerState.stepsCount + 1,
                     boardMoveAvailable = false,
                     effects = playerState.effects.mapNotNull { effect ->
                         when (effect) {
+                            is ChargedDice -> null
                             !is DiceRollModifier -> effect
                             !in modifiers -> effect
                             is PowerThrow -> effect.charge() as? WheelItem.Effect
