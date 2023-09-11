@@ -5,7 +5,7 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.Gamer
 import com.github.trueddd.data.items.Viewer
-import com.github.trueddd.data.items.WheelItem
+import com.github.trueddd.data.items.charge
 import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
@@ -42,8 +42,8 @@ data class GameStatusChange(
                 val newEffects = if (action.gameNewStatus.allowsNextStep) {
                     state.effects.mapNotNull { effect ->
                         when (effect) {
-                            is Gamer -> if (!effect.isActive) effect.setActive(true) else effect.charge() as? WheelItem.Effect
-                            is Viewer -> if (!effect.isActive) effect.setActive(true) else effect.charge() as? WheelItem.Effect
+                            is Gamer -> if (!effect.isActive) effect.setActive(true) else effect.charge()
+                            is Viewer -> if (!effect.isActive) effect.setActive(true) else effect.charge()
                             else -> effect
                         }
                     }

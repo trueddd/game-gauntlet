@@ -70,8 +70,9 @@ data class BoardMove(
                             is NoClownery -> if (previousStintIndex + 1 == newStintIndex) null else effect
                             !is DiceRollModifier -> effect
                             !in modifiers -> effect
-                            is PowerThrow -> effect.charge() as? WheelItem.Effect
-                            is WeakThrow -> effect.charge() as? WheelItem.Effect
+                            is BabySupport -> effect.charge()
+                            is PowerThrow -> effect.charge()
+                            is WeakThrow -> effect.charge()
                             else -> null
                         }
                     },

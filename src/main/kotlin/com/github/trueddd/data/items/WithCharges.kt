@@ -7,8 +7,8 @@ interface WithCharges<out T : WheelItem> {
     val chargesLeft: Int
 
     fun useCharge(): WithCharges<T>
+}
 
-    fun charge(): WithCharges<T>? {
-        return useCharge().let { if (it.chargesLeft <= 0) null else it }
-    }
+fun <T: WheelItem.Effect> WithCharges<T>.charge(): WheelItem.Effect? {
+    return useCharge().let { if (it.chargesLeft <= 0) null else it } as? WheelItem.Effect
 }
