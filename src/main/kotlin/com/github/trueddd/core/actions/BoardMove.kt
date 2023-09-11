@@ -2,6 +2,7 @@ package com.github.trueddd.core.actions
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerState
 import com.github.trueddd.data.items.*
 import com.github.trueddd.utils.StateModificationException
 import com.github.trueddd.utils.moveRange
@@ -36,6 +37,7 @@ data class BoardMove(
             if (currentState.players[action.rolledBy]?.boardMoveAvailable == false) {
                 throw StateModificationException(action, "Move is not available")
             }
+            val previousStintIndex = currentState[action.rolledBy.name]!!.stintIndex
             val newState = currentState.updatePlayer(action.rolledBy) { playerState ->
                 val modifiers = playerState.effects
                     .filterIsInstance<DiceRollModifier>()
@@ -46,7 +48,8 @@ data class BoardMove(
                 }
                 val moveValue = (modifiers.sumOf { it.modifier } + action.diceValue)
                     .let { value -> if (playerState.effects.any { it is ChargedDice }) -value else value }
-                val finalPosition = (playerState.position + moveValue).coerceIn(0, currentState.boardLength)
+                val finalPosition = (playerState.position + moveValue).coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
+                val newStintIndex = PlayerState.calculateStintIndex(finalPosition)
                 playerState.copy(
                     position = finalPosition,
                     stepsCount = playerState.stepsCount + 1,
@@ -54,6 +57,7 @@ data class BoardMove(
                     effects = playerState.effects.mapNotNull { effect ->
                         when (effect) {
                             is ChargedDice -> null
+                            is NoClownery -> if (previousStintIndex + 1 == newStintIndex) null else effect
                             !is DiceRollModifier -> effect
                             !in modifiers -> effect
                             is PowerThrow -> effect.charge() as? WheelItem.Effect

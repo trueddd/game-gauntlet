@@ -30,7 +30,10 @@ data class GlobalState(
 
     companion object {
 
+        const val START_POSITION = 0
         const val STINT_COUNT = 25
+        val STINT_SIZE = Game.Genre.entries.size
+        val PLAYABLE_BOARD_RANGE = 1 .. STINT_SIZE * STINT_COUNT
 
         fun default(
             genreDistribution: GameGenreDistribution = GameGenreDistribution.generateRandom(STINT_COUNT),
@@ -45,7 +48,7 @@ data class GlobalState(
                     Participant("solll") to PlayerState(),
                     Participant("keli") to PlayerState(),
                 ),
-                boardLength = Game.Genre.entries.size * STINT_COUNT,
+                boardLength = STINT_SIZE * STINT_COUNT,
                 gameGenreDistribution = genreDistribution,
             )
         }

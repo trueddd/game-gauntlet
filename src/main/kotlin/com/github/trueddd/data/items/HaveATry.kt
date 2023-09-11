@@ -3,6 +3,7 @@ package com.github.trueddd.data.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.generateWheelItemUid
+import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -24,5 +25,10 @@ class HaveATry private constructor(override val uid: String) : WheelItem.Invento
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(inventory = playerState.inventory.filter { it.uid != uid })
         }
+    }
+
+    @ItemFactory
+    class Factory : WheelItem.Factory {
+        override fun create() = HaveATry.create()
     }
 }
