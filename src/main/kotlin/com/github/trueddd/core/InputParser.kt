@@ -22,22 +22,23 @@ class InputParser(
      * Common pattern that matches all the actions triggered by players.
      * Action syntax: `<username>:<action_key>[:<argument1>..:<argumentN>]`
      */
-    private val pattern = Regex("^([a-z]+):(\\d+)(?::([\\w-]+))*\$")
+    private val pattern = Regex("^[a-z]+:\\d+(?::[\\w-]+)*\$")
 
     fun parse(input: String): Action? {
-        val parseResult = pattern.matchEntire(input) ?: run {
+        if (!input.matches(pattern)) {
             Log.error(TAG, "Couldn't parse action from input: $input")
             return null
         }
-        val user = parseResult.groupValues.getOrNull(1)?.let { participantProvider[it] } ?: run {
+        val parseResult = input.split(":")
+        val user = parseResult.getOrNull(0)?.let { participantProvider[it] } ?: run {
             Log.error(TAG, "Couldn't get `user` from input: $input")
             return null
         }
-        val actionId = parseResult.groupValues.getOrNull(2)?.toIntOrNull() ?: run {
+        val actionId = parseResult.getOrNull(1)?.toIntOrNull() ?: run {
             Log.error(TAG, "Couldn't get `actionId` from input: $input")
             return null
         }
-        val arguments = parseResult.groupValues.drop(3)
+        val arguments = parseResult.drop(2)
         val generator = generators.firstOrNull { it.actionKey == actionId } ?: run {
             Log.error(TAG, "Couldn't find a generator for input: $input")
             return null

@@ -23,7 +23,7 @@ class SamuraiLunge private constructor(override val uid: String) : WheelItem.Inv
         а походить вперед. Имеет 1 заряд.
     """.trimIndent()
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState): GlobalState {
+    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         Log.info(name, "Using item by ${usedBy.name}")
         return globalState.updatePlayer(usedBy) { state ->
             state.copy(

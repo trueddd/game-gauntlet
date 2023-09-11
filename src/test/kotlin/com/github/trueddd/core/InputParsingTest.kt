@@ -66,6 +66,24 @@ internal class InputParsingTest {
     }
 
     @Test
+    fun `parsing - item use 1`() {
+        val parsed = inputParser.parse("shizov:4:1")
+        assertIs<ItemUse>(parsed)
+        assertEquals("shizov", parsed.usedBy.name)
+        assertEquals(expected = "1", parsed.itemUid)
+        assertEquals(expected = emptyList(), parsed.arguments)
+    }
+
+    @Test
+    fun `parsing - item use 2`() {
+        val parsed = inputParser.parse("shizov:4:1:2")
+        assertIs<ItemUse>(parsed)
+        assertEquals("shizov", parsed.usedBy.name)
+        assertEquals(expected = "1", parsed.itemUid)
+        assertEquals(expected = listOf("2"), parsed.arguments)
+    }
+
+    @Test
     fun `parsing - game status change 1`() {
         val parsed = inputParser.parse("shizov:5:1")
         assertIs<GameStatusChange>(parsed)

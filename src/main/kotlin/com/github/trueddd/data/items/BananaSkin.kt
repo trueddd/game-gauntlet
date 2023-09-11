@@ -23,7 +23,7 @@ class BananaSkin private constructor(override val uid: String) : WheelItem.Inven
         Данный эффект работает и на стримера, который использовал этот предмет.
     """.trimIndent()
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState): GlobalState {
+    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(inventory = playerState.inventory.filter { it.uid != uid })
         }.let { state ->

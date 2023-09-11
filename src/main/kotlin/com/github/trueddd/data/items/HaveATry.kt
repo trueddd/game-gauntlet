@@ -21,7 +21,7 @@ class HaveATry private constructor(override val uid: String) : WheelItem.Invento
         При использовании можете воспользоваться гайдом, видеопрохождением или спидраном игры. Имеет 1 заряд.
     """.trimIndent()
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState): GlobalState {
+    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(inventory = playerState.inventory.filter { it.uid != uid })
         }

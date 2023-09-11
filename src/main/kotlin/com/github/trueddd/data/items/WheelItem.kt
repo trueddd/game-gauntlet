@@ -42,6 +42,7 @@ sealed class WheelItem {
             val WillOfGoodChance = Id(14)
             val WillOfBadChance = Id(15)
             val BabySupport = Id(16)
+            val LoyalModerator = Id(17)
         }
     }
 

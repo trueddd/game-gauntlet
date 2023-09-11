@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 data class ItemUse(
     val usedBy: Participant,
     val itemUid: String,
+    val arguments: List<String> = emptyList(),
 ) : Action(Key.ItemUse) {
 
     @ActionGenerator
@@ -21,7 +22,7 @@ data class ItemUse(
         override fun generate(participant: Participant, arguments: List<String>): ItemUse {
             val itemUid = arguments.firstOrNull()
                 ?: throw ActionCreationException("Couldn't parse itemUid from arguments: `$arguments`")
-            return ItemUse(participant, itemUid)
+            return ItemUse(participant, itemUid, arguments.drop(1))
         }
     }
 
@@ -32,7 +33,7 @@ data class ItemUse(
             val item = currentState.players[action.usedBy]?.inventory
                 ?.firstOrNull { it.uid == action.itemUid }
                 ?: return currentState
-            return item.use(action.usedBy, currentState)
+            return item.use(action.usedBy, currentState, action.arguments)
         }
     }
 }

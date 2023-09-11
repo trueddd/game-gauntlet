@@ -32,9 +32,7 @@ class PowerThrowItemTest : EventGateTest() {
         repeat(5) {
             eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create(chargesLeft = 1)))
         }
-        println(eventGate.stateHolder.current[user.name]!!.effects.toString())
         eventGate.eventManager.suspendConsumeAction(BoardMove(user, 6))
-        println(eventGate.stateHolder.current[user.name]!!.effects.toString())
         assertEquals(10, eventGate.stateHolder.current.players[user]!!.position)
         assertEquals(1, eventGate.stateHolder.current.players[user]!!.effects.size)
     }

@@ -4,6 +4,7 @@ import com.github.trueddd.EventGateTest
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GameGenreDistribution
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.utils.Log
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.RepeatedTest
@@ -11,6 +12,10 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 class GenreDistributionTest : EventGateTest() {
+
+    companion object {
+        private const val TAG = "GenreDistributionTest"
+    }
 
     @RepeatedTest(10)
     fun `genre sectors distribution`() = runTest {
@@ -21,6 +26,6 @@ class GenreDistributionTest : EventGateTest() {
         }
         val layout = Json.encodeToString(GameGenreDistribution.serializer, eventGate.stateHolder.current.gameGenreDistribution)
             .replace(Game.Genre.Special.ordinal.toString(), "[]")
-        println("Generated layout: $layout")
+        Log.info(TAG, "Generated layout: $layout")
     }
 }

@@ -3,6 +3,7 @@ package com.github.trueddd.core.actions
 import com.github.trueddd.core.ItemRoller
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.items.BabySupport
 import com.github.trueddd.data.items.Gamer
 import com.github.trueddd.data.items.Viewer
 import com.github.trueddd.data.items.WheelItem
@@ -49,6 +50,15 @@ data class ItemReceive(
                             state.copy(effects = state.effects - gamer)
                         } else {
                             state.copy(effects = state.effects + action.item.setActive(state.currentActiveGame == null))
+                        }
+                    }
+                }
+                is BabySupport -> {
+                    currentState.updatePlayer(action.receivedBy) { state ->
+                        if (currentState.players.minOf { it.value.position } == state.position) {
+                            state.copy(effects = state.effects + action.item)
+                        } else {
+                            state
                         }
                     }
                 }

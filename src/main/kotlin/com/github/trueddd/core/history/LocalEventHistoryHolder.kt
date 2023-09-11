@@ -4,6 +4,7 @@ import com.github.trueddd.core.ActionHandlerRegistry
 import com.github.trueddd.core.actions.Action
 import com.github.trueddd.data.GameGenreDistribution
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -18,6 +19,10 @@ import java.util.*
 open class LocalEventHistoryHolder(
     private val actionHandlerRegistry: ActionHandlerRegistry,
 ) : EventHistoryHolder {
+
+    companion object {
+        private const val TAG = "EventHistoryHolder"
+    }
 
     protected open val saveLocation = ".\\src\\main\\resources\\history"
 
@@ -39,7 +44,7 @@ open class LocalEventHistoryHolder(
     }
 
     override suspend fun save(globalState: GlobalState) {
-        println("Saving Global state")
+        Log.info(TAG, "Saving Global state")
         monitor.lock()
         val eventsToSave = latestEvents.toList()
         monitor.unlock()
@@ -58,7 +63,7 @@ open class LocalEventHistoryHolder(
                 historyHolderFile.appendText(text)
             }
         }
-        println("Global state saved")
+        Log.info(TAG, "Global state saved")
     }
 
     override suspend fun load(): GlobalState {
@@ -77,8 +82,8 @@ open class LocalEventHistoryHolder(
                 try {
                     handler.handle(action, state)
                 } catch (error: StateModificationException) {
-                    System.err.println("Error caught while restoring state at action: $action")
-                    System.err.println("Current state: $state")
+                    Log.error(TAG, "Error caught while restoring state at action: $action")
+                    Log.error(TAG, "Current state: $state")
                     error.printStackTrace()
                     state
                 }

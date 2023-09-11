@@ -2,6 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.EventGateTest
 import com.github.trueddd.core.actions.Action
+import com.github.trueddd.utils.Log
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
@@ -10,6 +11,10 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class GameWinnerTest : EventGateTest() {
+
+    companion object {
+        private const val TAG = "GameWinnerTest"
+    }
 
     private suspend fun makeMove(userName: String) {
         eventGate.parseAndHandleSuspend("$userName:${Action.Key.BoardMove}")
@@ -24,7 +29,7 @@ class GameWinnerTest : EventGateTest() {
                 emit(eventGate.stateHolder.current[userName]?.position)
             }
         }
-            .onEach { println("position: $it") }
+            .onEach { Log.info(TAG, "position: $it") }
             .filterNotNull()
             .takeWhile { it < eventGate.stateHolder.current.boardLength }
             .collect()

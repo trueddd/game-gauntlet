@@ -16,6 +16,14 @@ import kotlin.test.assertTrue
 class BabySupportItemTest : EventGateTest() {
 
     @Test
+    fun `receive by leader`() = runTest {
+        val leader = requireParticipant("shizov")
+        eventGate.eventManager.suspendConsumeAction(BoardMove(leader, 6))
+        eventGate.eventManager.suspendConsumeAction(ItemReceive(leader, BabySupport.create()))
+        assertTrue(effectsOf(leader).isEmpty())
+    }
+
+    @Test
     fun `regular use`() = runTest {
         val outsider = requireParticipant("solll")
         val leader = requireParticipant("shizov")
