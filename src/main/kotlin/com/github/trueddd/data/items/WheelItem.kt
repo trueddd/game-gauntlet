@@ -37,6 +37,7 @@ sealed class WheelItem {
             val ChargedDice = Id(9)
             val HaveATry = Id(10)
             val NoClownery = Id(11)
+            val BananaSkin = Id(12)
         }
     }
 

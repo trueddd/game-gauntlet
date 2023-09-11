@@ -1,5 +1,6 @@
 package com.github.trueddd.data
 
+import com.github.trueddd.data.items.BoardTrap
 import java.util.Calendar
 import java.util.Date
 import kotlin.time.Duration.Companion.days
@@ -12,6 +13,7 @@ data class GlobalState(
     val boardLength: Int,
     val winner: Participant? = null,
     val gameGenreDistribution: GameGenreDistribution,
+    val boardTraps: Map<Int, BoardTrap> = mapOf(),
 ) {
 
     operator fun get(playerName: String): PlayerState? {

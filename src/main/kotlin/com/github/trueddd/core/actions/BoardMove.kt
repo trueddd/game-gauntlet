@@ -34,6 +34,7 @@ data class BoardMove(
     class Handler : Action.Handler<BoardMove> {
 
         override suspend fun handle(action: BoardMove, currentState: GlobalState): GlobalState {
+            val trapsToClear = mutableListOf<Int>()
             if (currentState.players[action.rolledBy]?.boardMoveAvailable == false) {
                 throw StateModificationException(action, "Move is not available")
             }
@@ -49,6 +50,15 @@ data class BoardMove(
                 val moveValue = (modifiers.sumOf { it.modifier } + action.diceValue)
                     .let { value -> if (playerState.effects.any { it is ChargedDice }) -value else value }
                 val finalPosition = (playerState.position + moveValue).coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
+                    .let {
+                        when {
+                            currentState.boardTraps[it] is BananaSkinTrap -> {
+                                trapsToClear.add(it)
+                                it - 2
+                            }
+                            else -> it
+                        }
+                    }
                 val newStintIndex = PlayerState.calculateStintIndex(finalPosition)
                 playerState.copy(
                     position = finalPosition,
@@ -72,6 +82,7 @@ data class BoardMove(
                 ?.key
             return newState.copy(
                 winner = currentState.winner ?: winner,
+                boardTraps = currentState.boardTraps.filterKeys { it !in trapsToClear },
             )
         }
     }
