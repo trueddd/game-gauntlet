@@ -38,6 +38,9 @@ sealed class WheelItem {
             val HaveATry = Id(10)
             val NoClownery = Id(11)
             val BananaSkin = Id(12)
+            val WillOfChance = Id(13)
+            val WillOfGoodChance = Id(14)
+            val WillOfBadChance = Id(15)
         }
     }
 
