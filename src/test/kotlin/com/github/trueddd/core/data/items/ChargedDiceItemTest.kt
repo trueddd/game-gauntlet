@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ChargedDice : EventGateTest() {
+class ChargedDiceItemTest : EventGateTest() {
 
     @Test
     fun `make move with no modifiers`() = runTest {

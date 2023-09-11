@@ -10,7 +10,7 @@ import org.junit.jupiter.api.TestInstance
 import kotlin.test.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class InputParsing {
+internal class InputParsingTest {
 
     private val inputParser = provideInputParser()
 

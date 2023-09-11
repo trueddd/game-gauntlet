@@ -10,7 +10,20 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class DropGame : EventGateTest() {
+class DropGameActionTest : EventGateTest() {
+
+    @Test
+    fun `drop game`() = runTest {
+        val user = requireParticipant("shizov")
+        val moveDiceValue = 6
+        val dropDiceValue = 4
+        eventGate.eventManager.suspendConsumeAction(BoardMove(user, moveDiceValue))
+        eventGate.parseAndHandleSuspend("${user.name}:${Action.Key.GameRoll}")
+        eventGate.eventManager.suspendConsumeAction(GameDrop(user, dropDiceValue))
+        assertTrue(inventoryOf(user).isEmpty())
+        assertEquals(Game.Status.Dropped, lastGameOf(user)?.status)
+        assertEquals(expected = moveDiceValue - dropDiceValue, positionOf(user))
+    }
 
     @Test
     fun `drop game with SamuraiLunge`() = runTest {
@@ -23,9 +36,9 @@ class DropGame : EventGateTest() {
         eventGate.eventManager.suspendConsumeAction(ItemReceive(user, item))
         eventGate.eventManager.suspendConsumeAction(ItemUse(user, item.uid))
         eventGate.eventManager.suspendConsumeAction(GameDrop(user, dropDiceValue))
-        assertTrue(eventGate.stateHolder.current.players[user]!!.inventory.isEmpty())
-        assertTrue(eventGate.stateHolder.current.players[user]!!.effects.none { it is DropReverse })
-        assertEquals(Game.Status.Dropped, eventGate.stateHolder.current.players[user]?.currentGame?.status)
-        assertEquals(moveDiceValue + dropDiceValue, eventGate.stateHolder.current.players[user]!!.position)
+        assertTrue(inventoryOf(user).isEmpty())
+        assertTrue(effectsOf(user).none { it is DropReverse })
+        assertEquals(Game.Status.Dropped, lastGameOf(user)?.status)
+        assertEquals(expected = moveDiceValue + dropDiceValue, positionOf(user))
     }
 }

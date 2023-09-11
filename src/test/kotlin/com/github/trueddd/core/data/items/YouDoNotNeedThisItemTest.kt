@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class YouDoNotNeedThis : EventGateTest() {
+class YouDoNotNeedThisItemTest : EventGateTest() {
 
     @Test
     fun `drop buff`() = runTest {

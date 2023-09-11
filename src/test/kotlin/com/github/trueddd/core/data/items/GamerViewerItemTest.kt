@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class GamerViewer : EventGateTest() {
+class GamerViewerItemTest : EventGateTest() {
 
     @Test
     fun `gamer item test 1`() = runTest {

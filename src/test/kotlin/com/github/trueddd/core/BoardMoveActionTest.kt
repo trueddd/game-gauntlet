@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class BoardSteps : EventGateTest() {
+class BoardMoveActionTest : EventGateTest() {
 
     @Test
     fun `10 steps at once`() = runTest {

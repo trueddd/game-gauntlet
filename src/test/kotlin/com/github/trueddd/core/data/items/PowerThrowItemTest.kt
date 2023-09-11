@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class PowerThrow : EventGateTest() {
+class PowerThrowItemTest : EventGateTest() {
 
     @Test
     fun `power throw on 3`() = runTest {

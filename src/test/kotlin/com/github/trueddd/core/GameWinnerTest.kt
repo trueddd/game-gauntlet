@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class GameWinner : EventGateTest() {
+class GameWinnerTest : EventGateTest() {
 
     private suspend fun makeMove(userName: String) {
         eventGate.parseAndHandleSuspend("$userName:${Action.Key.BoardMove}")

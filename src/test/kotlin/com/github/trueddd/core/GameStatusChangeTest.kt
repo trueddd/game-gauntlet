@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class GameStatus : EventGateTest() {
+class GameStatusChangeTest : EventGateTest() {
 
     @Test
     fun `change status with failure`() = runTest {

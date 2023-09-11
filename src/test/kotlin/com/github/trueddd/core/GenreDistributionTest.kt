@@ -10,7 +10,7 @@ import org.junit.jupiter.api.RepeatedTest
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
-class GenreDistribution : EventGateTest() {
+class GenreDistributionTest : EventGateTest() {
 
     @RepeatedTest(10)
     fun `genre sectors distribution`() = runTest {

@@ -11,13 +11,13 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-class GameRoll : EventGateTest() {
+class GameRollActionTest : EventGateTest() {
 
     @Test
     fun `roll game once`() = runTest {
         val participant = requireParticipant("shizov")
         eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameRoll}")
-        assertNotEquals(illegal = null, eventGate.stateHolder.current.players[participant]?.currentGame)
+        assertNotEquals(illegal = null, lastGameOf(participant))
     }
 
     @Test

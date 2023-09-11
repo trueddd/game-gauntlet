@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class WeakThrow : EventGateTest() {
+class WeakThrowItemTest : EventGateTest() {
 
     @Test
     fun `weak throw on 5`() = runTest {

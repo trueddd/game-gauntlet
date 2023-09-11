@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.RepeatedTest
 import kotlin.test.assertEquals
 
-class StateRecoverability : EventGateTest() {
+class StateRecoverabilityTest : EventGateTest() {
 
     @RepeatedTest(10)
     fun `save, load & compare`() = runTest {

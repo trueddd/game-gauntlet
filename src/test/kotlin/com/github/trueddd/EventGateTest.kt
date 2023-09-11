@@ -14,7 +14,11 @@ abstract class EventGateTest {
 
     protected fun requireParticipant(userName: String) = eventGate.stateHolder[userName]!!
 
-    protected fun effectsOf(participant: Participant) = eventGate.stateHolder.current[participant.name]!!.effects
+    private fun getCurrentParticipantState(participant: Participant) = eventGate.stateHolder.current[participant.name]!!
+    protected fun effectsOf(participant: Participant) = getCurrentParticipantState(participant).effects
+    protected fun inventoryOf(participant: Participant) = getCurrentParticipantState(participant).inventory
+    protected fun positionOf(participant: Participant) = getCurrentParticipantState(participant).position
+    protected fun lastGameOf(participant: Participant) = getCurrentParticipantState(participant).currentGame
 
     protected suspend fun handleAction(action: Action) = eventGate.eventManager.suspendConsumeAction(action)
 

@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class Reroll : EventGateTest() {
+class RerollItemTest : EventGateTest() {
 
     @Test
     fun `test reroll use`() = runTest {
