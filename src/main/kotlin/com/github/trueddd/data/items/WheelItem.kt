@@ -45,6 +45,7 @@ sealed class WheelItem {
             val LoyalModerator = Id(17)
             val ClimbingRope = Id(18)
             val ClimbingRopeBuff = Id(19)
+            val DontWannaPlayThis = Id(20)
         }
     }
 
