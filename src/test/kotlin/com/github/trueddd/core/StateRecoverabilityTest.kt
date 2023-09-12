@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 
 class StateRecoverabilityTest : EventGateTest() {
 
-    @RepeatedTest(10)
+    @RepeatedTest(20)
     fun `save, load & compare`() = runTest {
         val actionsSequence = sequenceOf(
             "shizov:${Action.Key.BoardMove}",

@@ -47,11 +47,17 @@ sealed class WheelItem {
             val ClimbingRopeBuff = Id(19)
             val DontWannaPlayThis = Id(20)
             val HoleyPockets = Id(21)
+            val PlusOneBuff = Id(22)
+            val MinusOneDebuff = Id(23)
+            val PlusToEveryone = Id(24)
+            val PlusToEveryoneButYou = Id(25)
+            val MinusToEveryone = Id(26)
+            val MinusToEveryoneButYou = Id(27)
         }
     }
 
     override fun equals(other: Any?): Boolean {
-        return id == (other as? WheelItem)?.id && uid == (other as? WheelItem)?.uid
+        return id == (other as? WheelItem)?.id
     }
 
     override fun hashCode(): Int {

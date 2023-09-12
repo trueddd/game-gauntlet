@@ -6,12 +6,11 @@ import com.github.trueddd.data.PlayerState
 import com.github.trueddd.data.items.*
 import com.github.trueddd.utils.StateModificationException
 import com.github.trueddd.utils.moveRange
+import com.github.trueddd.utils.powerSet
 import com.github.trueddd.utils.rollDice
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.Serializable
-import java.util.*
-import kotlin.math.absoluteValue
 
 @Serializable
 data class BoardMove(
@@ -42,11 +41,9 @@ data class BoardMove(
             val newState = currentState.updatePlayer(action.rolledBy) { playerState ->
                 val modifiers = playerState.effects
                     .filterIsInstance<DiceRollModifier>()
-                    .sortedBy { it.modifier.absoluteValue }
-                    .let { LinkedList(it) }
-                while (modifiers.sumOf { it.modifier } + action.diceValue !in moveRange && modifiers.isNotEmpty()) {
-                    modifiers.removeAt(0)
-                }
+                    .powerSet()
+                    .filter { modifiers -> modifiers.sumOf { it.modifier } + action.diceValue in moveRange }
+                    .maxBy { it.size }
                 val moveValue = (modifiers.sumOf { it.modifier } + action.diceValue)
                     .let { value -> if (playerState.effects.any { it is ChargedDice }) -value else value }
                 val finalPosition = (playerState.position + moveValue).coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
@@ -60,19 +57,20 @@ data class BoardMove(
                         }
                     }
                 val newStintIndex = PlayerState.calculateStintIndex(finalPosition)
+                val modifiersToDiscard = modifiers.filterIsInstance<WheelItem.Effect>().map { it.uid }
                 playerState.copy(
                     position = finalPosition,
                     stepsCount = playerState.stepsCount + 1,
                     boardMoveAvailable = false,
                     effects = playerState.effects.mapNotNull { effect ->
-                        when (effect) {
-                            is ChargedDice -> null
-                            is NoClownery -> if (previousStintIndex + 1 == newStintIndex) null else effect
-                            !is DiceRollModifier -> effect
-                            !in modifiers -> effect
-                            is BabySupport -> effect.charge()
-                            is PowerThrow -> effect.charge()
-                            is WeakThrow -> effect.charge()
+                        when {
+                            effect is ChargedDice -> null
+                            effect is NoClownery -> if (previousStintIndex + 1 == newStintIndex) null else effect
+                            effect !is DiceRollModifier -> effect
+                            modifiersToDiscard.none { it == effect.uid } -> effect
+                            effect is BabySupport -> effect.charge()
+                            effect is PowerThrow -> effect.charge()
+                            effect is WeakThrow -> effect.charge()
                             else -> null
                         }
                     },

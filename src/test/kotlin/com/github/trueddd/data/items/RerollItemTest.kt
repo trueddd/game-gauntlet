@@ -1,8 +1,7 @@
-package com.github.trueddd.core.data.items
+package com.github.trueddd.data.items
 
 import com.github.trueddd.EventGateTest
 import com.github.trueddd.core.actions.ItemReceive
-import com.github.trueddd.data.items.Reroll
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

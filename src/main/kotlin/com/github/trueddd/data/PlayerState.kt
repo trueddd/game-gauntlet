@@ -1,5 +1,6 @@
 package com.github.trueddd.data
 
+import com.github.trueddd.data.items.DiceRollModifier
 import com.github.trueddd.data.items.WheelItem
 
 data class PlayerState(
@@ -29,4 +30,7 @@ data class PlayerState(
 
     val stintIndex: Int
         get() = calculateStintIndex(position)
+
+    val modifiersSum: Int
+        get() = effects.filterIsInstance<DiceRollModifier>().sumOf { it.modifier }
 }

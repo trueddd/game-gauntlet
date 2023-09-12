@@ -30,6 +30,12 @@ data class GlobalState(
         })
     }
 
+    fun updatePlayers(block: (Participant, PlayerState) -> PlayerState): GlobalState {
+        return this.copy(players = players.mapValues { (player, playerState) ->
+            block(player, playerState)
+        })
+    }
+
     companion object {
 
         const val START_POSITION = 0
