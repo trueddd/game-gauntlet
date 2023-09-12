@@ -3,6 +3,7 @@ package com.github.trueddd.core.actions
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.items.ClimbingRopeBuff
 import com.github.trueddd.data.items.Gamer
 import com.github.trueddd.data.items.Viewer
 import com.github.trueddd.data.items.charge
@@ -12,6 +13,7 @@ import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.Serializable
 
+// TODO: split this action to more specific ones or include game drop logics here?
 @Serializable
 data class GameStatusChange(
     val participant: Participant,
@@ -39,16 +41,21 @@ data class GameStatusChange(
                 val currentGame = state.gameHistory.lastOrNull()
                     ?: throw StateModificationException(action, "No game entries")
                 val newGameHistory = state.gameHistory.dropLast(1) + currentGame.copy(status = action.gameNewStatus)
-                val newEffects = if (action.gameNewStatus.allowsNextStep) {
-                    state.effects.mapNotNull { effect ->
-                        when (effect) {
-                            is Gamer -> if (!effect.isActive) effect.setActive(true) else effect.charge()
-                            is Viewer -> if (!effect.isActive) effect.setActive(true) else effect.charge()
-                            else -> effect
+                val newEffects = state.effects.mapNotNull { effect ->
+                    when (effect) {
+                        is Gamer -> when {
+                            !action.gameNewStatus.allowsNextStep -> effect
+                            !effect.isActive -> effect.setActive(true)
+                            else -> effect.charge()
                         }
+                        is Viewer -> when {
+                            !action.gameNewStatus.allowsNextStep -> effect
+                            !effect.isActive -> effect.setActive(true)
+                            else -> effect.charge()
+                        }
+                        is ClimbingRopeBuff -> null
+                        else -> effect
                     }
-                } else {
-                    state.effects
                 }
                 state.copy(
                     gameHistory = newGameHistory,

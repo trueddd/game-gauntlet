@@ -3,13 +3,13 @@ package com.github.trueddd.core.actions
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.items.ClimbingRopeBuff
 import com.github.trueddd.data.items.DropReverse
 import com.github.trueddd.utils.StateModificationException
 import com.github.trueddd.utils.rollDice
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.Serializable
-import kotlin.math.max
 
 @Serializable
 data class GameDrop(
@@ -38,19 +38,21 @@ data class GameDrop(
                 throw StateModificationException(action, "Current game is already complete")
             }
             return currentState.updatePlayer(action.rolledBy) { playerState ->
-                val moveValue = if (playerState.effects.any { it is DropReverse }) {
-                    action.diceValue
-                } else {
-                    -action.diceValue
+                val moveValue = when {
+                    playerState.effects.any { it is DropReverse } -> action.diceValue
+                    playerState.effects.any { it is ClimbingRopeBuff } -> -1
+                    else -> -action.diceValue
                 }
-                val finalPosition = max(playerState.position + moveValue, 0)
+                val finalPosition = (playerState.position + moveValue).coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
                 val newGameHistory = playerState.gameHistory.lastOrNull()
                     ?.copy(status = Game.Status.Dropped)
                     ?.let { playerState.gameHistory.dropLast(1) + it }
                     ?: playerState.gameHistory
                 playerState.copy(
                     position = finalPosition,
-                    effects = playerState.effects.filter { it !is DropReverse },
+                    effects = playerState.effects
+                        .filter { it !is DropReverse }
+                        .filter { it !is ClimbingRopeBuff },
                     gameHistory = newGameHistory,
                     boardMoveAvailable = false,
                 )
