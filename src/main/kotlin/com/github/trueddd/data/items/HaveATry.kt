@@ -29,6 +29,7 @@ class HaveATry private constructor(override val uid: String) : WheelItem.Invento
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.HaveATry
         override fun create() = HaveATry.create()
     }
 }

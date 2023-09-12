@@ -31,6 +31,7 @@ class YouDoNotNeedThis private constructor(override val uid: String) : WheelItem
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.YouDoNotNeedThis
         override fun create() = YouDoNotNeedThis.create()
     }
 }

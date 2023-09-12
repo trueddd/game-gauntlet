@@ -27,6 +27,7 @@ class MinusToEveryone private constructor(override val uid: String) : WheelItem.
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.MinusToEveryone
         override fun create() = MinusToEveryone.create()
     }
 }

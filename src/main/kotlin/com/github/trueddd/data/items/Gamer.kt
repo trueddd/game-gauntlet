@@ -36,6 +36,7 @@ class Gamer private constructor(
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.Gamer
         override fun create() = Gamer.create()
     }
 }

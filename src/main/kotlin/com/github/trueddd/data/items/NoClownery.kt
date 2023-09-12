@@ -22,6 +22,7 @@ class NoClownery private constructor(override val uid: String) : WheelItem.Effec
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.NoClownery
         override fun create() = NoClownery.create()
     }
 }

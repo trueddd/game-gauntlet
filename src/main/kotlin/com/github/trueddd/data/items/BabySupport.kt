@@ -33,6 +33,7 @@ class BabySupport private constructor(
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.BabySupport
         override fun create() = BabySupport.create()
     }
 }

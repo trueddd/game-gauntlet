@@ -30,6 +30,7 @@ class ClimbingRope private constructor(override val uid: String) : WheelItem.Inv
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.ClimbingRope
         override fun create() = ClimbingRope.create()
     }
 }

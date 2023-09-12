@@ -22,6 +22,7 @@ class ChargedDice private constructor(override val uid: String) : WheelItem.Effe
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.ChargedDice
         override fun create() = ChargedDice.create()
     }
 }

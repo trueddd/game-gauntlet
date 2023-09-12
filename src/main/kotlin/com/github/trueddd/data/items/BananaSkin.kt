@@ -34,6 +34,7 @@ class BananaSkin private constructor(override val uid: String) : WheelItem.Inven
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.BananaSkin
         override fun create() = BananaSkin.create()
     }
 }

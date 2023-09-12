@@ -1,7 +1,9 @@
 package com.github.trueddd.core.actions
 
+import com.github.trueddd.core.ItemRoller
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.items.Plasticine
 import com.github.trueddd.utils.ActionCreationException
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
@@ -27,13 +29,18 @@ data class ItemUse(
     }
 
     @ActionHandler(key = Key.ItemUse)
-    class Handler : Action.Handler<ItemUse> {
+    class Handler(
+        private val itemRoller: ItemRoller,
+    ) : Action.Handler<ItemUse> {
 
         override suspend fun handle(action: ItemUse, currentState: GlobalState): GlobalState {
             val item = currentState.players[action.usedBy]?.inventory
                 ?.firstOrNull { it.uid == action.itemUid }
                 ?: return currentState
-            return item.use(action.usedBy, currentState, action.arguments)
+            return when (item) {
+                is Plasticine -> item.transform(action.usedBy, currentState, action.arguments, itemRoller.allItemsFactories)
+                else -> item.use(action.usedBy, currentState, action.arguments)
+            }
         }
     }
 }

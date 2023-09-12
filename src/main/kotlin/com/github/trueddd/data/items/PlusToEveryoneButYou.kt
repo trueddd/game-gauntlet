@@ -34,6 +34,7 @@ class PlusToEveryoneButYou private constructor(override val uid: String) : Wheel
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.PlusToEveryoneButYou
         override fun create() = PlusToEveryoneButYou.create()
     }
 }

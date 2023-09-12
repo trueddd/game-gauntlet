@@ -34,6 +34,7 @@ class LoyalModerator private constructor(override val uid: String) : WheelItem.I
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.LoyalModerator
         override fun create() = LoyalModerator.create()
     }
 }

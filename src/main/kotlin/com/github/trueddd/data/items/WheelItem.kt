@@ -19,12 +19,14 @@ sealed class WheelItem {
     abstract val description: String
 
     interface Factory {
+        val itemId: Id
         fun create(): WheelItem
     }
 
     @Serializable
     @JvmInline
     value class Id(val value: Int) {
+        fun asString() = value.toString()
         companion object {
             val PowerThrow = Id(1)
             val WeakThrow = Id(2)
@@ -53,6 +55,7 @@ sealed class WheelItem {
             val PlusToEveryoneButYou = Id(25)
             val MinusToEveryone = Id(26)
             val MinusToEveryoneButYou = Id(27)
+            val Plasticine = Id(28)
         }
     }
 

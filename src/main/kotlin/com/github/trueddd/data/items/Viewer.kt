@@ -36,6 +36,7 @@ class Viewer private constructor(
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.Viewer
         override fun create() = Viewer.create()
     }
 }

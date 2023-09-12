@@ -38,6 +38,7 @@ class DontWannaPlayThis private constructor(override val uid: String) : WheelIte
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.DontWannaPlayThis
         override fun create() = DontWannaPlayThis.create()
     }
 }

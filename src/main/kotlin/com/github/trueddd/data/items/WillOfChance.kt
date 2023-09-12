@@ -35,6 +35,7 @@ class WillOfChance private constructor(override val uid: String) : WheelItem.Eve
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.WillOfChance
         override fun create() = WillOfChance.create()
     }
 }

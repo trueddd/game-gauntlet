@@ -8,7 +8,7 @@ import org.koin.core.annotation.Single
 @Single
 class ItemRoller(
     @Named(ItemFactory.TAG)
-    private val allItemsFactories: Set<WheelItem.Factory>,
+    val allItemsFactories: Set<WheelItem.Factory>,
 ) {
 
     fun pick(): WheelItem {

@@ -25,6 +25,7 @@ class Reroll private constructor(override val uid: String) : WheelItem.Event() {
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.Reroll
         override fun create() = Reroll.create()
     }
 }

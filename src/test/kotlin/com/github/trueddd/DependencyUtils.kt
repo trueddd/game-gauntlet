@@ -14,8 +14,9 @@ import com.github.trueddd.di.getItemFactoriesSet
 internal fun provideEventGate(): EventGate {
     val stateHolder = StateHolder()
     val gamesProvider = GamesProvider()
-    val actionHandlerRegistry = provideActionHandlerRegistry(gamesProvider)
-    val inputParser = provideInputParser(stateHolder, gamesProvider)
+    val itemRoller = ItemRoller(getItemFactoriesSet() as Set<WheelItem.Factory>)
+    val actionHandlerRegistry = provideActionHandlerRegistry(gamesProvider, itemRoller)
+    val inputParser = provideInputParser(stateHolder, gamesProvider, itemRoller)
     val eventManager = EventManager(actionHandlerRegistry, stateHolder)
     val historyHolder = provideHistoryHolder(actionHandlerRegistry)
     return EventGate(stateHolder, inputParser, eventManager, historyHolder)
@@ -23,17 +24,15 @@ internal fun provideEventGate(): EventGate {
 
 internal fun provideInputParser(
     stateHolder: StateHolder = StateHolder(),
-    gamesProvider: GamesProvider = GamesProvider()
+    gamesProvider: GamesProvider = GamesProvider(),
+    itemRoller: ItemRoller = ItemRoller(getItemFactoriesSet() as Set<WheelItem.Factory>)
 ) = InputParser(
-    getActionGeneratorsSet(
-        gamesProvider,
-        ItemRoller(getItemFactoriesSet() as Set<WheelItem.Factory>),
-    ) as Set<Action.Generator<*>>,
+    getActionGeneratorsSet(gamesProvider, itemRoller) as Set<Action.Generator<*>>,
     stateHolder
 )
 
-private fun provideActionHandlerRegistry(gamesProvider: GamesProvider) = ActionHandlerRegistry(
-    handlers = getActionHandlersMap(gamesProvider) as Map<Int, Action.Handler<*>>
+private fun provideActionHandlerRegistry(gamesProvider: GamesProvider, itemRoller: ItemRoller) = ActionHandlerRegistry(
+    handlers = getActionHandlersMap(gamesProvider, itemRoller) as Map<Int, Action.Handler<*>>
 )
 
 private fun provideHistoryHolder(actionHandlerRegistry: ActionHandlerRegistry): EventHistoryHolder {

@@ -38,6 +38,7 @@ class WeakThrow private constructor(
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.WeakThrow
         override fun create() = WeakThrow.create()
     }
 }

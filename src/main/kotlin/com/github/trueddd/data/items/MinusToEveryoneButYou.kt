@@ -34,6 +34,7 @@ class MinusToEveryoneButYou private constructor(override val uid: String) : Whee
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.MinusToEveryoneButYou
         override fun create() = MinusToEveryoneButYou.create()
     }
 }

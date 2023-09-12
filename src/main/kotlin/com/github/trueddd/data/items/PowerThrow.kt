@@ -41,6 +41,7 @@ class PowerThrow private constructor(
 
     @ItemFactory
     class Factory : WheelItem.Factory {
+        override val itemId = Id.PowerThrow
         override fun create() = PowerThrow.create()
     }
 }
