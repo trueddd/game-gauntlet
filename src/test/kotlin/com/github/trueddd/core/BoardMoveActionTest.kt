@@ -14,28 +14,28 @@ class BoardMoveActionTest : EventGateTest() {
 
     @Test
     fun `10 steps at once`() = runTest {
-        val participant = requireParticipant("shizov")
+        val participant = requireRandomParticipant()
         repeat(10) {
-            eventGate.eventManager.suspendConsumeAction(BoardMove(participant, rollDice()))
+            handleAction(BoardMove(participant, rollDice()))
         }
-        assertEquals(expected = 1, eventGate.stateHolder.current.players[participant]?.stepsCount)
+        assertEquals(expected = 1, stateOf(participant).stepsCount)
     }
 
     @Test
     fun `steps not available after board move`() = runTest {
-        val participant = requireParticipant("shizov")
-        eventGate.eventManager.suspendConsumeAction(BoardMove(participant, rollDice()))
-        assertEquals(expected = false, eventGate.stateHolder.current.players[participant]?.boardMoveAvailable)
+        val participant = requireRandomParticipant()
+        handleAction(BoardMove(participant, rollDice()))
+        assertEquals(expected = false, stateOf(participant).boardMoveAvailable)
     }
 
     @Test
     fun `step - game - step`() = runTest {
-        val participant = requireParticipant("shizov")
-        eventGate.eventManager.suspendConsumeAction(BoardMove(participant, rollDice()))
-        eventGate.eventManager.suspendConsumeAction(GameRoll(participant, Game.Id(1)))
-        eventGate.eventManager.suspendConsumeAction(GameStatusChange(participant, Game.Status.Finished))
-        assertEquals(expected = true, eventGate.stateHolder.current.players[participant]?.boardMoveAvailable)
-        eventGate.eventManager.suspendConsumeAction(BoardMove(participant, rollDice()))
-        assertEquals(expected = false, eventGate.stateHolder.current.players[participant]?.boardMoveAvailable)
+        val participant = requireRandomParticipant()
+        handleAction(BoardMove(participant, rollDice()))
+        handleAction(GameRoll(participant, Game.Id(1)))
+        handleAction(GameStatusChange(participant, Game.Status.Finished))
+        assertEquals(expected = true, stateOf(participant).boardMoveAvailable)
+        handleAction(BoardMove(participant, rollDice()))
+        assertEquals(expected = false, stateOf(participant).boardMoveAvailable)
     }
 }

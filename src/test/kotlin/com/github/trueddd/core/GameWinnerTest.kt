@@ -2,6 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.EventGateTest
 import com.github.trueddd.core.actions.Action
+import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.Log
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
@@ -22,11 +23,11 @@ class GameWinnerTest : EventGateTest() {
         eventGate.parseAndHandleSuspend("$userName:${Action.Key.GameStatusChange}:1")
     }
 
-    private suspend fun makeMovesUntilFinish(userName: String) {
+    private suspend fun makeMovesUntilFinish(player: Participant) {
         flow {
             while (currentCoroutineContext().isActive) {
-                makeMove(userName)
-                emit(eventGate.stateHolder.current[userName]?.position)
+                makeMove(player.name)
+                emit(positionOf(player))
             }
         }
             .onEach { Log.info(TAG, "position: $it") }
@@ -37,14 +38,16 @@ class GameWinnerTest : EventGateTest() {
 
     @Test
     fun `basic winner test`() = runTest {
-        makeMovesUntilFinish("shizov")
-        assertEquals(requireParticipant("shizov"), eventGate.stateHolder.current.winner)
+        val player = requireRandomParticipant()
+        makeMovesUntilFinish(player)
+        assertEquals(player, eventGate.stateHolder.current.winner)
     }
 
     @Test
     fun `single winner test`() = runTest {
-        makeMovesUntilFinish("shizov")
-        makeMovesUntilFinish("keli")
-        assertEquals(requireParticipant("shizov"), eventGate.stateHolder.current.winner)
+        val (player1, player2) = requireParticipants()
+        makeMovesUntilFinish(player1)
+        makeMovesUntilFinish(player2)
+        assertEquals(player1, eventGate.stateHolder.current.winner)
     }
 }

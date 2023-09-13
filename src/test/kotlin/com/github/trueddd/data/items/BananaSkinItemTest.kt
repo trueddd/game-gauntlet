@@ -12,29 +12,28 @@ class BananaSkinItemTest : EventGateTest() {
 
     @Test
     fun `item use`() = runTest {
-        val user = requireParticipant("shizov")
+        val user = requireRandomParticipant()
         val item = BananaSkin.create()
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, item))
+        handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, inventoryOf(user).count { it is BananaSkin })
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 4))
-        eventGate.eventManager.suspendConsumeAction(GameRoll(user, Game.Id(1)))
-        eventGate.eventManager.suspendConsumeAction(GameStatusChange(user, Game.Status.Finished))
-        eventGate.eventManager.suspendConsumeAction(ItemUse(user, item.uid))
+        handleAction(BoardMove(user, diceValue = 4))
+        handleAction(GameRoll(user, Game.Id(1)))
+        handleAction(GameStatusChange(user, Game.Status.Finished))
+        handleAction(ItemUse(user, item.uid))
         assertEquals(expected = 0, effectsOf(user).size)
     }
 
     @Test
     fun `step on banana`() = runTest {
-        val userToPlace = requireParticipant("shizov")
-        val userToStep = requireParticipant("solll")
+        val (userToPlace, userToStep) = requireParticipants()
         val item = BananaSkin.create()
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(userToPlace, item))
-        eventGate.eventManager.suspendConsumeAction(BoardMove(userToPlace, 4))
-        eventGate.eventManager.suspendConsumeAction(GameRoll(userToPlace, Game.Id(1)))
-        eventGate.eventManager.suspendConsumeAction(GameStatusChange(userToPlace, Game.Status.Finished))
-        eventGate.eventManager.suspendConsumeAction(ItemUse(userToPlace, item.uid))
+        handleAction(ItemReceive(userToPlace, item))
+        handleAction(BoardMove(userToPlace, diceValue = 4))
+        handleAction(GameRoll(userToPlace, Game.Id(1)))
+        handleAction(GameStatusChange(userToPlace, Game.Status.Finished))
+        handleAction(ItemUse(userToPlace, item.uid))
 
-        eventGate.eventManager.suspendConsumeAction(BoardMove(userToStep, 4))
+        handleAction(BoardMove(userToStep, diceValue = 4))
         assertEquals(expected = 2, positionOf(userToStep))
         assertTrue(eventGate.stateHolder.current.boardTraps.isEmpty())
     }

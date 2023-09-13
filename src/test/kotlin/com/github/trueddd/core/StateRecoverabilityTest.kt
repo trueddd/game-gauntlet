@@ -10,16 +10,17 @@ class StateRecoverabilityTest : EventGateTest() {
 
     @RepeatedTest(20)
     fun `save, load & compare`() = runTest {
+        val (user1, user2, user3) = requireParticipants()
         val actionsSequence = sequenceOf(
-            "shizov:${Action.Key.BoardMove}",
-            "shizov:${Action.Key.GameRoll}",
-            "solll:${Action.Key.BoardMove}",
-            "shizov:${Action.Key.ItemReceive}",
-            "shizov:${Action.Key.GameDrop}",
-            "shizov:${Action.Key.GameRoll}",
-            "shizov:${Action.Key.GameStatusChange}:1",
-            "shizov:${Action.Key.BoardMove}",
-            "keli:${Action.Key.BoardMove}",
+            "${user1.name}:${Action.Key.BoardMove}",
+            "${user1.name}:${Action.Key.GameRoll}",
+            "${user2.name}:${Action.Key.BoardMove}",
+            "${user1.name}:${Action.Key.ItemReceive}",
+            "${user1.name}:${Action.Key.GameDrop}",
+            "${user1.name}:${Action.Key.GameRoll}",
+            "${user1.name}:${Action.Key.GameStatusChange}:1",
+            "${user1.name}:${Action.Key.BoardMove}",
+            "${user3.name}:${Action.Key.BoardMove}",
         )
         actionsSequence.forEach {
             eventGate.parseAndHandleSuspend(it)

@@ -3,6 +3,7 @@ package com.github.trueddd.data.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.generateWheelItemUid
+import com.github.trueddd.utils.isEven
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
@@ -24,7 +25,7 @@ class WillOfChance private constructor(override val uid: String) : WheelItem.Eve
 
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
         return globalState.updatePlayer(rolledBy) { playerState ->
-            val effect = if (playerState.position.rem(2) == 0) {
+            val effect = if (playerState.position.isEven) {
                 WillOfGoodChance.create()
             } else {
                 WillOfBadChance.create()

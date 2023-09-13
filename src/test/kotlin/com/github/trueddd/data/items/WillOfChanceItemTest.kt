@@ -15,26 +15,26 @@ class WillOfChanceItemTest : EventGateTest() {
 
     @Test
     fun `receive on odd`() = runTest {
-        val user = requireParticipant("shizov")
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 3))
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WillOfChance.create()))
+        val user = requireRandomParticipant()
+        handleAction(BoardMove(user, diceValue = 3))
+        handleAction(ItemReceive(user, WillOfChance.create()))
         assertEquals(expected = -2, effectsOf(user).filterIsInstance<DiceRollModifier>().sumOf { it.modifier })
-        eventGate.eventManager.suspendConsumeAction(GameRoll(user, Game.Id(1)))
-        eventGate.eventManager.suspendConsumeAction(GameStatusChange(user, Game.Status.Finished))
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 3))
+        handleAction(GameRoll(user, Game.Id(1)))
+        handleAction(GameStatusChange(user, Game.Status.Finished))
+        handleAction(BoardMove(user, diceValue = 3))
         assertEquals(expected = 4, positionOf(user))
         assertTrue(effectsOf(user).isEmpty())
     }
 
     @Test
     fun `receive on even`() = runTest {
-        val user = requireParticipant("shizov")
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 4))
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WillOfChance.create()))
+        val user = requireRandomParticipant()
+        handleAction(BoardMove(user, diceValue = 4))
+        handleAction(ItemReceive(user, WillOfChance.create()))
         assertEquals(expected = 2, effectsOf(user).filterIsInstance<DiceRollModifier>().sumOf { it.modifier })
-        eventGate.eventManager.suspendConsumeAction(GameRoll(user, Game.Id(1)))
-        eventGate.eventManager.suspendConsumeAction(GameStatusChange(user, Game.Status.Finished))
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 3))
+        handleAction(GameRoll(user, Game.Id(1)))
+        handleAction(GameStatusChange(user, Game.Status.Finished))
+        handleAction(BoardMove(user, diceValue = 3))
         assertEquals(expected = 9, positionOf(user))
         assertTrue(effectsOf(user).isEmpty())
     }

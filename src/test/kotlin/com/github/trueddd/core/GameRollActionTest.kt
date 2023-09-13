@@ -15,32 +15,32 @@ class GameRollActionTest : EventGateTest() {
 
     @Test
     fun `roll game once`() = runTest {
-        val participant = requireParticipant("shizov")
+        val participant = requireRandomParticipant()
         eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameRoll}")
         assertNotEquals(illegal = null, lastGameOf(participant))
     }
 
     @Test
     fun `roll game twice`() = runTest {
-        val participant = requireParticipant("shizov")
-        eventGate.eventManager.suspendConsumeAction(GameRoll(participant, Game.Id(0)))
-        val currentGame = eventGate.stateHolder.current.players[participant]?.currentGame
-        eventGate.eventManager.suspendConsumeAction(GameRoll(participant, Game.Id(1)))
-        assertEquals(expected = currentGame, eventGate.stateHolder.current.players[participant]?.currentGame)
-        assertEquals(expected = Game.Id(0), eventGate.stateHolder.current.players[participant]?.gameHistory?.firstOrNull()?.game?.id)
+        val participant = requireRandomParticipant()
+        handleAction(GameRoll(participant, Game.Id(0)))
+        val currentGame = stateOf(participant).currentGame
+        handleAction(GameRoll(participant, Game.Id(1)))
+        assertEquals(currentGame, stateOf(participant).currentGame)
+        assertEquals(Game.Id(0), stateOf(participant).gameHistory.firstOrNull()?.game?.id)
     }
 
     @Test
     fun `roll game - complete - move & roll game`() = runTest {
-        val participant = requireParticipant("shizov")
-        eventGate.eventManager.suspendConsumeAction(BoardMove(participant, 5))
-        eventGate.eventManager.suspendConsumeAction(GameRoll(participant, Game.Id(0)))
-        val firstGame = eventGate.stateHolder.current.players[participant]?.currentGame
-        eventGate.eventManager.suspendConsumeAction(GameStatusChange(participant, Game.Status.Finished))
-        eventGate.eventManager.suspendConsumeAction(BoardMove(participant, 3))
-        eventGate.eventManager.suspendConsumeAction(GameRoll(participant, Game.Id(2)))
-        assertEquals(expected = firstGame?.game?.id, eventGate.stateHolder.current.players[participant]?.gameHistory?.firstOrNull()?.game?.id)
-        assertEquals(expected = Game.Status.Finished, eventGate.stateHolder.current.players[participant]?.gameHistory?.firstOrNull()?.status)
-        assertEquals(expected = Game.Status.InProgress, eventGate.stateHolder.current.players[participant]?.currentGame?.status)
+        val participant = requireRandomParticipant()
+        handleAction(BoardMove(participant, diceValue = 5))
+        handleAction(GameRoll(participant, Game.Id(0)))
+        val firstGame = stateOf(participant).currentGame
+        handleAction(GameStatusChange(participant, Game.Status.Finished))
+        handleAction(BoardMove(participant, diceValue = 3))
+        handleAction(GameRoll(participant, Game.Id(2)))
+        assertEquals(firstGame?.game?.id, stateOf(participant).gameHistory.firstOrNull()?.game?.id)
+        assertEquals(Game.Status.Finished, stateOf(participant).gameHistory.firstOrNull()?.status)
+        assertEquals(Game.Status.InProgress, stateOf(participant).currentGame?.status)
     }
 }

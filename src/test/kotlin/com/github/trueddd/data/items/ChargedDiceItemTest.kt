@@ -15,26 +15,26 @@ class ChargedDiceItemTest : EventGateTest() {
 
     @Test
     fun `make move with no modifiers`() = runTest {
-        val user = requireParticipant("shizov")
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 5))
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, ChargedDice.create()))
-        eventGate.eventManager.suspendConsumeAction(GameRoll(user, Game.Id(1)))
-        eventGate.eventManager.suspendConsumeAction(GameStatusChange(user, Game.Status.Finished))
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 4))
-        assertEquals(expected = 1, eventGate.stateHolder.current.players[user]!!.position)
-        assertTrue(eventGate.stateHolder.current.players[user]!!.effects.isEmpty())
+        val user = requireRandomParticipant()
+        handleAction(BoardMove(user, diceValue = 5))
+        handleAction(ItemReceive(user, ChargedDice.create()))
+        handleAction(GameRoll(user, Game.Id(1)))
+        handleAction(GameStatusChange(user, Game.Status.Finished))
+        handleAction(BoardMove(user, diceValue = 4))
+        assertEquals(expected = 1, positionOf(user))
+        assertTrue(effectsOf(user).isEmpty())
     }
 
     @Test
     fun `make move with modifiers`() = runTest {
-        val user = requireParticipant("shizov")
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 6))
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, ChargedDice.create()))
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
-        eventGate.eventManager.suspendConsumeAction(GameRoll(user, Game.Id(1)))
-        eventGate.eventManager.suspendConsumeAction(GameStatusChange(user, Game.Status.Finished))
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 4))
-        assertEquals(expected = 1, eventGate.stateHolder.current.players[user]!!.position)
-        assertTrue(eventGate.stateHolder.current.players[user]!!.effects.isEmpty())
+        val user = requireRandomParticipant()
+        handleAction(BoardMove(user, diceValue = 6))
+        handleAction(ItemReceive(user, ChargedDice.create()))
+        handleAction(ItemReceive(user, PowerThrow.create()))
+        handleAction(GameRoll(user, Game.Id(1)))
+        handleAction(GameStatusChange(user, Game.Status.Finished))
+        handleAction(BoardMove(user, diceValue = 4))
+        assertEquals(expected = 1, positionOf(user))
+        assertTrue(effectsOf(user).isEmpty())
     }
 }

@@ -12,7 +12,8 @@ abstract class EventGateTest {
 
     protected val eventGate: EventGate = provideEventGate()
 
-    protected fun requireParticipant(userName: String) = eventGate.stateHolder[userName]!!
+    protected fun requireRandomParticipant() = eventGate.stateHolder.participants.random()
+    protected fun requireParticipants() = eventGate.stateHolder.participants.toList()
 
     protected fun stateOf(participant: Participant) = eventGate.stateHolder.current[participant.name]!!
     protected fun effectsOf(participant: Participant) = stateOf(participant).effects

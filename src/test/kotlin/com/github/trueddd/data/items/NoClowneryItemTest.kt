@@ -14,15 +14,15 @@ class NoClowneryItemTest : EventGateTest() {
 
     @Test
     fun `item dispose - after special spot`() = runTest {
-        val user = requireParticipant("shizov")
+        val user = requireRandomParticipant()
         val item = NoClownery.create()
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, item))
+        handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, effectsOf(user).count { it is NoClownery })
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 4))
-        eventGate.eventManager.suspendConsumeAction(GameRoll(user, Game.Id(1)))
-        eventGate.eventManager.suspendConsumeAction(GameStatusChange(user, Game.Status.Finished))
+        handleAction(BoardMove(user, diceValue = 4))
+        handleAction(GameRoll(user, Game.Id(1)))
+        handleAction(GameStatusChange(user, Game.Status.Finished))
         assertEquals(expected = 1, effectsOf(user).count { it is NoClownery })
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 4))
+        handleAction(BoardMove(user, diceValue = 4))
         assertEquals(expected = 0, effectsOf(user).size)
     }
 }

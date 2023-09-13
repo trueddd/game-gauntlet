@@ -10,14 +10,14 @@ class LoyalModeratorItemTest : EventGateTest() {
 
     @Test
     fun `use against the debuff`() = runTest {
-        val user = requireParticipant("shizov")
+        val user = requireRandomParticipant()
         val item = LoyalModerator.create()
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, item))
+        handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, inventoryOf(user).size)
         val debuff = WeakThrow.create()
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, debuff))
+        handleAction(ItemReceive(user, debuff))
         assertEquals(expected = 1, effectsOf(user).size)
-        eventGate.parseAndHandleSuspend("shizov:4:${item.uid}:${debuff.uid}")
+        eventGate.parseAndHandleSuspend("${user.name}:4:${item.uid}:${debuff.uid}")
         assertEquals(expected = 0, effectsOf(user).size)
         assertEquals(expected = 0, inventoryOf(user).size)
     }

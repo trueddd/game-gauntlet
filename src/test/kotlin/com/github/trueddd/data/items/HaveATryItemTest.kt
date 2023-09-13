@@ -11,11 +11,11 @@ class HaveATryItemTest : EventGateTest() {
 
     @Test
     fun `using item`() = runTest {
-        val user = requireParticipant("shizov")
+        val user = requireRandomParticipant()
         val item = HaveATry.create()
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, item))
+        handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, inventoryOf(user).count { it is HaveATry })
-        eventGate.eventManager.suspendConsumeAction(ItemUse(user, item.uid))
+        handleAction(ItemUse(user, item.uid))
         assertEquals(expected = 0, inventoryOf(user).size)
     }
 }

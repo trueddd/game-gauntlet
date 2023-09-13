@@ -11,17 +11,17 @@ class WeakThrowItemTest : EventGateTest() {
 
     @Test
     fun `weak throw on 5`() = runTest {
-        val user = requireParticipant("keli")
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 5))
-        assertEquals(4, eventGate.stateHolder.current.players[user]!!.position)
+        val user = requireRandomParticipant()
+        handleAction(ItemReceive(user, WeakThrow.create()))
+        handleAction(BoardMove(user, diceValue = 5))
+        assertEquals(expected = 4, positionOf(user))
     }
 
     @Test
     fun `weak throw on 1`() = runTest {
-        val user = requireParticipant("keli")
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 1))
-        assertEquals(1, eventGate.stateHolder.current.players[user]!!.position)
+        val user = requireRandomParticipant()
+        handleAction(ItemReceive(user, WeakThrow.create()))
+        handleAction(BoardMove(user, diceValue = 1))
+        assertEquals(expected = 1,positionOf(user))
     }
 }

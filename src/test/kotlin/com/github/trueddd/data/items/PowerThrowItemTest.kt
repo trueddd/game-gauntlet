@@ -11,54 +11,48 @@ class PowerThrowItemTest : EventGateTest() {
 
     @Test
     fun `power throw on 3`() = runTest {
-        val user = requireParticipant("solll")
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 3))
-        assertEquals(4, eventGate.stateHolder.current.players[user]!!.position)
+        val user = requireRandomParticipant()
+        handleAction(ItemReceive(user, PowerThrow.create()))
+        handleAction(BoardMove(user, diceValue = 3))
+        assertEquals(expected = 4, positionOf(user))
     }
 
     @Test
     fun `power throw on 6`() = runTest {
-        val user = requireParticipant("solll")
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 6))
-        assertEquals(7, eventGate.stateHolder.current.players[user]!!.position)
+        val user = requireRandomParticipant()
+        handleAction(ItemReceive(user, PowerThrow.create()))
+        handleAction(BoardMove(user, diceValue = 6))
+        assertEquals(expected = 7, positionOf(user))
     }
 
     @Test
     fun `power throw overflow`() = runTest {
-        val user = requireParticipant("solll")
+        val user = requireRandomParticipant()
         repeat(5) {
-            eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create(chargesLeft = 1)))
+            handleAction(ItemReceive(user, PowerThrow.create(chargesLeft = 1)))
         }
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 6))
-        assertEquals(10, eventGate.stateHolder.current.players[user]!!.position)
-        assertEquals(1, eventGate.stateHolder.current.players[user]!!.effects.size)
+        handleAction(BoardMove(user, 6))
+        assertEquals(expected = 10, positionOf(user))
+        assertEquals(expected = 1, effectsOf(user).size)
     }
 
     @Test
     fun `power throw removal after move`() = runTest {
-        val user = requireParticipant("solll")
+        val user = requireRandomParticipant()
         repeat(5) {
-            eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
+            handleAction(ItemReceive(user, PowerThrow.create()))
         }
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 5))
-        assertEquals(10, eventGate.stateHolder.current.players[user]!!.position)
-        assertEquals(0, eventGate.stateHolder.current.players[user]!!.effects.size)
+        handleAction(BoardMove(user, diceValue = 5))
+        assertEquals(expected = 10, positionOf(user))
+        assertEquals(expected = 0, effectsOf(user).size)
     }
 
     @Test
     fun `power throw with charges`() = runTest {
-        val user = requireParticipant("solll")
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create(chargesLeft = 2)))
-        eventGate.eventManager.suspendConsumeAction(BoardMove(user, 6))
-        assertEquals(7, eventGate.stateHolder.current.players[user]!!.position)
-        assertEquals(
-            expected = 1,
-            eventGate.stateHolder.current.players[user]!!
-                .effects.filterIsInstance<PowerThrow>()
-                .firstOrNull()
-                ?.chargesLeft
-        )
+        val user = requireRandomParticipant()
+        handleAction(ItemReceive(user, PowerThrow.create(chargesLeft = 2)))
+        handleAction(BoardMove(user, diceValue = 6))
+        assertEquals(expected = 7, positionOf(user))
+        assertEquals(expected = 1, effectsOf(user).filterIsInstance<PowerThrow>().firstOrNull()?.chargesLeft)
     }
 }

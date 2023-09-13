@@ -18,6 +18,9 @@ class EventGate(
         private const val TAG = "EventGate"
     }
 
+    @TestOnly
+    fun getInputParser() = inputParser
+
     suspend fun parseAndHandle(input: String): Boolean {
         val action = inputParser.parse(input) ?: return false
         eventManager.consumeAction(action)

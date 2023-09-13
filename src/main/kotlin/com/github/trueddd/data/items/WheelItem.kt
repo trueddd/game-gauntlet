@@ -56,6 +56,7 @@ sealed class WheelItem {
             val MinusToEveryone = Id(26)
             val MinusToEveryoneButYou = Id(27)
             val Plasticine = Id(28)
+            val Earthquake = Id(29)
         }
     }
 

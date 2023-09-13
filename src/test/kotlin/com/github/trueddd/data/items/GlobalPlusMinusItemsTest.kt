@@ -15,7 +15,7 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
         eventGate.stateHolder.current.players.values.forEach { player ->
             assertEquals(expected = 0, player.modifiersSum)
         }
-        handleAction(ItemReceive(eventGate.stateHolder.current.players.keys.random(), PlusToEveryone.create()))
+        handleAction(ItemReceive(requireRandomParticipant(), PlusToEveryone.create()))
         eventGate.stateHolder.current.players.values.forEach { player ->
             assertEquals(expected = 1, player.modifiersSum)
         }
@@ -23,7 +23,7 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
 
     @Test
     fun `plus to everyone - ensure one move only`() = runTest {
-        handleAction(ItemReceive(eventGate.stateHolder.current.players.keys.random(), PlusToEveryone.create()))
+        handleAction(ItemReceive(requireRandomParticipant(), PlusToEveryone.create()))
         eventGate.stateHolder.current.players.values.forEach { player ->
             assertEquals(expected = 1, player.modifiersSum)
         }
@@ -40,7 +40,7 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
         eventGate.stateHolder.current.players.values.forEach { player ->
             assertEquals(expected = 0, player.modifiersSum)
         }
-        handleAction(ItemReceive(eventGate.stateHolder.current.players.keys.random(), MinusToEveryone.create()))
+        handleAction(ItemReceive(requireRandomParticipant(), MinusToEveryone.create()))
         eventGate.stateHolder.current.players.values.forEach { player ->
             assertEquals(expected = -1, player.modifiersSum)
         }
@@ -48,7 +48,7 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
 
     @Test
     fun `minus to everyone - ensure one move only`() = runTest {
-        handleAction(ItemReceive(eventGate.stateHolder.current.players.keys.random(), MinusToEveryone.create()))
+        handleAction(ItemReceive(requireRandomParticipant(), MinusToEveryone.create()))
         eventGate.stateHolder.current.players.values.forEach { player ->
             assertEquals(expected = -1, player.modifiersSum)
         }
@@ -66,7 +66,7 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
 
     @Test
     fun `minus to everyone but you`() = runTest {
-        val player = requireParticipant("shizov")
+        val player = requireRandomParticipant()
         eventGate.stateHolder.current.players.values.forEach {
             assertEquals(expected = 0, it.modifiersSum)
         }
@@ -82,7 +82,7 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
 
     @Test
     fun `plus to everyone but you`() = runTest {
-        val player = requireParticipant("shizov")
+        val player = requireRandomParticipant()
         eventGate.stateHolder.current.players.values.forEach {
             assertEquals(expected = 0, it.modifiersSum)
         }

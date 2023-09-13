@@ -4,10 +4,7 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.PlayerState
 import com.github.trueddd.data.items.*
-import com.github.trueddd.utils.StateModificationException
-import com.github.trueddd.utils.moveRange
-import com.github.trueddd.utils.powerSet
-import com.github.trueddd.utils.rollDice
+import com.github.trueddd.utils.*
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.Serializable
@@ -17,6 +14,10 @@ data class BoardMove(
     val rolledBy: Participant,
     val diceValue: Int,
 ) : Action(Key.BoardMove) {
+
+    init {
+        require(diceValue in d6Range) { IllegalArgumentException("diceValue cannot be out of d6Range($d6Range)") }
+    }
 
     @ActionGenerator
     class Generator : Action.Generator<BoardMove> {

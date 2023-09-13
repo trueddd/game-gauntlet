@@ -11,32 +11,32 @@ class YouDoNotNeedThisItemTest : EventGateTest() {
 
     @Test
     fun `drop buff`() = runTest {
-        val user = requireParticipant("solll")
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, YouDoNotNeedThis.create()))
-        assertEquals(1, eventGate.stateHolder.current.players[user]!!.effects.size)
-        assertTrue(eventGate.stateHolder.current.players[user]!!.effects.none { it is WheelItem.Effect.Buff })
+        val user = requireRandomParticipant()
+        handleAction(ItemReceive(user, PowerThrow.create()))
+        handleAction(ItemReceive(user, WeakThrow.create()))
+        handleAction(ItemReceive(user, YouDoNotNeedThis.create()))
+        assertEquals(expected = 1, effectsOf(user).size)
+        assertTrue(effectsOf(user).none { it is WheelItem.Effect.Buff })
     }
 
     @Test
     fun `non-drop buff`() = runTest {
-        val user = requireParticipant("solll")
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, YouDoNotNeedThis.create()))
-        assertEquals(1, eventGate.stateHolder.current.players[user]!!.effects.size)
-        assertTrue(eventGate.stateHolder.current.players[user]!!.effects.none { it is WheelItem.Effect.Buff })
+        val user = requireRandomParticipant()
+        handleAction(ItemReceive(user, WeakThrow.create()))
+        handleAction(ItemReceive(user, YouDoNotNeedThis.create()))
+        assertEquals(expected = 1, effectsOf(user).size)
+        assertTrue(effectsOf(user).none { it is WheelItem.Effect.Buff })
     }
 
     @Test
     fun `drop single buff`() = runTest {
-        val user = requireParticipant("solll")
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, PowerThrow.create()))
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, WeakThrow.create()))
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, YouDoNotNeedThis.create()))
-        assertEquals(2, eventGate.stateHolder.current.players[user]!!.effects.size)
-        assertTrue(eventGate.stateHolder.current.players[user]!!.effects.any { it is WheelItem.Effect.Buff })
-        assertTrue(eventGate.stateHolder.current.players[user]!!.effects.any { it is WheelItem.Effect.Debuff })
+        val user = requireRandomParticipant()
+        handleAction(ItemReceive(user, PowerThrow.create()))
+        handleAction(ItemReceive(user, PowerThrow.create()))
+        handleAction(ItemReceive(user, WeakThrow.create()))
+        handleAction(ItemReceive(user, YouDoNotNeedThis.create()))
+        assertEquals(expected = 2, effectsOf(user).size)
+        assertTrue(effectsOf(user).any { it is WheelItem.Effect.Buff })
+        assertTrue(effectsOf(user).any { it is WheelItem.Effect.Debuff })
     }
 }

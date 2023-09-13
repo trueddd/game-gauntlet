@@ -10,9 +10,9 @@ class RerollItemTest : EventGateTest() {
 
     @Test
     fun `test reroll use`() = runTest {
-        val user = requireParticipant("shizov")
+        val user = requireRandomParticipant()
         val initial = eventGate.stateHolder.current
-        eventGate.eventManager.suspendConsumeAction(ItemReceive(user, Reroll.create()))
+        handleAction(ItemReceive(user, Reroll.create()))
         assertEquals(expected = initial, eventGate.stateHolder.current)
     }
 }

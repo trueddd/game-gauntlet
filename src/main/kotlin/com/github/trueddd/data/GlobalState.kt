@@ -52,9 +52,9 @@ data class GlobalState(
                 startDate,
                 endDate,
                 players = mapOf(
-                    Participant("shizov") to PlayerState(),
-                    Participant("solll") to PlayerState(),
-                    Participant("keli") to PlayerState(),
+                    Participant("megagamer") to PlayerState(),
+                    Participant("player") to PlayerState(),
+                    Participant("clutcher") to PlayerState(),
                 ),
                 boardLength = STINT_SIZE * STINT_COUNT,
                 gameGenreDistribution = genreDistribution,
