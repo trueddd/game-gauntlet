@@ -23,10 +23,13 @@ data class PlayerState(
     }
 
     val currentGame: GameHistoryEntry?
-        get() = gameHistory.lastOrNull()
+        get() = gameHistory.lastOrNull { it.status != Game.Status.Next }
 
     val currentActiveGame: GameHistoryEntry?
         get() = currentGame?.takeIf { it.status == Game.Status.InProgress }
+
+    val hasCurrentActive: Boolean
+        get() = currentActiveGame != null
 
     val stintIndex: Int
         get() = calculateStintIndex(position)

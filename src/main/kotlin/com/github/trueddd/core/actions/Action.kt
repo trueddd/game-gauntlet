@@ -23,6 +23,7 @@ sealed class Action(
         const val ItemUse = 4
         const val GameStatusChange = 5
         const val GameRoll = 6
+        const val GameSet = 7
     }
 
     /**

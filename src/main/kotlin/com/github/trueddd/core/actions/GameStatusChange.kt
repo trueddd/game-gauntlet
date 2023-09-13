@@ -38,9 +38,16 @@ data class GameStatusChange(
 
         override suspend fun handle(action: GameStatusChange, currentState: GlobalState): GlobalState {
             return currentState.updatePlayer(action.participant) { state ->
-                val currentGame = state.gameHistory.lastOrNull()
+                val currentGame = state.currentActiveGame
                     ?: throw StateModificationException(action, "No game entries")
-                val newGameHistory = state.gameHistory.dropLast(1) + currentGame.copy(status = action.gameNewStatus)
+                val nextGame = state.gameHistory.firstOrNull { it.status == Game.Status.Next }
+                val newGameHistory = state.gameHistory.map { entry ->
+                    when (entry.game) {
+                        currentGame.game -> entry.copy(status = action.gameNewStatus)
+                        nextGame?.game -> entry.copy(status = Game.Status.InProgress)
+                        else -> entry
+                    }
+                }
                 val newEffects = state.effects.mapNotNull { effect ->
                     when (effect) {
                         is Gamer -> when {

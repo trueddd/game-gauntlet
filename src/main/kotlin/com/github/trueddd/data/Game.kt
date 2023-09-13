@@ -22,10 +22,12 @@ data class Game(
         @SerialName("dropped")
         Dropped,
         @SerialName("rerolled")
-        Rerolled;
+        Rerolled,
+        @SerialName("next")
+        Next;
 
         val isComplete: Boolean
-            get() = this != InProgress
+            get() = this != InProgress && this != Next
 
         val allowsNextStep: Boolean
             get() = this == Finished || this == Dropped

@@ -61,7 +61,7 @@ class IntoSetProcessor(
                 val items = declarations.joinToString { it.callConstructor }
                 fileSpec.addFunction(
                     FunSpec.builder("get${type}Set")
-                        .addParameters(declarations.flatMap { it.dependenciesAsParameters })
+                        .addParameters(declarations.flatMap { it.dependenciesAsParameters }.distinct())
                         .returns(SET.parameterizedBy(STAR))
                         .addStatement("return setOf(${items})")
                         .addAnnotation(Single::class)

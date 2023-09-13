@@ -59,7 +59,7 @@ class IntoMapProcessor(
                 val items = declarations.joinToString { "${it.key} to ${it.callConstructor}" }
                 fileSpec.addFunction(
                     FunSpec.builder("get${map}Map")
-                        .addParameters(declarations.flatMap { it.dependenciesAsParameters })
+                        .addParameters(declarations.flatMap { it.dependenciesAsParameters }.distinct())
                         .returns(MAP.parameterizedBy(listOf(INT, STAR)))
                         .addStatement("return mapOf(${items})")
                         .addAnnotation(Single::class)
