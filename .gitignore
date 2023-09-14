@@ -21,6 +21,8 @@ bin/
 
 ### IntelliJ IDEA ###
 .idea
+!.idea/fileTemplates
+!.idea/file.template.settings.xml
 *.iws
 *.iml
 *.ipr

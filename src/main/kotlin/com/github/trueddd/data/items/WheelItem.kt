@@ -61,6 +61,8 @@ sealed class WheelItem {
             val RatMove = Id(31)
             val LuckyThrow = Id(32)
             val LuckyThrowBuff = Id(33)
+            val ForgotMyGame = Id(34)
+            val NotDumb = Id(35)
         }
     }
 
