@@ -26,9 +26,9 @@ class WillOfChance private constructor(override val uid: String) : WheelItem.Eve
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
         return globalState.updatePlayer(rolledBy) { playerState ->
             val effect = if (playerState.position.isEven) {
-                WillOfGoodChance.create()
+                Buff.create()
             } else {
-                WillOfBadChance.create()
+                Debuff.create()
             }
             playerState.copy(effects = playerState.effects + effect)
         }
@@ -38,5 +38,39 @@ class WillOfChance private constructor(override val uid: String) : WheelItem.Eve
     class Factory : WheelItem.Factory {
         override val itemId = Id.WillOfChance
         override fun create() = WillOfChance.create()
+    }
+
+    @Serializable
+    class Debuff private constructor(
+        override val uid: String,
+        override val modifier: Int = -2
+    ) : Effect.Debuff(), DiceRollModifier {
+
+        companion object {
+            fun create() = Debuff(uid = generateWheelItemUid())
+        }
+
+        override val id = Id.WillOfBadChance
+
+        override val name = "Воля случая. Дебафф"
+
+        override val description = "-2 к следующему броску кубика для перехода по секторам."
+    }
+
+    @Serializable
+    class Buff private constructor(
+        override val uid: String,
+        override val modifier: Int = 2
+    ) : Effect.Buff(), DiceRollModifier {
+
+        companion object {
+            fun create() = Buff(uid = generateWheelItemUid())
+        }
+
+        override val id = Id.WillOfGoodChance
+
+        override val name = "Воля случая. Бафф"
+
+        override val description = "+2 к следующему броску кубика для перехода по секторам."
     }
 }

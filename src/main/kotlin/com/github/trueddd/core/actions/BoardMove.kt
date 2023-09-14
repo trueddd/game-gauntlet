@@ -50,7 +50,7 @@ data class BoardMove(
                 val finalPosition = (playerState.position + moveValue).coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
                     .let {
                         when {
-                            currentState.boardTraps[it] is BananaSkinTrap -> {
+                            currentState.boardTraps[it] is BananaSkin.Trap -> {
                                 trapsToClear.add(it)
                                 it - 2
                             }
@@ -60,7 +60,7 @@ data class BoardMove(
                 val newStintIndex = PlayerState.calculateStintIndex(finalPosition)
                 val modifiersToDiscard = modifiers.filterIsInstance<WheelItem.Effect>().map { it.uid }
                 val luckyThrowActivated = playerState.effects
-                    .filterIsInstance<LuckyThrowBuff>()
+                    .filterIsInstance<LuckyThrow.Buff>()
                     .any { it.genre == currentState.gameGenreDistribution.genreAtPosition(finalPosition) }
                 playerState.copy(
                     position = finalPosition,
@@ -68,7 +68,7 @@ data class BoardMove(
                     boardMoveAvailable = luckyThrowActivated,
                     effects = playerState.effects.mapNotNull { effect ->
                         when {
-                            effect is LuckyThrowBuff -> null
+                            effect is LuckyThrow.Buff -> null
                             effect is ChargedDice -> null
                             effect is NoClownery -> if (previousStintIndex + 1 == newStintIndex) null else effect
                             effect !is DiceRollModifier -> effect

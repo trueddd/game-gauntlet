@@ -25,7 +25,7 @@ class SamuraiLunge private constructor(override val uid: String) : WheelItem.Inv
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState.updatePlayer(usedBy) { state ->
             state.copy(
-                effects = state.effects + DropReverse.create(),
+                effects = state.effects + Buff.create(),
                 inventory = state.inventory.filter { it.uid != uid },
             )
         }
@@ -35,5 +35,19 @@ class SamuraiLunge private constructor(override val uid: String) : WheelItem.Inv
     class Factory : WheelItem.Factory {
         override val itemId = Id.SamuraiLunge
         override fun create() = SamuraiLunge.create()
+    }
+
+    @Serializable
+    class Buff private constructor(override val uid: String) : Effect.Buff() {
+
+        companion object {
+            fun create() = Buff(uid = generateWheelItemUid())
+        }
+
+        override val id = Id.SamuraiLunge
+
+        override val name = "Самурайский выпад"
+
+        override val description = "При дропе игры позволяет не откатываться назад, а походить вперед."
     }
 }

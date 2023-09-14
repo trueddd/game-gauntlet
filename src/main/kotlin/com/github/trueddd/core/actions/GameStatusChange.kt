@@ -3,7 +3,7 @@ package com.github.trueddd.core.actions
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
-import com.github.trueddd.data.items.ClimbingRopeBuff
+import com.github.trueddd.data.items.ClimbingRope
 import com.github.trueddd.data.items.Gamer
 import com.github.trueddd.data.items.Viewer
 import com.github.trueddd.data.items.charge
@@ -60,7 +60,7 @@ data class GameStatusChange(
                             !effect.isActive -> effect.setActive(true)
                             else -> effect.charge()
                         }
-                        is ClimbingRopeBuff -> null
+                        is ClimbingRope.Buff -> null
                         else -> effect
                     }
                 }

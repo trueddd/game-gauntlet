@@ -3,8 +3,8 @@ package com.github.trueddd.core.actions
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
-import com.github.trueddd.data.items.ClimbingRopeBuff
-import com.github.trueddd.data.items.DropReverse
+import com.github.trueddd.data.items.ClimbingRope
+import com.github.trueddd.data.items.SamuraiLunge
 import com.github.trueddd.utils.StateModificationException
 import com.github.trueddd.utils.rollDice
 import com.trueddd.github.annotations.ActionGenerator
@@ -39,8 +39,8 @@ data class GameDrop(
             }
             return currentState.updatePlayer(action.rolledBy) { playerState ->
                 val moveValue = when {
-                    playerState.effects.any { it is DropReverse } -> action.diceValue
-                    playerState.effects.any { it is ClimbingRopeBuff } -> -1
+                    playerState.effects.any { it is SamuraiLunge.Buff } -> action.diceValue
+                    playerState.effects.any { it is ClimbingRope.Buff } -> -1
                     else -> -action.diceValue
                 }
                 val finalPosition = (playerState.position + moveValue).coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
@@ -51,8 +51,8 @@ data class GameDrop(
                 playerState.copy(
                     position = finalPosition,
                     effects = playerState.effects
-                        .filter { it !is DropReverse }
-                        .filter { it !is ClimbingRopeBuff },
+                        .filter { it !is SamuraiLunge.Buff }
+                        .filter { it !is ClimbingRope.Buff },
                     gameHistory = newGameHistory,
                     boardMoveAvailable = false,
                 )

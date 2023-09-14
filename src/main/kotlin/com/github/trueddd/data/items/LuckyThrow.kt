@@ -29,7 +29,7 @@ class LuckyThrow private constructor(override val uid: String) : WheelItem.Pendi
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.filter { it.uid != uid },
-                effects = playerState.effects + LuckyThrowBuff.create(genre),
+                effects = playerState.effects + Buff.create(genre),
             )
         }
     }
@@ -38,5 +38,25 @@ class LuckyThrow private constructor(override val uid: String) : WheelItem.Pendi
     class Factory : WheelItem.Factory {
         override val itemId = Id.LuckyThrow
         override fun create() = LuckyThrow.create()
+    }
+
+    @Serializable
+    class Buff private constructor(
+        override val uid: String,
+        val genre: Game.Genre
+    ) : Effect.Buff() {
+
+        companion object {
+            fun create(genre: Game.Genre) = Buff(uid = generateWheelItemUid(), genre)
+        }
+
+        override val id = Id.LuckyThrow
+
+        override val name = "Счастливый бросок. ${genre.name}"
+
+        override val description = """
+        Если после следующего броска кубика стример попадает на клетку с жанром ${genre.name}, 
+        то эта клетка автоматически засчитывается пройденной и стример двигается дальше.
+    """.trimIndent()
     }
 }

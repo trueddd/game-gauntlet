@@ -3,7 +3,6 @@ package com.github.trueddd.core
 import com.github.trueddd.EventGateTest
 import com.github.trueddd.core.actions.*
 import com.github.trueddd.data.Game
-import com.github.trueddd.data.items.DropReverse
 import com.github.trueddd.data.items.SamuraiLunge
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
@@ -37,7 +36,7 @@ class DropGameActionTest : EventGateTest() {
         handleAction(ItemUse(user, item.uid))
         handleAction(GameDrop(user, dropDiceValue))
         assertTrue(inventoryOf(user).isEmpty())
-        assertTrue(effectsOf(user).none { it is DropReverse })
+        assertTrue(effectsOf(user).none { it is SamuraiLunge.Buff })
         assertEquals(Game.Status.Dropped, lastGameOf(user)?.status)
         assertEquals(expected = moveDiceValue + dropDiceValue, positionOf(user))
     }

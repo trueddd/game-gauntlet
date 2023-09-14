@@ -27,7 +27,7 @@ class BananaSkin private constructor(override val uid: String) : WheelItem.Inven
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(inventory = playerState.inventory.filter { it.uid != uid })
         }.let { state ->
-            val trapEntry = globalState.players[usedBy]!!.position to BananaSkinTrap()
+            val trapEntry = globalState.players[usedBy]!!.position to Trap()
             state.copy(boardTraps = state.boardTraps + trapEntry)
         }
     }
@@ -36,5 +36,9 @@ class BananaSkin private constructor(override val uid: String) : WheelItem.Inven
     class Factory : WheelItem.Factory {
         override val itemId = Id.BananaSkin
         override fun create() = BananaSkin.create()
+    }
+
+    class Trap : BoardTrap {
+        override val name = "Банановая кожура"
     }
 }
