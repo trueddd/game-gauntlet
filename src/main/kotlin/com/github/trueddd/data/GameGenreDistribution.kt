@@ -10,6 +10,10 @@ data class GameGenreDistribution(
     val genres: List<Game.Genre>,
 ) {
 
+    fun genreAtPosition(position: Int): Game.Genre {
+        return genres[position - 1]
+    }
+
     companion object {
 
         private val Genres = Game.Genre.entries

@@ -59,12 +59,16 @@ data class BoardMove(
                     }
                 val newStintIndex = PlayerState.calculateStintIndex(finalPosition)
                 val modifiersToDiscard = modifiers.filterIsInstance<WheelItem.Effect>().map { it.uid }
+                val luckyThrowActivated = playerState.effects
+                    .filterIsInstance<LuckyThrowBuff>()
+                    .any { it.genre == currentState.gameGenreDistribution.genreAtPosition(finalPosition) }
                 playerState.copy(
                     position = finalPosition,
                     stepsCount = playerState.stepsCount + 1,
-                    boardMoveAvailable = false,
+                    boardMoveAvailable = luckyThrowActivated,
                     effects = playerState.effects.mapNotNull { effect ->
                         when {
+                            effect is LuckyThrowBuff -> null
                             effect is ChargedDice -> null
                             effect is NoClownery -> if (previousStintIndex + 1 == newStintIndex) null else effect
                             effect !is DiceRollModifier -> effect
