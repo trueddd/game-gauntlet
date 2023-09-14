@@ -7,7 +7,7 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class RatMove private constructor(override val uid: String) : WheelItem.Event(), Usable {
+class RatMove private constructor(override val uid: String) : WheelItem.PendingEvent() {
 
     companion object {
         fun create() = RatMove(uid = generateWheelItemUid())
@@ -22,12 +22,6 @@ class RatMove private constructor(override val uid: String) : WheelItem.Event(),
         Нельзя сбросить пустой инвентарь, нельзя сбросить свой инвентарь, если у всех стримеров пустой инвентарь, 
         то пункт рероллится.
     """.trimIndent()
-
-    override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
-        return globalState.updatePlayer(rolledBy) { playerState ->
-            playerState.copy(pendingEvents = playerState.pendingEvents + this)
-        }
-    }
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         val targetUser = arguments.first()

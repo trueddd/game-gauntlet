@@ -4,7 +4,6 @@ import com.github.trueddd.core.ItemRoller
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.Plasticine
-import com.github.trueddd.data.items.RatMove
 import com.github.trueddd.data.items.WheelItem
 import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.StateModificationException
@@ -42,7 +41,7 @@ data class ItemUse(
                 ?: return currentState
             return when (item) {
                 is Plasticine -> item.transform(action.usedBy, currentState, action.arguments, itemRoller.allItemsFactories)
-                is RatMove -> item.use(action.usedBy, currentState, action.arguments)
+                is WheelItem.PendingEvent -> item.use(action.usedBy, currentState, action.arguments)
                 is WheelItem.InventoryItem -> item.use(action.usedBy, currentState, action.arguments)
                 else -> throw StateModificationException(action, "ItemUse is undefined for this item ($item)")
             }

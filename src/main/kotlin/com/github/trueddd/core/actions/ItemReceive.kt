@@ -69,6 +69,9 @@ data class ItemReceive(
                     it.copy(effects = it.effects + action.item)
                 }
                 is WheelItem.Event -> action.item.invoke(currentState, action.receivedBy)
+                is WheelItem.PendingEvent -> currentState.updatePlayer(action.receivedBy) {
+                    it.copy(pendingEvents = it.pendingEvents + action.item)
+                }
             }
         }
     }

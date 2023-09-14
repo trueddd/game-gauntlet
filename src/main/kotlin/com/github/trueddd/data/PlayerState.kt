@@ -20,7 +20,7 @@ data class PlayerState(
     val inventory: List<WheelItem.InventoryItem> = emptyList(),
     val effects: List<WheelItem.Effect> = emptyList(),
     val gameHistory: List<GameHistoryEntry> = emptyList(),
-    val pendingEvents: List<WheelItem.Event> = emptyList(),
+    val pendingEvents: List<WheelItem.PendingEvent> = emptyList(),
 ) {
 
     companion object {

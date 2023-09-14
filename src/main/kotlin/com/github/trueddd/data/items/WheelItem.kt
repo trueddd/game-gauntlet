@@ -86,6 +86,9 @@ sealed class WheelItem {
     }
 
     @Serializable
+    sealed class PendingEvent : WheelItem(), Usable
+
+    @Serializable
     sealed class Effect : WheelItem() {
 
         @Serializable
