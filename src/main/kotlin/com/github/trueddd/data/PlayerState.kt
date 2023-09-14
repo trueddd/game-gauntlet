@@ -3,6 +3,16 @@ package com.github.trueddd.data
 import com.github.trueddd.data.items.DiceRollModifier
 import com.github.trueddd.data.items.WheelItem
 
+/**
+ * @property stepsCount amount of steps that have been made by player using [BoardMove][com.github.trueddd.core.actions.BoardMove].
+ * @property boardMoveAvailable flag determining whether the next [BoardMove][com.github.trueddd.core.actions.BoardMove] is available for player
+ * @property position current position of player on the board.
+ * 0 means the starting point of the board, player cannot reenter this spot.
+ * @property inventory current set of inventory item of player available for them to use.
+ * @property effects current set of effects that are applied to player.
+ * @property gameHistory whole history of games (including current one) that have been played or rerolled by player.
+ * @property pendingEvents current set of events that have been received be player and now awaiting to be used.
+ */
 data class PlayerState(
     val stepsCount: Int = 0,
     val boardMoveAvailable: Boolean = true,
@@ -10,6 +20,7 @@ data class PlayerState(
     val inventory: List<WheelItem.InventoryItem> = emptyList(),
     val effects: List<WheelItem.Effect> = emptyList(),
     val gameHistory: List<GameHistoryEntry> = emptyList(),
+    val pendingEvents: List<WheelItem.Event> = emptyList(),
 ) {
 
     companion object {

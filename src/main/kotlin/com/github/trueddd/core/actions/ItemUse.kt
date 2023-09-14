@@ -4,7 +4,10 @@ import com.github.trueddd.core.ItemRoller
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.Plasticine
+import com.github.trueddd.data.items.RatMove
+import com.github.trueddd.data.items.WheelItem
 import com.github.trueddd.utils.ActionCreationException
+import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.Serializable
@@ -34,12 +37,14 @@ data class ItemUse(
     ) : Action.Handler<ItemUse> {
 
         override suspend fun handle(action: ItemUse, currentState: GlobalState): GlobalState {
-            val item = currentState.players[action.usedBy]?.inventory
-                ?.firstOrNull { it.uid == action.itemUid }
+            val item = currentState.players[action.usedBy]?.inventory?.firstOrNull { it.uid == action.itemUid }
+                ?: currentState.players[action.usedBy]?.pendingEvents?.firstOrNull { it.uid == action.itemUid }
                 ?: return currentState
             return when (item) {
                 is Plasticine -> item.transform(action.usedBy, currentState, action.arguments, itemRoller.allItemsFactories)
-                else -> item.use(action.usedBy, currentState, action.arguments)
+                is RatMove -> item.use(action.usedBy, currentState, action.arguments)
+                is WheelItem.InventoryItem -> item.use(action.usedBy, currentState, action.arguments)
+                else -> throw StateModificationException(action, "ItemUse is undefined for this item ($item)")
             }
         }
     }

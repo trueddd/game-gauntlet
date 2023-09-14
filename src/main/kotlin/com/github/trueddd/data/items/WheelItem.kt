@@ -58,6 +58,7 @@ sealed class WheelItem {
             val Plasticine = Id(28)
             val Earthquake = Id(29)
             val DontCare = Id(30)
+            val RatMove = Id(31)
         }
     }
 
