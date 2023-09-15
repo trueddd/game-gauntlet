@@ -63,6 +63,7 @@ sealed class WheelItem {
             val FamilyFriendlyStreamer = Id(33)
             val ForgotMyGame = Id(34)
             val NotDumb = Id(35)
+            val YourStream = Id(36)
         }
     }
 

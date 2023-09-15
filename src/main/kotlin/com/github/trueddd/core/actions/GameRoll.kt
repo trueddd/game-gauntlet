@@ -5,6 +5,7 @@ import com.github.trueddd.data.Game
 import com.github.trueddd.data.GameHistoryEntry
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.items.YourStream
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
@@ -39,7 +40,12 @@ data class GameRoll(
                 val newGameHistory = gamesProvider.getById(action.gameId)?.let {
                     state.gameHistory + GameHistoryEntry(it, Game.Status.InProgress)
                 } ?: throw StateModificationException(action, "Game with id (${action.gameId.value}) not found")
-                state.copy(gameHistory = newGameHistory)
+                val indexOfYourStreamBuff = state.effects.indexOfFirst { it is YourStream }
+                val newEffects = state.effects.filterIndexed { index, _ -> index != indexOfYourStreamBuff }
+                state.copy(
+                    gameHistory = newGameHistory,
+                    effects = newEffects
+                )
             }
         }
     }
