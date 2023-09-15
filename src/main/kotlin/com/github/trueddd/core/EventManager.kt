@@ -3,10 +3,12 @@ package com.github.trueddd.core
 import com.github.trueddd.core.actions.Action
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.utils.Log
-import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.sync.Mutex
 import org.jetbrains.annotations.TestOnly
 import org.koin.core.annotation.Single
@@ -100,7 +102,7 @@ class EventManager(
                     val result = handler.handle(action, stateHolder.globalStateFlow.value)
                     stateHolder.update { result }
                     handledActionsFlow.emit(HandledAction(action.id, action.issuedAt))
-                } catch (error: StateModificationException) {
+                } catch (error: Exception) {
                     handledActionsFlow.emit(HandledAction(action.id, action.issuedAt, error))
                 } finally {
                     eventHandlingMonitor.unlock()
