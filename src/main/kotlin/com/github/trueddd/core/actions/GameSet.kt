@@ -6,6 +6,7 @@ import com.github.trueddd.data.GameHistoryEntry
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.items.DontCare
+import com.github.trueddd.data.items.DontUnderstand
 import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
@@ -37,19 +38,36 @@ data class GameSet(
         override suspend fun handle(action: GameSet, currentState: GlobalState): GlobalState {
             val game = gamesProvider.getById(action.gameId)
                 ?: throw StateModificationException(action, "Game with Id (${action.gameId}) was not found")
-            if (currentState[action.setBy.name]?.effects?.any { it is DontCare } == true) {
-                return currentState.updatePlayer(action.setBy) { playerState ->
-                    val entry = GameHistoryEntry(
-                        game = game,
-                        status = if (playerState.hasCurrentActive) Game.Status.Next else Game.Status.InProgress
-                    )
-                    playerState.copy(
-                        effects = playerState.effects.filter { it !is DontCare },
-                        gameHistory = playerState.gameHistory + entry,
-                    )
+            return when {
+                currentState.effectsOf(action.setBy).any { it is DontCare } -> {
+                    currentState.updatePlayer(action.setBy) { playerState ->
+                        val entry = GameHistoryEntry(
+                            game = game,
+                            status = if (playerState.hasCurrentActive) Game.Status.Next else Game.Status.InProgress
+                        )
+                        playerState.copy(
+                            effects = playerState.effects.filter { it !is DontCare },
+                            gameHistory = playerState.gameHistory + entry,
+                        )
+                    }
                 }
+                currentState.effectsOf(action.setBy).any { it is DontUnderstand } -> {
+                    currentState.updatePlayer(action.setBy) { playerState ->
+                        val entry = GameHistoryEntry(
+                            game = game,
+                            status = if (playerState.hasCurrentActive) Game.Status.Next else Game.Status.InProgress
+                        )
+                        playerState.copy(
+                            effects = playerState.effects.filter { it !is DontUnderstand },
+                            gameHistory = playerState.gameHistory + entry,
+                        )
+                    }
+                }
+                else -> throw StateModificationException(
+                    action,
+                    cause = "Player doesn't have required buff to set the game by themselves"
+                )
             }
-            throw StateModificationException(action, "Player doesn't have required buff to set the game by themselves")
         }
     }
 }
