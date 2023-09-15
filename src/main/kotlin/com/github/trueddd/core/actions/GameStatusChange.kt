@@ -3,10 +3,7 @@ package com.github.trueddd.core.actions
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
-import com.github.trueddd.data.items.ClimbingRope
-import com.github.trueddd.data.items.Gamer
-import com.github.trueddd.data.items.Viewer
-import com.github.trueddd.data.items.charge
+import com.github.trueddd.data.items.*
 import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
@@ -48,8 +45,14 @@ data class GameStatusChange(
                         else -> entry
                     }
                 }
+                val newPendingEvents = state.pendingEvents.mapNotNull { pendingEvent ->
+                    return@mapNotNull when (pendingEvent) {
+                        is FamilyFriendlyStreamer -> pendingEvent.takeIf { action.gameNewStatus != Game.Status.Finished }
+                        else -> pendingEvent
+                    }
+                }
                 val newEffects = state.effects.mapNotNull { effect ->
-                    when (effect) {
+                    return@mapNotNull when (effect) {
                         is Gamer -> when {
                             !action.gameNewStatus.allowsNextStep -> effect
                             !effect.isActive -> effect.setActive(true)
@@ -68,6 +71,7 @@ data class GameStatusChange(
                     gameHistory = newGameHistory,
                     boardMoveAvailable = if (action.gameNewStatus.allowsNextStep) true else state.boardMoveAvailable,
                     effects = newEffects,
+                    pendingEvents = newPendingEvents,
                 )
             }
         }
