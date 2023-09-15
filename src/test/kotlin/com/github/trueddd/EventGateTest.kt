@@ -3,6 +3,12 @@ package com.github.trueddd
 import com.github.trueddd.core.EventGate
 import com.github.trueddd.core.actions.Action
 import com.github.trueddd.data.Participant
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.isActive
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -23,6 +29,24 @@ abstract class EventGateTest {
     protected fun lastGameOf(participant: Participant) = stateOf(participant).currentGame
 
     protected suspend fun handleAction(action: Action) = eventGate.eventManager.suspendConsumeAction(action)
+
+    private suspend fun makeMove(participant: Participant) {
+        eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.BoardMove}")
+        eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameRoll}")
+        eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameStatusChange}:1")
+    }
+
+    protected suspend fun makeMovesUntilFinish(player: Participant) {
+        flow {
+            while (currentCoroutineContext().isActive) {
+                makeMove(player)
+                emit(positionOf(player))
+            }
+        }
+            .filterNotNull()
+            .takeWhile { it < eventGate.stateHolder.current.boardLength }
+            .collect()
+    }
 
     @BeforeEach
     fun startEventGate() {
