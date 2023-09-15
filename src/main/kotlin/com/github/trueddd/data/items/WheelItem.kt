@@ -71,6 +71,7 @@ sealed class WheelItem {
             val ImportSubstitution = Id(41)
             val Classic = Id(42)
             val FarmsDigsAndRobots = Id(43)
+            val DiceBattle = Id(44)
         }
     }
 

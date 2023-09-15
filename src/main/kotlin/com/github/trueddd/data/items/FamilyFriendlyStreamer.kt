@@ -39,6 +39,7 @@ class FamilyFriendlyStreamer private constructor(override val uid: String) : Whe
         override fun create() = FamilyFriendlyStreamer.create()
     }
 
+    @Serializable
     class Debuff private constructor(
         override val uid: String,
         override val modifier: Int = -3

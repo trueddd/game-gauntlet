@@ -37,6 +37,10 @@ data class GlobalState(
         }
     }
 
+    fun participantByName(name: String): Participant? {
+        return players.keys.firstOrNull { it.name == name }
+    }
+
     operator fun get(playerName: String): PlayerState? {
         return players.entries.firstOrNull { (key, _) -> key.name == playerName }?.value
     }
