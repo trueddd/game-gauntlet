@@ -2,6 +2,7 @@ package com.github.trueddd.data.items
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.without
 import com.github.trueddd.utils.generateWheelItemUid
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
@@ -24,10 +25,14 @@ class LoyalModerator private constructor(override val uid: String) : WheelItem.I
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState.updatePlayer(usedBy) { playerState ->
-            val targetDebuffId = arguments.first()
+            val targetDebuffId = arguments.firstOrNull()
+                ?: throw IllegalArgumentException("Debuff uid must be specified")
+            if (playerState.effects.firstOrNull { it.uid == targetDebuffId } is EasterCakeBang) {
+                throw IllegalArgumentException("This debuff cannot be dispelled")
+            }
             playerState.copy(
-                effects = playerState.effects.filter { it.uid != targetDebuffId },
-                inventory = playerState.inventory.filter { it.uid != uid },
+                effects = playerState.effects.without(targetDebuffId),
+                inventory = playerState.inventory.without(uid),
             )
         }
     }

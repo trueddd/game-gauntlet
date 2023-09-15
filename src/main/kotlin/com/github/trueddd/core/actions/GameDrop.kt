@@ -3,7 +3,9 @@ package com.github.trueddd.core.actions
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.without
 import com.github.trueddd.data.items.ClimbingRope
+import com.github.trueddd.data.items.EasterCakeBang
 import com.github.trueddd.data.items.SamuraiLunge
 import com.github.trueddd.utils.StateModificationException
 import com.github.trueddd.utils.rollDice
@@ -37,6 +39,9 @@ data class GameDrop(
             if (currentGame.status.isComplete) {
                 throw StateModificationException(action, "Current game is already complete")
             }
+            if (currentState.effectsOf(action.rolledBy).any { it is EasterCakeBang }) {
+                throw StateModificationException(action, "Cannot drop the game due to player's debuff")
+            }
             return currentState.updatePlayer(action.rolledBy) { playerState ->
                 val moveValue = when {
                     playerState.effects.any { it is SamuraiLunge.Buff } -> action.diceValue
@@ -51,8 +56,8 @@ data class GameDrop(
                 playerState.copy(
                     position = finalPosition,
                     effects = playerState.effects
-                        .filter { it !is SamuraiLunge.Buff }
-                        .filter { it !is ClimbingRope.Buff },
+                        .without<SamuraiLunge.Buff>()
+                        .without<ClimbingRope.Buff>(),
                     gameHistory = newGameHistory,
                     boardMoveAvailable = false,
                 )

@@ -3,6 +3,7 @@ package com.github.trueddd.data.items
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.without
 import com.github.trueddd.utils.generateWheelItemUid
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
@@ -37,7 +38,7 @@ class WannaSwap private constructor(override val uid: String) : WheelItem.Pendin
             when (participant.name) {
                 usedBy.name -> playerState.copy(
                     gameHistory = playerState.updatedHistoryWithLast { gameToSwap.copy(status = Game.Status.InProgress) },
-                    pendingEvents = playerState.pendingEvents.filter { it.uid != uid },
+                    pendingEvents = playerState.pendingEvents.without(uid),
                 )
                 swapPlayer.name -> playerState.copy(
                     gameHistory = playerState.updatedHistoryWithLast { userGame.copy(status = Game.Status.InProgress) },

@@ -2,6 +2,7 @@ package com.github.trueddd.data.items
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.without
 import com.github.trueddd.utils.generateWheelItemUid
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
@@ -26,7 +27,7 @@ class SamuraiLunge private constructor(override val uid: String) : WheelItem.Inv
         return globalState.updatePlayer(usedBy) { state ->
             state.copy(
                 effects = state.effects + Buff.create(),
-                inventory = state.inventory.filter { it.uid != uid },
+                inventory = state.inventory.without(uid),
             )
         }
     }

@@ -2,6 +2,7 @@ package com.github.trueddd.data.items
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.without
 import com.github.trueddd.utils.generateWheelItemUid
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
@@ -23,7 +24,7 @@ class ClimbingRope private constructor(override val uid: String) : WheelItem.Inv
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 effects = playerState.effects + Buff.create(),
-                inventory = playerState.inventory.filter { it.uid != uid },
+                inventory = playerState.inventory.without(uid),
             )
         }
     }

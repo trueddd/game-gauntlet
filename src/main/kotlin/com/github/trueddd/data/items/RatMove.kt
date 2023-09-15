@@ -2,6 +2,7 @@ package com.github.trueddd.data.items
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.without
 import com.github.trueddd.utils.generateWheelItemUid
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
@@ -27,10 +28,10 @@ class RatMove private constructor(override val uid: String) : WheelItem.PendingE
         val targetUser = arguments.first()
         return globalState.updatePlayers { participant, playerState ->
             when (participant.name) {
-                usedBy.name -> playerState.copy(pendingEvents = playerState.pendingEvents.filter { it.uid != uid })
+                usedBy.name -> playerState.copy(pendingEvents = playerState.pendingEvents.without(uid))
                 targetUser -> playerState.copy(
                     inventory = emptyList(),
-                    effects = emptyList(),
+                    effects = playerState.effects.filterIsInstance<EasterCakeBang>(),
                 )
                 else -> playerState
             }

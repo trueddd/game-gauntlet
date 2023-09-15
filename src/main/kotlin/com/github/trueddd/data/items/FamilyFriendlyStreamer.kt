@@ -2,6 +2,7 @@ package com.github.trueddd.data.items
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.without
 import com.github.trueddd.utils.generateWheelItemUid
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
@@ -26,7 +27,7 @@ class FamilyFriendlyStreamer private constructor(override val uid: String) : Whe
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
-                pendingEvents = playerState.pendingEvents.filter { it.uid != uid },
+                pendingEvents = playerState.pendingEvents.without(uid),
                 effects = playerState.effects + Debuff.create(),
             )
         }

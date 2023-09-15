@@ -2,6 +2,7 @@ package com.github.trueddd.data.items
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.without
 import com.github.trueddd.utils.generateWheelItemUid
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
@@ -37,7 +38,7 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
         return globalState.updatePlayers { participant, playerState ->
             when (participant.name) {
                 usedBy.name -> playerState.copy(
-                    pendingEvents = playerState.pendingEvents.filter { it.uid != uid },
+                    pendingEvents = playerState.pendingEvents.without(uid),
                     effects = playerState.effects + if (jokeSucceeded) JokerBuff.create() else JokerDebuff.create()
                 )
                 listener.name -> playerState.copy(

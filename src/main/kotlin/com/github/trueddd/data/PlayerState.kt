@@ -52,3 +52,11 @@ data class PlayerState(
         return gameHistory.mapIndexed { index, entry -> if (index == gameHistory.size - 1) block(entry) else entry }
     }
 }
+
+inline fun <reified T : WheelItem.Effect> List<WheelItem.Effect>.without(): List<WheelItem.Effect> {
+    return filter { it !is T }
+}
+
+fun <T : WheelItem> List<T>.without(itemUid: String): List<T> {
+    return filter { it.uid != itemUid }
+}

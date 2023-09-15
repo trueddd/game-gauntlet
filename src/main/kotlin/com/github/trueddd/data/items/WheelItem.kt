@@ -67,6 +67,7 @@ sealed class WheelItem {
             val IWouldBeatIt = Id(37)
             val DontUnderstand = Id(38)
             val CompanySoul = Id(39)
+            val EasterCakeBang = Id(40)
         }
     }
 

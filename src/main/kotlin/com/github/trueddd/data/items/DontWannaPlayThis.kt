@@ -3,6 +3,7 @@ package com.github.trueddd.data.items
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.without
 import com.github.trueddd.utils.generateWheelItemUid
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
@@ -28,7 +29,7 @@ class DontWannaPlayThis private constructor(override val uid: String) : WheelIte
         return globalState.updatePlayer(usedBy) { playerState ->
             val currentGame = playerState.currentActiveGame!!
             playerState.copy(
-                inventory = playerState.inventory.filter { it.uid != uid },
+                inventory = playerState.inventory.without(uid),
                 gameHistory = playerState.gameHistory.map {
                     if (it.game == currentGame.game) it.copy(status = Game.Status.Rerolled) else it
                 },

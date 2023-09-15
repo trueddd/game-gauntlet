@@ -63,6 +63,10 @@ data class GameStatusChange(
                             !effect.isActive -> effect.setActive(true)
                             else -> effect.charge()
                         }
+                        is EasterCakeBang -> when {
+                            action.gameNewStatus == Game.Status.Finished -> null
+                            else -> effect
+                        }
                         is ClimbingRope.Buff -> null
                         else -> effect
                     }

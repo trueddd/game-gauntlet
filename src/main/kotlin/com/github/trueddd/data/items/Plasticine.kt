@@ -2,6 +2,7 @@ package com.github.trueddd.data.items
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.without
 import com.github.trueddd.utils.generateWheelItemUid
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
@@ -36,7 +37,7 @@ class Plasticine private constructor(override val uid: String) : WheelItem.Inven
         val item = factory.create() as InventoryItem
         return globalState.updatePlayer(user) { playerState ->
             playerState.copy(
-                inventory = playerState.inventory.filter { it.uid != uid } + item,
+                inventory = playerState.inventory.without(uid) + item,
             )
         }
     }

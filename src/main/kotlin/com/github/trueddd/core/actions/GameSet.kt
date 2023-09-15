@@ -1,10 +1,7 @@
 package com.github.trueddd.core.actions
 
 import com.github.trueddd.core.GamesProvider
-import com.github.trueddd.data.Game
-import com.github.trueddd.data.GameHistoryEntry
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.*
 import com.github.trueddd.data.items.DontCare
 import com.github.trueddd.data.items.DontUnderstand
 import com.github.trueddd.utils.ActionCreationException
@@ -46,7 +43,7 @@ data class GameSet(
                             status = if (playerState.hasCurrentActive) Game.Status.Next else Game.Status.InProgress
                         )
                         playerState.copy(
-                            effects = playerState.effects.filter { it !is DontCare },
+                            effects = playerState.effects.without<DontCare>(),
                             gameHistory = playerState.gameHistory + entry,
                         )
                     }
@@ -58,7 +55,7 @@ data class GameSet(
                             status = if (playerState.hasCurrentActive) Game.Status.Next else Game.Status.InProgress
                         )
                         playerState.copy(
-                            effects = playerState.effects.filter { it !is DontUnderstand },
+                            effects = playerState.effects.without<DontUnderstand>(),
                             gameHistory = playerState.gameHistory + entry,
                         )
                     }

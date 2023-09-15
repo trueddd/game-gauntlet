@@ -3,6 +3,7 @@ package com.github.trueddd.data.items
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.without
 import com.github.trueddd.utils.generateWheelItemUid
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
@@ -32,7 +33,7 @@ class ForgotMyGame private constructor(override val uid: String) : WheelItem.Pen
         }
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
-                pendingEvents = playerState.pendingEvents.filter { it.uid != uid },
+                pendingEvents = playerState.pendingEvents.without(uid),
                 gameHistory = if (shouldReroll) {
                     playerState.updatedHistoryWithLast { it.copy(status = Game.Status.Rerolled) }
                 } else {
