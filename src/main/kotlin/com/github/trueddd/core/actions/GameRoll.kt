@@ -5,6 +5,7 @@ import com.github.trueddd.data.Game
 import com.github.trueddd.data.GameHistoryEntry
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.items.IWouldBeatIt
 import com.github.trueddd.data.items.YourStream
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
@@ -35,6 +36,11 @@ data class GameRoll(
             val currentGame = currentState[action.participant.name]?.gameHistory?.lastOrNull()
             if (currentGame != null && !currentGame.status.isComplete) {
                 throw StateModificationException(action, "Current game is not finished ($currentGame)")
+            }
+            if (currentState.effectsOf(action.participant).any { it is IWouldBeatIt }
+                && action.gameId !in currentState.getDroppedGames()
+                && currentState.getDroppedGames().isNotEmpty()) {
+                throw StateModificationException(action, "Player has to roll next game from the dropped ones")
             }
             return currentState.updatePlayer(action.participant) { state ->
                 val newGameHistory = gamesProvider.getById(action.gameId)?.let {

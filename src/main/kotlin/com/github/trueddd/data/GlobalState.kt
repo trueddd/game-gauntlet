@@ -16,6 +16,21 @@ data class GlobalState(
     val boardTraps: Map<Int, BoardTrap> = mapOf(),
 ) {
 
+    fun stateOf(participant: Participant) = get(participant.name)!!
+    fun effectsOf(participant: Participant) = stateOf(participant).effects
+    fun pendingEventsOf(participant: Participant) = stateOf(participant).pendingEvents
+    fun inventoryOf(participant: Participant) = stateOf(participant).inventory
+    fun positionOf(participant: Participant) = stateOf(participant).position
+    fun lastGameOf(participant: Participant) = stateOf(participant).currentGame
+
+    fun getDroppedGames(): List<Game.Id> {
+        return players.values.flatMap { playerState ->
+            playerState.gameHistory
+                .filter { it.status == Game.Status.Dropped }
+                .map { it.game.id }
+        }
+    }
+
     operator fun get(playerName: String): PlayerState? {
         return players.entries.firstOrNull { (key, _) -> key.name == playerName }?.value
     }

@@ -64,6 +64,7 @@ sealed class WheelItem {
             val ForgotMyGame = Id(34)
             val NotDumb = Id(35)
             val YourStream = Id(36)
+            val IWouldBeatIt = Id(37)
         }
     }
 

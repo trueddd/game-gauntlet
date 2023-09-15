@@ -15,7 +15,7 @@ abstract class EventGateTest {
     protected fun requireRandomParticipant() = eventGate.stateHolder.participants.random()
     protected fun requireParticipants() = eventGate.stateHolder.participants.toList()
 
-    protected fun stateOf(participant: Participant) = eventGate.stateHolder.current[participant.name]!!
+    protected fun stateOf(participant: Participant) = eventGate.stateHolder.current.stateOf(participant)
     protected fun effectsOf(participant: Participant) = stateOf(participant).effects
     protected fun pendingEventsOf(participant: Participant) = stateOf(participant).pendingEvents
     protected fun inventoryOf(participant: Participant) = stateOf(participant).inventory
