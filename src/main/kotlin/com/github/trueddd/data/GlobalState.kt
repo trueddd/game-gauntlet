@@ -23,6 +23,12 @@ data class GlobalState(
     fun positionOf(participant: Participant) = stateOf(participant).position
     fun lastGameOf(participant: Participant) = stateOf(participant).currentGame
 
+    fun getAllEverRolledGames(): List<Game> {
+        return players.values
+            .flatMap { it.gameHistory }
+            .map { it.game }
+    }
+
     fun getDroppedGames(): List<Game.Id> {
         return players.values.flatMap { playerState ->
             playerState.gameHistory

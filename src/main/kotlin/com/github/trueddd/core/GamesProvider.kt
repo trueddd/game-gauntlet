@@ -14,6 +14,7 @@ class GamesProvider {
         Game(id = Game.Id(2), name = "The Gamer: Wild Game"),
         Game(id = Game.Id(3), name = "Gamers Creed"),
         Game(id = Game.Id(4), name = "Just Gaming"),
+        Game(id = Game.Id(5), name = "Супер Корова"),
     )
 
     fun roll(): Game {
