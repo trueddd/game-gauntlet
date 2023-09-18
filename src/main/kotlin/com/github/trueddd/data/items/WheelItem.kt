@@ -80,6 +80,7 @@ sealed class WheelItem {
             val GreatEvent = Id(50)
             val AwfulEvent = Id(51)
             val UnrealBoost = Id(52)
+            val MongoliaDoesNotExist = Id(53)
         }
     }
 
