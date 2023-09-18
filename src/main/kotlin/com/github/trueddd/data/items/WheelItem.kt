@@ -79,6 +79,7 @@ sealed class WheelItem {
             val TwoForThePriceOfOne = Id(49)
             val GreatEvent = Id(50)
             val AwfulEvent = Id(51)
+            val UnrealBoost = Id(52)
         }
     }
 

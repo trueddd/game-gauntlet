@@ -32,7 +32,7 @@ abstract class EventGateTest {
 
     protected suspend fun handleAction(action: Action) = eventGate.eventManager.suspendConsumeAction(action)
 
-    private suspend fun makeMove(participant: Participant) {
+    protected suspend fun makeMove(participant: Participant) {
         eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.BoardMove}")
         eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameRoll}")
         eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameStatusChange}:1")
