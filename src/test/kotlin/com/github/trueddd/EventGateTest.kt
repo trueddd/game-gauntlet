@@ -17,6 +17,8 @@ import org.junit.jupiter.api.TestInstance
 abstract class EventGateTest {
 
     protected val eventGate: EventGate = provideEventGate()
+    protected val genreDistribution
+        get() = eventGate.stateHolder.current.gameGenreDistribution
 
     protected fun requireRandomParticipant() = eventGate.stateHolder.participants.random()
     protected fun requireParticipants() = eventGate.stateHolder.participants.toList()

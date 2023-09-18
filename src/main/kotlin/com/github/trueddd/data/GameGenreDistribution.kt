@@ -14,6 +14,20 @@ data class GameGenreDistribution(
         return genres[position - 1]
     }
 
+    fun closestPositionToGenre(anchorPosition: Int, genre: Game.Genre): Int {
+        var shift = 1
+        while (anchorPosition + shift in genres.indices || anchorPosition - shift in genres.indices) {
+            if (genreAtPosition(anchorPosition + shift) == genre) {
+                return anchorPosition + shift
+            }
+            if (genreAtPosition(anchorPosition - shift) == genre) {
+                return anchorPosition - shift
+            }
+            shift++
+        }
+        throw IllegalStateException("No genres were found")
+    }
+
     companion object {
 
         private val Genres = Game.Genre.entries
