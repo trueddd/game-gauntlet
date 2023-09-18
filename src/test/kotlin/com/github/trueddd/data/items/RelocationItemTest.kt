@@ -41,7 +41,8 @@ class RelocationItemTest : EventGateTest() {
                 if (genre != Game.Genre.Special) {
                     return@forEachIndexed
                 }
-                if (genres[index - 2] == genres[index + 2]) {
+                if (genres.getOrNull(index - 2) == genres.getOrNull(index + 2)
+                    && genres.getOrNull(index + 2) != null) {
                     return@let index + 1
                 }
             }

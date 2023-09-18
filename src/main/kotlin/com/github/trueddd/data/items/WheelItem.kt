@@ -74,7 +74,9 @@ sealed class WheelItem {
             val DiceBattle = Id(44)
             val Democracy = Id(45)
             val UnbelievableDemocracy = Id(46)
-            val Relocation = Id(46)
+            val Relocation = Id(47)
+            val ShoppingWithChat = Id(48)
+            val TwoForThePriceOfOne = Id(49)
         }
     }
 
