@@ -28,7 +28,7 @@ class Teleport private constructor(override val uid: String) : WheelItem.Pending
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         val userPosition = globalState.positionOf(usedBy)
         val neighborBack = globalState.players.values
-            .filter { it.position < userPosition }
+            .filter { it.position < userPosition && it.position in GlobalState.PLAYABLE_BOARD_RANGE }
             .maxOfOrNull { it.position }
         val neighborForth = globalState.players.values
             .filter { it.position > userPosition && it.position < GlobalState.PLAYABLE_BOARD_RANGE.last }

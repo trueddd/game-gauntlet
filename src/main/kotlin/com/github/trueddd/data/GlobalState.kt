@@ -21,7 +21,6 @@ data class GlobalState(
     fun pendingEventsOf(participant: Participant) = stateOf(participant).pendingEvents
     fun inventoryOf(participant: Participant) = stateOf(participant).inventory
     fun positionOf(participant: Participant) = stateOf(participant).position
-    fun lastGameOf(participant: Participant) = stateOf(participant).currentGame
 
     fun getAllEverRolledGames(): List<Game> {
         return players.values
@@ -39,6 +38,11 @@ data class GlobalState(
 
     fun participantByName(name: String): Participant? {
         return players.keys.firstOrNull { it.name == name }
+    }
+
+    fun positionAmongPlayers(player: Participant): Int {
+        val positions = players.values.map { it.position }.distinct().sortedDescending()
+        return positions.indexOf(positionOf(player))
     }
 
     operator fun get(playerName: String): PlayerState? {
@@ -80,6 +84,7 @@ data class GlobalState(
                     Participant("megagamer") to PlayerState(),
                     Participant("player") to PlayerState(),
                     Participant("clutcher") to PlayerState(),
+                    Participant("dropper") to PlayerState(),
                 ),
                 boardLength = STINT_SIZE * STINT_COUNT,
                 gameGenreDistribution = genreDistribution,

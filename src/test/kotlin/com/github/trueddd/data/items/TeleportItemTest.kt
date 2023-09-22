@@ -40,10 +40,11 @@ class TeleportItemTest : EventGateTest() {
 
     @Test
     fun `2 neighbors - backward`() = runTest {
-        val (user1, user2, user3) = requireParticipants()
+        val (user1, user2, user3, user4) = requireParticipants()
         val item = Teleport.create()
         handleAction(BoardMove(user1, diceValue = 2))
         handleAction(BoardMove(user2, diceValue = 1))
+        handleAction(BoardMove(user4, diceValue = 2))
         handleAction(BoardMove(user3, diceValue = 3))
         handleAction(ItemReceive(user1, item))
         assertEquals(expected = 1, pendingEventsOf(user1).size)

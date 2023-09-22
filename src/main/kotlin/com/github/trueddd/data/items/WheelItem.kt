@@ -84,6 +84,7 @@ sealed class WheelItem {
             val Teleport = Id(54)
             val NimbleFingers = Id(55)
             val Poll = Id(56)
+            val Shitter = Id(57)
         }
     }
 

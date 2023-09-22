@@ -53,7 +53,7 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
             assertEquals(expected = -1, player.modifiersSum)
         }
         eventGate.stateHolder.current.players.keys.forEachIndexed { index, player ->
-            handleAction(BoardMove(player, diceValue = index * 2 + 1))
+            handleAction(BoardMove(player, diceValue = if (index == 0) 1 else 3))
         }
         eventGate.stateHolder.current.players.values.forEach { player ->
             if (player.position == 1) {
