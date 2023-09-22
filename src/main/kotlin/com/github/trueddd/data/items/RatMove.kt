@@ -25,11 +25,11 @@ class RatMove private constructor(override val uid: String) : WheelItem.PendingE
     """.trimIndent()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val targetUser = arguments.first()
+        val targetUser = arguments.getParticipantParameter(index = 0, globalState)
         return globalState.updatePlayers { participant, playerState ->
             when (participant.name) {
                 usedBy.name -> playerState.copy(pendingEvents = playerState.pendingEvents.without(uid))
-                targetUser -> playerState.copy(
+                targetUser.name -> playerState.copy(
                     inventory = emptyList(),
                     effects = playerState.effects.filterIsInstance<EasterCakeBang>(),
                 )

@@ -83,6 +83,7 @@ sealed class WheelItem {
             val MongoliaDoesNotExist = Id(53)
             val Teleport = Id(54)
             val NimbleFingers = Id(55)
+            val Poll = Id(56)
         }
     }
 

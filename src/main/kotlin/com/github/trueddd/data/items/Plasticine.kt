@@ -32,7 +32,7 @@ class Plasticine private constructor(override val uid: String) : WheelItem.Inven
         arguments: List<String>,
         factories: Set<WheelItem.Factory>
     ): GlobalState {
-        val itemId = arguments.first().toInt()
+        val itemId = arguments.getIntParameter()
         val factory = factories.first { it.itemId.value == itemId }
         val item = factory.create() as InventoryItem
         return globalState.updatePlayer(user) { playerState ->

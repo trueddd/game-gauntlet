@@ -27,9 +27,7 @@ class WannaSwap private constructor(override val uid: String) : WheelItem.Pendin
     """.trimIndent()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val playerName = arguments.firstOrNull()
-        val swapPlayer = playerName?.let { name -> globalState.players.keys.firstOrNull { it.name == name } }
-            ?: throw IllegalArgumentException("Name of another player should be specified, but was `$playerName`")
+        val swapPlayer = arguments.getParticipantParameter(index = 0, globalState)
         val userGame = globalState[usedBy.name]!!.currentActiveGame
             ?: throw IllegalStateException("The game of user must be in active state")
         val gameToSwap = globalState[swapPlayer.name]!!.currentActiveGame

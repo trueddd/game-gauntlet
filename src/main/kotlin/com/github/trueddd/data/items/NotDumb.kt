@@ -29,7 +29,7 @@ class NotDumb private constructor(override val uid: String) : WheelItem.PendingE
     """.trimIndent()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val value = arguments.firstOrNull()?.toIntOrNull().let { value ->
+        val value = arguments.getIntParameter().let { value ->
             when (value) {
                 0, 1, 2 -> -3
                 3 -> -2

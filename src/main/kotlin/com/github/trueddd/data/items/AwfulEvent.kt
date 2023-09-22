@@ -24,9 +24,8 @@ class AwfulEvent private constructor(override val uid: String) : WheelItem.Pendi
     """.trimIndent()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val online = arguments.firstOrNull()?.toIntOrNull()
-            ?.also { require(it in 0 .. globalState.players.size) }
-            ?: throw IllegalArgumentException("Amount of online players must be specified, but was ${arguments.firstOrNull()}")
+        val online = arguments.getIntParameter(index = 0)
+            .also { require(it in 0 .. globalState.players.size) }
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),

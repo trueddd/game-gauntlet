@@ -28,11 +28,10 @@ class DiceBattle private constructor(override val uid: String) : WheelItem.Pendi
     """.trimIndent()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val opponent = arguments.getOrNull(0)?.let { globalState.participantByName(it) }
-            ?: throw IllegalArgumentException("Name of opponent must be specified")
-        val myDice = arguments.getOrNull(1)?.toIntOrNull()?.takeIf { it in d6Range }
+        val opponent = arguments.getParticipantParameter(index = 0, globalState)
+        val myDice = arguments.getIntParameter(index = 1).takeIf { it in d6Range }
             ?: throw IllegalArgumentException("Player dice value was corrupted or not specified")
-        val opponentDice = arguments.getOrNull(2)?.toIntOrNull()?.takeIf { it in d6Range }
+        val opponentDice = arguments.getIntParameter(index = 2).takeIf { it in d6Range }
             ?: throw IllegalArgumentException("Opponent dice value was corrupted or not specified")
         if (myDice == opponentDice) {
             throw IllegalArgumentException("Dice values must differ")

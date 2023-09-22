@@ -26,7 +26,7 @@ class LuckyThrow private constructor(override val uid: String) : WheelItem.Pendi
     """.trimIndent()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val genre = arguments.first().let { Json.decodeFromString<Game.Genre>(it) }
+        val genre = arguments.getStringParameter().let { Json.decodeFromString<Game.Genre>(it) }
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),

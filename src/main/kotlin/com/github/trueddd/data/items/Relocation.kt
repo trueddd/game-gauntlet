@@ -24,8 +24,8 @@ class Relocation private constructor(override val uid: String) : WheelItem.Pendi
     """.trimIndent()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val genre = arguments.firstOrNull()?.toIntOrNull()
-            ?.let { Game.Genre.entries.getOrNull(it) }
+        val genre = arguments.getIntParameter()
+            .let { Game.Genre.entries.getOrNull(it) }
             ?.also { require(it != Game.Genre.Special) }
             ?: throw IllegalArgumentException("Index of genre must be specified")
         return globalState.updatePlayer(usedBy) { playerState ->

@@ -57,10 +57,19 @@ class IntoMapProcessor(
             .forEach { (map, declarations) ->
                 environment.logger.info("Writing map $map")
                 val items = declarations.joinToString { "${it.key} to ${it.callConstructor}" }
+                val returnType = when (map) {
+                    ActionHandler.TAG -> listOf(
+                        INT, ClassName(
+                            "com.github.trueddd.core.actions",
+                            "Action", "Handler"
+                        ).parameterizedBy(STAR)
+                    )
+                    else -> listOf(INT, STAR)
+                }.let { MAP.parameterizedBy(it) }
                 fileSpec.addFunction(
                     FunSpec.builder("get${map}Map")
                         .addParameters(declarations.flatMap { it.dependenciesAsParameters }.distinct())
-                        .returns(MAP.parameterizedBy(listOf(INT, STAR)))
+                        .returns(returnType)
                         .addStatement("return mapOf(${items})")
                         .addAnnotation(Single::class)
                         .addAnnotation(

@@ -59,10 +59,21 @@ class IntoSetProcessor(
             .forEach { (type, declarations) ->
                 environment.logger.info("type: $type")
                 val items = declarations.joinToString { it.callConstructor }
+                val returnType = when (type) {
+                    ItemFactory.TAG -> ClassName(
+                        "com.github.trueddd.data.items",
+                        "WheelItem", "Factory"
+                    )
+                    ActionGenerator.TAG -> ClassName(
+                        "com.github.trueddd.core.actions",
+                        "Action", "Generator"
+                    ).parameterizedBy(STAR)
+                    else -> STAR
+                }.let { SET.parameterizedBy(it) }
                 fileSpec.addFunction(
                     FunSpec.builder("get${type}Set")
                         .addParameters(declarations.flatMap { it.dependenciesAsParameters }.distinct())
-                        .returns(SET.parameterizedBy(STAR))
+                        .returns(returnType)
                         .addStatement("return setOf(${items})")
                         .addAnnotation(Single::class)
                         .addAnnotation(

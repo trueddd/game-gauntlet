@@ -27,9 +27,7 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
     """.trimIndent()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val listener = arguments.getOrNull(0)
-            ?.let { name -> globalState.players.keys.firstOrNull { it.name == name } }
-            ?: throw IllegalArgumentException("Listener name must be specified")
+        val listener = arguments.getParticipantParameter(index = 0, globalState)
         val jokeSucceeded = arguments.getBooleanParameter(index = 1)
         return globalState.updatePlayers { participant, playerState ->
             when (participant.name) {

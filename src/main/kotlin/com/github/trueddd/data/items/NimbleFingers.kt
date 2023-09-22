@@ -25,11 +25,9 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
     """.trimIndent()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val targetUser = arguments.getOrNull(index = 0)
-            ?.let { globalState.participantByName(it) }
-            ?: throw IllegalArgumentException("Name of target must be specified")
-        val targetItem = arguments.getOrNull(index = 1)
-            ?.let { id -> globalState.inventoryOf(targetUser).firstOrNull { it.uid == id } }
+        val targetUser = arguments.getParticipantParameter(index = 0, globalState)
+        val targetItem = arguments.getStringParameter(index = 1)
+            .let { id -> globalState.inventoryOf(targetUser).firstOrNull { it.uid == id } }
             ?: throw IllegalArgumentException("ID of target item must be specified")
         return globalState.updatePlayers { participant, state ->
             when (participant) {
