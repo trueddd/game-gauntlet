@@ -18,6 +18,12 @@ data class ItemUse(
     val arguments: List<String> = emptyList(),
 ) : Action(Key.ItemUse) {
 
+    constructor(usedBy: Participant, itemUid: String, vararg arguments: String)
+            : this(usedBy, itemUid, arguments.asList())
+
+    constructor(usedBy: Participant, item: WheelItem, vararg arguments: String)
+            : this(usedBy, item.uid, arguments.asList())
+
     @ActionGenerator
     class Generator : Action.Generator<ItemUse> {
 
@@ -40,10 +46,15 @@ data class ItemUse(
                 ?: currentState.players[action.usedBy]?.pendingEvents?.firstOrNull { it.uid == action.itemUid }
                 ?: return currentState
             return when (item) {
-                is Plasticine -> item.transform(action.usedBy, currentState, action.arguments, itemRoller.allItemsFactories)
+                is Plasticine -> item.transform(
+                    user = action.usedBy,
+                    globalState = currentState,
+                    arguments = action.arguments,
+                    factories = itemRoller.allItemsFactories
+                )
                 is WheelItem.PendingEvent -> item.use(action.usedBy, currentState, action.arguments)
                 is WheelItem.InventoryItem -> item.use(action.usedBy, currentState, action.arguments)
-                else -> throw StateModificationException(action, "ItemUse is undefined for this item ($item)")
+                else -> throw StateModificationException(action, "ItemUse is undefined for this item")
             }
         }
     }

@@ -82,6 +82,7 @@ sealed class WheelItem {
             val UnrealBoost = Id(52)
             val MongoliaDoesNotExist = Id(53)
             val Teleport = Id(54)
+            val NimbleFingers = Id(55)
         }
     }
 

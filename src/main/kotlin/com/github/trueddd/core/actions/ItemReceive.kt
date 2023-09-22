@@ -3,10 +3,7 @@ package com.github.trueddd.core.actions
 import com.github.trueddd.core.ItemRoller
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
-import com.github.trueddd.data.items.BabySupport
-import com.github.trueddd.data.items.Gamer
-import com.github.trueddd.data.items.Viewer
-import com.github.trueddd.data.items.WheelItem
+import com.github.trueddd.data.items.*
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.Serializable
@@ -33,6 +30,12 @@ data class ItemReceive(
 
         override suspend fun handle(action: ItemReceive, currentState: GlobalState): GlobalState {
             return when (action.item) {
+                is NimbleFingers -> when (action.item.canUse(action.receivedBy, currentState)) {
+                    true -> currentState.updatePlayer(action.receivedBy) {
+                        it.copy(pendingEvents = it.pendingEvents + action.item)
+                    }
+                    else -> currentState
+                }
                 is Gamer -> {
                     currentState.updatePlayer(action.receivedBy) { state ->
                         val viewer = state.effects.firstOrNull { it is Viewer }
