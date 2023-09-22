@@ -28,13 +28,7 @@ class MongoliaDoesNotExist private constructor(override val uid: String) : Wheel
     """.trimIndent()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val isSuccessful = arguments.firstOrNull().let {
-            when (it) {
-                "1" -> true
-                "0" -> false
-                else -> throw IllegalArgumentException("Boolean argument should be passed, but was $it")
-            }
-        }
+        val isSuccessful = arguments.getBooleanParameter()
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),

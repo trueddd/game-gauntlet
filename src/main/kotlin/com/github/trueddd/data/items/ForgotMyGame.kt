@@ -22,15 +22,7 @@ class ForgotMyGame private constructor(override val uid: String) : WheelItem.Pen
     override val description = "При выпадении этого пункта стример может рероллнуть игру."
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val shouldReroll = arguments.firstOrNull().let {
-            when (it) {
-                "1" -> true
-                "0" -> false
-                else -> throw IllegalArgumentException(
-                    "Result should be sent as `0` or `1` (for negative and positive responses), but was $it"
-                )
-            }
-        }
+        val shouldReroll = arguments.getBooleanParameter()
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),

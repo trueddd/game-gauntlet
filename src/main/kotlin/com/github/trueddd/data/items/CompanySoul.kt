@@ -30,11 +30,7 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
         val listener = arguments.getOrNull(0)
             ?.let { name -> globalState.players.keys.firstOrNull { it.name == name } }
             ?: throw IllegalArgumentException("Listener name must be specified")
-        val jokeSucceeded = when (val value = arguments.getOrNull(1)) {
-            "1" -> true
-            "0" -> false
-            else -> throw IllegalArgumentException("Boolean argument must be passed, but was $value")
-        }
+        val jokeSucceeded = arguments.getBooleanParameter(index = 1)
         return globalState.updatePlayers { participant, playerState ->
             when (participant.name) {
                 usedBy.name -> playerState.copy(

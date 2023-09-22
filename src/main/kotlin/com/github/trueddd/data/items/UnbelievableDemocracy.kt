@@ -24,13 +24,7 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
     """.trimIndent()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val pollSucceeded = arguments.firstOrNull().let {
-            when (it) {
-                "1" -> true
-                "0" -> false
-                else -> throw IllegalArgumentException("Boolean value must be specified as a poll result, but was $it")
-            }
-        }
+        val pollSucceeded = arguments.getBooleanParameter()
         return globalState.updatePlayers { participant, playerState ->
             playerState.copy(
                 pendingEvents = if (participant == usedBy) {
