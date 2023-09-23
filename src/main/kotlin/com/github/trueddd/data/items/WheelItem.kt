@@ -87,6 +87,7 @@ sealed class WheelItem {
             val Shitter = Id(57)
             val UnrecognizedDisk = Id(58)
             val FewLetters = Id(59)
+            val ThereIsGiftAtYourDoor = Id(60)
         }
     }
 

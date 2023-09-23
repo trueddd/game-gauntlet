@@ -72,11 +72,7 @@ class EventManager(
             .onSubscription { sendAction(action) }
             .filter { (id, issuedAt, _) -> id == action.id && issuedAt == action.issuedAt }
             .first()
-        handledAction.error?.let {
-            Log.error(TAG, "Action(${action.id}) handling resulted in error: ${it.message}")
-        } ?: {
-            Log.info(TAG, "Action(${action.id}) handled")
-        }
+        Log.info(TAG, "Action(${action.id}) handled")
         return handledAction
     }
 

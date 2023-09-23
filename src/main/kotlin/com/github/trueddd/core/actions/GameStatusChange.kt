@@ -68,12 +68,17 @@ data class GameStatusChange(
                             else -> effect
                         }
                         is ClimbingRope.Buff -> null
+                        is ThereIsGiftAtYourDoor.StayAfterGame -> null
                         else -> effect
                     }
                 }
                 state.copy(
                     gameHistory = newGameHistory,
-                    boardMoveAvailable = if (action.gameNewStatus.allowsNextStep) true else state.boardMoveAvailable,
+                    boardMoveAvailable = when {
+                        state.effects.any { it is ThereIsGiftAtYourDoor.StayAfterGame } -> false
+                        action.gameNewStatus.allowsNextStep -> true
+                        else -> state.boardMoveAvailable
+                    },
                     effects = newEffects,
                     pendingEvents = newPendingEvents,
                 )
