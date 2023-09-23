@@ -5,6 +5,7 @@ import com.github.trueddd.data.Game
 import com.github.trueddd.data.GameHistoryEntry
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.items.FewLetters
 import com.github.trueddd.data.items.IWouldBeatIt
 import com.github.trueddd.data.items.YourStream
 import com.github.trueddd.utils.StateModificationException
@@ -37,17 +38,24 @@ data class GameRoll(
             if (currentGame != null && !currentGame.status.isComplete) {
                 throw StateModificationException(action, "Current game is not finished ($currentGame)")
             }
+            val newGame = gamesProvider.getById(action.gameId)
+                ?: throw StateModificationException(action, "Game with id (${action.gameId.value}) not found")
             if (currentState.effectsOf(action.participant).any { it is IWouldBeatIt }
                 && action.gameId !in currentState.getDroppedGames()
                 && currentState.getDroppedGames().isNotEmpty()) {
                 throw StateModificationException(action, "Player has to roll next game from the dropped ones")
             }
+            if (currentState.effectsOf(action.participant).any { it is FewLetters }
+                && newGame.name.count { it.isLetterOrDigit() } > FewLetters.SYMBOLS_LIMIT) {
+                throw StateModificationException(action, "Cannot have this game while FewLetters debuff is applied")
+            }
             return currentState.updatePlayer(action.participant) { state ->
-                val newGameHistory = gamesProvider.getById(action.gameId)?.let {
-                    state.gameHistory + GameHistoryEntry(it, Game.Status.InProgress)
-                } ?: throw StateModificationException(action, "Game with id (${action.gameId.value}) not found")
+                val newGameHistory = state.gameHistory + GameHistoryEntry(newGame, Game.Status.InProgress)
                 val indexOfYourStreamBuff = state.effects.indexOfFirst { it is YourStream }
-                val newEffects = state.effects.filterIndexed { index, _ -> index != indexOfYourStreamBuff }
+                val indexOfFewLettersDebuff = state.effects.indexOfFirst { it is FewLetters }
+                val newEffects = state.effects.filterIndexed { index, _ ->
+                    index != indexOfYourStreamBuff && index != indexOfFewLettersDebuff
+                }
                 state.copy(
                     gameHistory = newGameHistory,
                     effects = newEffects

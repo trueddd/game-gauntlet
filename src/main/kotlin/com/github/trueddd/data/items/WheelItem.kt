@@ -86,6 +86,7 @@ sealed class WheelItem {
             val Poll = Id(56)
             val Shitter = Id(57)
             val UnrecognizedDisk = Id(58)
+            val FewLetters = Id(59)
         }
     }
 
