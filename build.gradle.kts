@@ -23,7 +23,7 @@ ktor {
 
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_16
+        jvmTarget = JvmTarget.JVM_11
         freeCompilerArgs.add("-Xcontext-receivers")
     }
     sourceSets.main {
