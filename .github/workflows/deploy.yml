@@ -1,6 +1,8 @@
-name: Checks
+name: Deploy
 
 on:
+  push:
+    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
@@ -19,11 +21,14 @@ jobs:
       run: chmod +x gradlew
     - name: Validate Gradle wrapper
       uses: gradle/wrapper-validation-action@v1
-    - name: Build with Gradle
+    - name: Build FatJar with Gradle
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: assemble
-    - name: Run tests
-      uses: gradle/gradle-build-action@v2
+        arguments: buildFatJar
+    - name: Upload Jar
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
-        arguments: test --info
+        server: ${{ secrets.FTP_ADDRESS }}
+        username: ${{ secrets.FTP_USER }}
+        password: ${{ secrets.FTP_PASS }}
+        local-dir: ./build/libs/
