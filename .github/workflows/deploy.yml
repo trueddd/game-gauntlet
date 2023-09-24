@@ -25,6 +25,11 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         arguments: buildFatJar
+      env:
+        JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        JWT_DOMAIN: ${{ secrets.JWT_DOMAIN }}
+        JWT_REALM: ${{ secrets.JWT_REALM }}
     - name: Upload Jar
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
