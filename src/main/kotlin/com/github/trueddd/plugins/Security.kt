@@ -6,10 +6,9 @@ import com.github.trueddd.utils.Log
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.Properties
+import java.util.*
 
 object Jwt {
     const val AUDIENCE = "JWT_AUDIENCE"
@@ -32,7 +31,11 @@ fun Application.configureSecurity() {
                     .build()
             )
             validate { credential ->
-                if (credential.payload.audience.contains(jwtAudience)) JWTPrincipal(credential.payload) else null
+                if (credential.payload.audience.contains(jwtAudience)) {
+                    JWTPrincipal(credential.payload)
+                } else {
+                    null
+                }
             }
         }
     }
@@ -43,7 +46,8 @@ private fun currentDir(): Path {
 }
 
 private fun readJwtConfig(): Properties {
-    val propertiesFile = File(currentDir().toFile(), "../jwt.properties")
+    val propertiesFile = currentDir().toFile().parentFile
+        .resolve("jwt.properties")
     return if (propertiesFile.exists()) {
         propertiesFile.inputStream().use { Properties().apply { load(it) } }
     } else {
