@@ -1,0 +1,37 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: gradle
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Validate Gradle wrapper
+      uses: gradle/wrapper-validation-action@v1
+    - name: Build FatJar with Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: buildFatJar
+      env:
+        JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        JWT_DOMAIN: ${{ secrets.JWT_DOMAIN }}
+        JWT_REALM: ${{ secrets.JWT_REALM }}
+    - name: Upload Jar
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_ADDRESS }}
+        username: ${{ secrets.FTP_USER }}
+        password: ${{ secrets.FTP_PASS }}
+        local-dir: ./build/libs/

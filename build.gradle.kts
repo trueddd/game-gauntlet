@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.io.IOException
 
 plugins {
     application
@@ -23,7 +24,7 @@ ktor {
 
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_16
+        jvmTarget = JvmTarget.JVM_11
         freeCompilerArgs.add("-Xcontext-receivers")
     }
     sourceSets.main {
@@ -62,4 +63,33 @@ dependencies {
     testImplementation(libs.test.jupiter.engine)
     testImplementation(libs.test.jupiter.api)
     testImplementation(libs.coroutines.test)
+}
+
+tasks.named("buildFatJar") {
+    doLast {
+        val destinationDir = buildDir.resolve("libs")
+        val jwtFile = destinationDir.resolve("jwt.properties")
+        if (!jwtFile.exists()) {
+            jwtFile.createNewFile()
+        } else {
+            jwtFile.writeText("")
+        }
+        val properties = listOf(
+            "JWT_AUDIENCE",
+            "JWT_DOMAIN",
+            "JWT_REALM",
+            "JWT_SECRET",
+        ).associateWith { System.getenv(it) }
+            .filterValues { it != null }
+            .toProperties()
+        println(properties.toString())
+        val stream = jwtFile.outputStream()
+        try {
+            properties.store(stream, null)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            stream.close()
+        }
+    }
 }

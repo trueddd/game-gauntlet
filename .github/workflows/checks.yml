@@ -1,8 +1,6 @@
 name: Checks
 
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
@@ -14,7 +12,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v3
       with:
-        java-version: '16'
+        java-version: '11'
         distribution: 'temurin'
         cache: gradle
     - name: Grant execute permission for gradlew
