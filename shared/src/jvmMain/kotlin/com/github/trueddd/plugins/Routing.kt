@@ -12,6 +12,6 @@ fun Application.configureRouting() {
         get("/") {
             call.respondText("Hello World!")
         }
-        staticFiles("/icons", File("src/main/resources/icons"))
+        staticFiles("/icons", File("src/main/resources/icons/items"))
     }
 }

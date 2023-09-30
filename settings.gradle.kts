@@ -1,7 +1,26 @@
 rootProject.name = "game-gauntlet-backend"
-include("di")
+include("di", "shared")
+
+pluginManagement {
+    repositories {
+        google()
+        gradlePluginPortal()
+        mavenCentral()
+    }
+    plugins {
+        kotlin("multiplatform") version "1.9.0"
+        kotlin("plugin.serialization") version "1.9.0"
+        id("io.ktor.plugin") version "2.3.2"
+        id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
+        id("com.google.devtools.ksp") version "1.9.0-1.0.12"
+    }
+}
 
 dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-js-wrappers") }
+    }
     versionCatalogs {
         create("libs") {
             val kotlin = version("kotlin", "1.9.0")
@@ -12,18 +31,18 @@ dependencyResolutionManagement {
             library("logging", "ch.qos.logback", "logback-classic").version("1.4.8")
 
             plugin("ktor", "io.ktor.plugin").versionRef(ktor)
-            library("ktor-server-core", "io.ktor", "ktor-server-core-jvm").versionRef(ktor)
-            library("ktor-server-netty", "io.ktor", "ktor-server-netty-jvm").versionRef(ktor)
-            library("ktor-server-websockets", "io.ktor", "ktor-server-websockets-jvm").versionRef(ktor)
-            library("ktor-server-content-negotiation", "io.ktor", "ktor-server-content-negotiation-jvm").versionRef(ktor)
-            library("ktor-server-call-logging", "io.ktor", "ktor-server-call-logging-jvm").versionRef(ktor)
-            library("ktor-server-headers-default", "io.ktor", "ktor-server-default-headers-jvm").versionRef(ktor)
-            library("ktor-server-headers-conditional", "io.ktor", "ktor-server-conditional-headers-jvm").versionRef(ktor)
-            library("ktor-server-cors", "io.ktor", "ktor-server-cors-jvm").versionRef(ktor)
-            library("ktor-server-auth-core", "io.ktor", "ktor-server-auth-jvm").versionRef(ktor)
-            library("ktor-server-auth-jwt", "io.ktor", "ktor-server-auth-jwt-jvm").versionRef(ktor)
-            library("ktor-server-tests", "io.ktor", "ktor-server-tests-jvm").versionRef(ktor)
-            library("ktor-serialization", "io.ktor", "ktor-serialization-kotlinx-json-jvm").versionRef(ktor)
+            library("ktor-server-core", "io.ktor", "ktor-server-core").versionRef(ktor)
+            library("ktor-server-netty", "io.ktor", "ktor-server-netty").versionRef(ktor)
+            library("ktor-server-websockets", "io.ktor", "ktor-server-websockets").versionRef(ktor)
+            library("ktor-server-content-negotiation", "io.ktor", "ktor-server-content-negotiation").versionRef(ktor)
+            library("ktor-server-call-logging", "io.ktor", "ktor-server-call-logging").versionRef(ktor)
+            library("ktor-server-headers-default", "io.ktor", "ktor-server-default-headers").versionRef(ktor)
+            library("ktor-server-headers-conditional", "io.ktor", "ktor-server-conditional-headers").versionRef(ktor)
+            library("ktor-server-cors", "io.ktor", "ktor-server-cors").versionRef(ktor)
+            library("ktor-server-auth-core", "io.ktor", "ktor-server-auth").versionRef(ktor)
+            library("ktor-server-auth-jwt", "io.ktor", "ktor-server-auth-jwt").versionRef(ktor)
+            library("ktor-server-tests", "io.ktor", "ktor-server-tests").versionRef(ktor)
+            library("ktor-serialization", "io.ktor", "ktor-serialization-kotlinx-json").versionRef(ktor)
 
             library("test-kotlin", "org.jetbrains.kotlin", "kotlin-test-junit").versionRef(kotlin)
             library("test-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").versionRef(jupiter)

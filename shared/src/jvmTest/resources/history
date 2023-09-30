@@ -1,0 +1,10 @@
+"1420536230514605314265230416450123654031260521436514032624305161423506352041603145262514036134502613025463450216324150654203161203456342501605241360432516520143604315260435216"
+{"type":"com.github.trueddd.core.actions.BoardMove","id":1,"issuedAt":1696079699049,"rolledBy":{"name":"megagamer"},"diceValue":6}
+{"type":"com.github.trueddd.core.actions.GameRoll","id":6,"issuedAt":1696079699049,"participant":{"name":"megagamer"},"gameId":0}
+{"type":"com.github.trueddd.core.actions.BoardMove","id":1,"issuedAt":1696079699050,"rolledBy":{"name":"player"},"diceValue":4}
+{"type":"com.github.trueddd.core.actions.ItemReceive","id":3,"issuedAt":1696079699050,"receivedBy":{"name":"megagamer"},"item":{"type":"com.github.trueddd.data.items.Relocation","uid":"534f962c-ea26-4080-8ac6-1a1ad68cd903"}}
+{"type":"com.github.trueddd.core.actions.GameDrop","id":2,"issuedAt":1696079699050,"rolledBy":{"name":"megagamer"},"diceValue":1}
+{"type":"com.github.trueddd.core.actions.GameRoll","id":6,"issuedAt":1696079699050,"participant":{"name":"megagamer"},"gameId":2}
+{"type":"com.github.trueddd.core.actions.GameStatusChange","id":5,"issuedAt":1696079699050,"participant":{"name":"megagamer"},"gameNewStatus":"finished"}
+{"type":"com.github.trueddd.core.actions.BoardMove","id":1,"rolledBy":{"name":"megagamer"},"diceValue":2}
+{"type":"com.github.trueddd.core.actions.BoardMove","id":1,"rolledBy":{"name":"clutcher"},"diceValue":6}

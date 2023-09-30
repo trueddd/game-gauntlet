@@ -24,7 +24,7 @@ open class LocalEventHistoryHolder(
         private const val TAG = "EventHistoryHolder"
     }
 
-    protected open val saveLocation = ".\\src\\main\\resources\\history"
+    protected open val saveLocation = ".\\src\\jvmMain\\resources\\history"
 
     protected open val overwrite = false
 
