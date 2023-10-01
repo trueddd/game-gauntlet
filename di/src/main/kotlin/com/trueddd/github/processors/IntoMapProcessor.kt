@@ -60,7 +60,7 @@ class IntoMapProcessor(
                 val returnType = when (map) {
                     ActionHandler.TAG -> listOf(
                         INT, ClassName(
-                            "com.github.trueddd.core.actions",
+                            "com.github.trueddd.actions",
                             "Action", "Handler"
                         ).parameterizedBy(STAR)
                     )

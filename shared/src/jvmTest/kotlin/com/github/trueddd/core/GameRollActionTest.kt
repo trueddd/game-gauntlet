@@ -1,10 +1,10 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.EventGateTest
-import com.github.trueddd.core.actions.Action
-import com.github.trueddd.core.actions.BoardMove
-import com.github.trueddd.core.actions.GameRoll
-import com.github.trueddd.core.actions.GameStatusChange
+import com.github.trueddd.actions.Action
+import com.github.trueddd.actions.BoardMove
+import com.github.trueddd.actions.GameRoll
+import com.github.trueddd.actions.GameStatusChange
 import com.github.trueddd.data.Game
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test

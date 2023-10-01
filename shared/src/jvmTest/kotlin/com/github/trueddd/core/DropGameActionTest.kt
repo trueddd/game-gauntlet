@@ -1,9 +1,9 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.EventGateTest
-import com.github.trueddd.core.actions.*
+import com.github.trueddd.actions.*
 import com.github.trueddd.data.Game
-import com.github.trueddd.data.items.SamuraiLunge
+import com.github.trueddd.items.SamuraiLunge
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

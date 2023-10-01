@@ -1,7 +1,7 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.EventGateTest
-import com.github.trueddd.core.actions.Action
+import com.github.trueddd.actions.Action
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.RepeatedTest
 import kotlin.test.assertEquals

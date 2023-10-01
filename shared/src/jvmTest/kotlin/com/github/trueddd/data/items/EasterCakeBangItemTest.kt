@@ -1,8 +1,12 @@
 package com.github.trueddd.data.items
 
 import com.github.trueddd.EventGateTest
-import com.github.trueddd.core.actions.*
+import com.github.trueddd.actions.*
 import com.github.trueddd.data.Game
+import com.github.trueddd.items.EasterCakeBang
+import com.github.trueddd.items.HoleyPockets
+import com.github.trueddd.items.LoyalModerator
+import com.github.trueddd.items.RatMove
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

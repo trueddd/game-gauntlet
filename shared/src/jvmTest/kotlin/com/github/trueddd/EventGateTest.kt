@@ -1,7 +1,7 @@
 package com.github.trueddd
 
 import com.github.trueddd.core.EventGate
-import com.github.trueddd.core.actions.Action
+import com.github.trueddd.actions.Action
 import com.github.trueddd.data.Participant
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.collect

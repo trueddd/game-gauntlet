@@ -1,10 +1,12 @@
 package com.github.trueddd.data.items
 
 import com.github.trueddd.EventGateTest
-import com.github.trueddd.core.actions.BoardMove
-import com.github.trueddd.core.actions.GameRoll
-import com.github.trueddd.core.actions.ItemReceive
+import com.github.trueddd.actions.BoardMove
+import com.github.trueddd.actions.GameRoll
+import com.github.trueddd.actions.ItemReceive
 import com.github.trueddd.data.Game
+import com.github.trueddd.items.Classic
+import com.github.trueddd.items.WheelItem
 import org.junit.jupiter.api.Test
 import kotlinx.coroutines.test.runTest
 import kotlin.test.assertEquals

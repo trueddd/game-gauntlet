@@ -1,8 +1,12 @@
 package com.github.trueddd.data.items
 
 import com.github.trueddd.EventGateTest
-import com.github.trueddd.core.actions.BoardMove
-import com.github.trueddd.core.actions.ItemReceive
+import com.github.trueddd.actions.BoardMove
+import com.github.trueddd.actions.ItemReceive
+import com.github.trueddd.items.MinusToEveryone
+import com.github.trueddd.items.MinusToEveryoneButYou
+import com.github.trueddd.items.PlusToEveryone
+import com.github.trueddd.items.PlusToEveryoneButYou
 import com.github.trueddd.utils.rollDice
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test

@@ -1,7 +1,7 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.EventGateTest
-import com.github.trueddd.core.actions.*
+import com.github.trueddd.actions.*
 import com.github.trueddd.data.Game
 import com.github.trueddd.utils.d6Range
 import org.junit.jupiter.api.Test

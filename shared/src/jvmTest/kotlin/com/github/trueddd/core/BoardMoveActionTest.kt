@@ -1,9 +1,9 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.EventGateTest
-import com.github.trueddd.core.actions.BoardMove
-import com.github.trueddd.core.actions.GameRoll
-import com.github.trueddd.core.actions.GameStatusChange
+import com.github.trueddd.actions.BoardMove
+import com.github.trueddd.actions.GameRoll
+import com.github.trueddd.actions.GameStatusChange
 import com.github.trueddd.data.Game
 import com.github.trueddd.utils.rollDice
 import kotlinx.coroutines.test.runTest

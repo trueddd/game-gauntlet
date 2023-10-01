@@ -1,10 +1,12 @@
 package com.github.trueddd.data.items
 
 import com.github.trueddd.EventGateTest
-import com.github.trueddd.core.actions.BoardMove
-import com.github.trueddd.core.actions.ItemReceive
-import com.github.trueddd.core.actions.ItemUse
+import com.github.trueddd.actions.BoardMove
+import com.github.trueddd.actions.ItemReceive
+import com.github.trueddd.actions.ItemUse
 import com.github.trueddd.data.Game
+import com.github.trueddd.items.LuckyThrow
+import com.github.trueddd.items.WheelItem
 import com.github.trueddd.utils.rollDice
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json

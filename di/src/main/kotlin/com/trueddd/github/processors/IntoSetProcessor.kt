@@ -61,11 +61,11 @@ class IntoSetProcessor(
                 val items = declarations.joinToString { it.callConstructor }
                 val returnType = when (type) {
                     ItemFactory.TAG -> ClassName(
-                        "com.github.trueddd.data.items",
+                        "com.github.trueddd.items",
                         "WheelItem", "Factory"
                     )
                     ActionGenerator.TAG -> ClassName(
-                        "com.github.trueddd.core.actions",
+                        "com.github.trueddd.actions",
                         "Action", "Generator"
                     ).parameterizedBy(STAR)
                     else -> STAR
