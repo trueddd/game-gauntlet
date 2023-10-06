@@ -1,4 +1,4 @@
-rootProject.name = "game-gauntlet-backend"
+rootProject.name = "game-gauntlet"
 include("annotations", "di", "shared")
 
 pluginManagement {

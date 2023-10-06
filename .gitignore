@@ -3,7 +3,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 .run
 kotlin-js-store/
-shared/jvmTest/resources/
+shared/src/jvmTest/resources/
 
 ### STS ###
 .apt_generated
