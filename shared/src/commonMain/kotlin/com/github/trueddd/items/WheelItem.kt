@@ -3,7 +3,6 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import kotlinx.serialization.Serializable
-import java.util.*
 
 /**
  * Wheel item is an item that can be rolled on the wheel and somehow affect player state.
@@ -25,8 +24,7 @@ sealed class WheelItem {
     }
 
     @Serializable
-    @JvmInline
-    value class Id(val value: Int) {
+    data class Id(val value: Int) {
         fun asString() = value.toString()
         companion object {
             val PowerThrow = Id(1)
@@ -129,4 +127,4 @@ sealed class WheelItem {
     }
 }
 
-internal fun generateWheelItemUid() = UUID.randomUUID().toString()
+expect fun generateWheelItemUid(): String

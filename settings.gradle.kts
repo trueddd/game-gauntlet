@@ -1,5 +1,5 @@
 rootProject.name = "game-gauntlet-backend"
-include("di", "shared")
+include("annotations", "di", "shared")
 
 pluginManagement {
     repositories {
@@ -58,6 +58,7 @@ dependencyResolutionManagement {
             library("kotlin-ksp-api", "com.google.devtools.ksp", "symbol-processing-api").versionRef(ksp)
 
             plugin("serialization", "org.jetbrains.kotlin.plugin.serialization").versionRef(kotlin)
+            library("serialization", "org.jetbrains.kotlinx", "kotlinx-serialization-json").version("1.6.0")
 
             library("coroutines-test", "org.jetbrains.kotlinx", "kotlinx-coroutines-test").version("1.7.1")
         }

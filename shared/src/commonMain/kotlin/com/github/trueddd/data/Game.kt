@@ -10,8 +10,7 @@ data class Game(
 ) {
 
     @Serializable
-    @JvmInline
-    value class Id(val value: Int)
+    data class Id(val value: Int)
 
     @Serializable
     enum class Status {

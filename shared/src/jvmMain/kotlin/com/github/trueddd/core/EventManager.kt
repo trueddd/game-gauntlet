@@ -2,6 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.globalState
 import org.jetbrains.annotations.TestOnly
 
 /**
@@ -28,5 +29,5 @@ interface EventManager {
 
     fun stopHandling()
 
-    fun startHandling(initState: GlobalState = GlobalState.default())
+    fun startHandling(initState: GlobalState = globalState())
 }

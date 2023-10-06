@@ -1,6 +1,6 @@
 package com.github.trueddd.core
 
-import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.globalState
 import com.github.trueddd.utils.Log
 import org.koin.core.annotation.Single
 
@@ -40,7 +40,7 @@ class EventGateImpl(
     override fun stop() {
         Log.info(TAG, "Stopping and clearing...")
         eventManager.stopHandling()
-        stateHolder.update { GlobalState.default() }
+        stateHolder.update { globalState() }
         historyHolder.drop()
     }
 }

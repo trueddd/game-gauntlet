@@ -1,11 +1,9 @@
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-src/**/resources/*
-!src/**/resources/icons/
 .run
+kotlin-js-store/
+shared/jvmTest/resources/
 
 ### STS ###
 .apt_generated

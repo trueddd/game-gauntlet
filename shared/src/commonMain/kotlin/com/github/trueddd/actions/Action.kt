@@ -2,6 +2,7 @@ package com.github.trueddd.actions
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.utils.Timer
 import kotlinx.serialization.Serializable
 
 /**
@@ -12,7 +13,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class Action(
     open val id: Int,
-    val issuedAt: Long = System.currentTimeMillis(),
+    val issuedAt: Long = Timer.currentTimeMillis(),
 ) {
 
     @Suppress("ConstPropertyName")

@@ -3,6 +3,7 @@ package com.github.trueddd.core
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GameGenreDistribution
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.globalState
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.Dispatchers
@@ -75,7 +76,7 @@ open class LocalEventHistoryHolder(
                 .filter { it.isNotBlank() }
                 .drop(1)
                 .map { Json.decodeFromString(Action.serializer(), it) }
-            val initialState = GlobalState.default(genreDistribution = mapLayout)
+            val initialState = globalState(genreDistribution = mapLayout)
             events.fold(initialState) { state, action ->
                 val handler = actionHandlerRegistry.handlerOf(action) ?: return@fold state
                 try {

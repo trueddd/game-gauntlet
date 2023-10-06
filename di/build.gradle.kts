@@ -7,6 +7,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":annotations"))
     implementation(libs.kotlin.ksp.api)
     implementation(libs.kotlin.poet)
     api(libs.koin.core)

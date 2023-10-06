@@ -1,4 +1,5 @@
 import java.io.IOException
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     kotlin("multiplatform")
@@ -29,9 +30,19 @@ kotlin {
             kotlinOptions.freeCompilerArgs = listOf("-Xcontext-receivers")
         }
     }
+    js(IR) {
+        browser {
+            commonWebpackConfig(Action<KotlinWebpackConfig> {
+                outputFileName = "agg.js"
+            })
+        }
+        binaries.executable()
+    }
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(libs.serialization)
+                implementation(project(":annotations"))
             }
         }
         val commonTest by getting {
@@ -58,6 +69,11 @@ kotlin {
             }
         }
         jvmMain.dependsOn(commonMain)
+        val jsMain by getting {
+            dependencies {
+            }
+        }
+        jsMain.dependsOn(commonMain)
         val jvmTest by getting {
             dependencies {
                 implementation(libs.ktor.server.tests)

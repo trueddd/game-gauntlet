@@ -1,20 +1,24 @@
 package com.github.trueddd.data
 
 import com.github.trueddd.items.BoardTrap
-import java.util.Calendar
-import java.util.Date
-import kotlin.time.Duration.Companion.days
 
 data class GlobalState(
-    val startDate: Date,
+    val startDate: Long,
     // TODO: Add end date check for input actions
-    val endDate: Date,
+    val endDate: Long,
     val players: Map<Participant, PlayerState>,
     val boardLength: Int,
     val winner: Participant? = null,
     val gameGenreDistribution: GameGenreDistribution,
     val boardTraps: Map<Int, BoardTrap> = mapOf(),
 ) {
+
+    companion object {
+        const val START_POSITION = 0
+        const val STINT_COUNT = 25
+        val STINT_SIZE = Game.Genre.entries.size
+        val PLAYABLE_BOARD_RANGE = 1 .. STINT_SIZE * STINT_COUNT
+    }
 
     fun stateOf(participant: Participant) = get(participant.name)!!
     fun effectsOf(participant: Participant) = stateOf(participant).effects
@@ -63,32 +67,5 @@ data class GlobalState(
         return this.copy(players = players.mapValues { (player, playerState) ->
             block(player, playerState)
         })
-    }
-
-    companion object {
-
-        const val START_POSITION = 0
-        const val STINT_COUNT = 25
-        val STINT_SIZE = Game.Genre.entries.size
-        val PLAYABLE_BOARD_RANGE = 1 .. STINT_SIZE * STINT_COUNT
-
-        fun default(
-            genreDistribution: GameGenreDistribution = GameGenreDistribution.generateRandom(STINT_COUNT),
-        ): GlobalState {
-            val startDate = Calendar.Builder().setDate(2022, 11, 15).build().time
-            val endDate = Date(startDate.time + 21.days.inWholeMilliseconds)
-            return GlobalState(
-                startDate,
-                endDate,
-                players = mapOf(
-                    Participant("megagamer") to PlayerState(),
-                    Participant("player") to PlayerState(),
-                    Participant("clutcher") to PlayerState(),
-                    Participant("dropper") to PlayerState(),
-                ),
-                boardLength = STINT_SIZE * STINT_COUNT,
-                gameGenreDistribution = genreDistribution,
-            )
-        }
     }
 }

@@ -1,12 +1,8 @@
 package com.github.trueddd.utils
 
-object Log {
+expect object Log {
 
-    fun info(tag: String, message: String) {
-        println("$tag: $message")
-    }
+    fun info(tag: String, message: String)
 
-    fun error(tag: String, message: String) {
-        System.err.println("$tag: $message")
-    }
+    fun error(tag: String, message: String)
 }

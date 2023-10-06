@@ -2,7 +2,6 @@ package com.github.trueddd.items
 
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
-import org.jetbrains.annotations.TestOnly
 
 @Serializable
 class PowerThrow private constructor(
@@ -12,7 +11,6 @@ class PowerThrow private constructor(
 
     companion object {
         fun create() = PowerThrow(uid = generateWheelItemUid(), chargesLeft = 1)
-        @TestOnly
         fun create(chargesLeft: Int) = PowerThrow(uid = generateWheelItemUid(), chargesLeft)
     }
 
