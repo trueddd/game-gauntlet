@@ -1,5 +1,4 @@
 import java.io.IOException
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     kotlin("multiplatform")
@@ -31,11 +30,7 @@ kotlin {
         }
     }
     js(IR) {
-        browser {
-            commonWebpackConfig(Action<KotlinWebpackConfig> {
-                outputFileName = "agg.js"
-            })
-        }
+        browser()
         binaries.executable()
     }
     sourceSets {
@@ -68,12 +63,11 @@ kotlin {
                 implementation(libs.koin.ktor)
             }
         }
-        jvmMain.dependsOn(commonMain)
         val jsMain by getting {
             dependencies {
+                implementation(libs.fritz.core)
             }
         }
-        jsMain.dependsOn(commonMain)
         val jvmTest by getting {
             dependencies {
                 implementation(libs.ktor.server.tests)
@@ -83,7 +77,8 @@ kotlin {
                 implementation(libs.coroutines.test)
             }
         }
-        jvmTest.dependsOn(commonTest)
+        val jsTest by getting {
+        }
     }
 }
 

@@ -8,11 +8,10 @@ pluginManagement {
         mavenCentral()
     }
     plugins {
-        kotlin("multiplatform") version "1.9.0"
-        kotlin("plugin.serialization") version "1.9.0"
+        kotlin("multiplatform") version "1.9.20"
+        kotlin("plugin.serialization") version "1.9.20"
         id("io.ktor.plugin") version "2.3.2"
-        id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
-        id("com.google.devtools.ksp") version "1.9.0-1.0.12"
+        id("com.google.devtools.ksp") version "1.9.20-1.0.14"
     }
 }
 
@@ -23,10 +22,11 @@ dependencyResolutionManagement {
     }
     versionCatalogs {
         create("libs") {
-            val kotlin = version("kotlin", "1.9.0")
-            val ksp = version("ksp", "1.9.0-1.0.12")
+            val kotlin = version("kotlin", "1.9.20")
+            val ksp = version("ksp", "1.9.20-1.0.14")
             val ktor = version("ktor", "2.3.2")
             val jupiter = version("jupiter", "5.10.0")
+            val fritz = version("fritz", "1.0-RC12")
 
             library("logging", "ch.qos.logback", "logback-classic").version("1.4.8")
 
@@ -61,6 +61,9 @@ dependencyResolutionManagement {
             library("serialization", "org.jetbrains.kotlinx", "kotlinx-serialization-json").version("1.6.0")
 
             library("coroutines-test", "org.jetbrains.kotlinx", "kotlinx-coroutines-test").version("1.7.1")
+
+            library("fritz-core", "dev.fritz2", "core").versionRef(fritz)
+            library("fritz-annotation", "dev.fritz2", "lenses-annotation-processor").versionRef(fritz)
         }
     }
 }

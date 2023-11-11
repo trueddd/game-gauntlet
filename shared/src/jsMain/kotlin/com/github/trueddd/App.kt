@@ -1,5 +1,12 @@
 package com.github.trueddd
 
+import dev.fritz2.core.render
+
 fun main() {
-    console.log("AGG 2 page")
+    render("#target") {
+        h1 { + "AGG2 page" }
+        div("css") {
+            + "Text"
+        }
+    }
 }
