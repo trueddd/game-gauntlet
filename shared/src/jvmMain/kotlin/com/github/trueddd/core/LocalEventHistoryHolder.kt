@@ -48,7 +48,7 @@ open class LocalEventHistoryHolder(
         monitor.lock()
         val eventsToSave = latestEvents.toList()
         monitor.unlock()
-        val mapLayout = Json.encodeToString(GameGenreDistribution.serializer, globalState.gameGenreDistribution)
+        val mapLayout = Json.encodeToString(GameGenreDistribution.serializer(), globalState.gameGenreDistribution)
         val events = eventsToSave
             .asReversed()
             .joinToString("\n") { Json.encodeToString(it) }
@@ -71,7 +71,7 @@ open class LocalEventHistoryHolder(
             historyHolderFile.readLines()
         }
         return withContext(Dispatchers.Default) {
-            val mapLayout = fileContent.first().let { Json.decodeFromString(GameGenreDistribution.serializer, it) }
+            val mapLayout = fileContent.first().let { Json.decodeFromString(GameGenreDistribution.serializer(), it) }
             val events = fileContent
                 .filter { it.isNotBlank() }
                 .drop(1)

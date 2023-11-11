@@ -2,6 +2,7 @@ package com.github.trueddd.data
 
 import com.github.trueddd.items.DiceRollModifier
 import com.github.trueddd.items.WheelItem
+import kotlinx.serialization.Serializable
 
 /**
  * @property stepsCount amount of steps that have been made by player using [BoardMove][com.github.trueddd.actions.BoardMove].
@@ -13,6 +14,7 @@ import com.github.trueddd.items.WheelItem
  * @property gameHistory whole history of games (including current one) that have been played or rerolled by player.
  * @property pendingEvents current set of events that have been received be player and now awaiting to be used.
  */
+@Serializable
 data class PlayerState(
     val stepsCount: Int = 0,
     val boardMoveAvailable: Boolean = true,

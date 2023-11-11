@@ -3,6 +3,7 @@ package com.github.trueddd.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Serializable
 data class Game(
     val id: Id,
     val name: String,

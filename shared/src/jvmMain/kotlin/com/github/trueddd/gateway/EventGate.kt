@@ -8,6 +8,8 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.koin.ktor.ext.inject
 
 private const val TAG = "EventGate"
@@ -15,9 +17,20 @@ private const val TAG = "EventGate"
 fun Routing.setupEventGate() {
     val eventGate by inject<EventGate>()
     webSocket("/state") {
+        val encoder = Json {
+            allowStructuredMapKeys = true
+        }
+        val verbalState = call.parameters.contains("verbal", "1")
         eventGate.stateHolder.globalStateFlow
             .onStart { Log.info(TAG, "Listening for global state in session ${this@webSocket}") }
-            .onEach { outgoing.send(Frame.Text("New game state: $it")) }
+            .onEach { state ->
+                val encoded = if (verbalState) {
+                    "New game state: $state"
+                } else {
+                    encoder.encodeToString(state)
+                }
+                outgoing.send(Frame.Text(encoded))
+            }
             .launchIn(this)
         for (frame in incoming) {
             if (frame is Frame.Text) {

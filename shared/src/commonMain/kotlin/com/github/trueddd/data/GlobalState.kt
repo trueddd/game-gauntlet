@@ -1,7 +1,9 @@
 package com.github.trueddd.data
 
 import com.github.trueddd.items.BoardTrap
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class GlobalState(
     val startDate: Long,
     // TODO: Add end date check for input actions

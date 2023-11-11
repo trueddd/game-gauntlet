@@ -1,11 +1,13 @@
 package com.github.trueddd.data
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
+@Serializable(with = GameGenreDistribution.Serializer::class)
 data class GameGenreDistribution(
     val genres: List<Game.Genre>,
 ) {
@@ -40,20 +42,20 @@ data class GameGenreDistribution(
                 }.flatten()
             )
         }
+    }
 
-        val serializer = object : KSerializer<GameGenreDistribution> {
+    class Serializer : KSerializer<GameGenreDistribution> {
 
-            override val descriptor = PrimitiveSerialDescriptor("GameGenreDistribution", PrimitiveKind.STRING)
+        override val descriptor = PrimitiveSerialDescriptor("GameGenreDistribution", PrimitiveKind.STRING)
 
-            override fun deserialize(decoder: Decoder): GameGenreDistribution {
-                return decoder.decodeString()
-                    .map { ordinal -> ordinal.digitToInt().let { Game.Genre.entries[it] } }
-                    .let { GameGenreDistribution(it) }
-            }
+        override fun deserialize(decoder: Decoder): GameGenreDistribution {
+            return decoder.decodeString()
+                .map { ordinal -> ordinal.digitToInt().let { Game.Genre.entries[it] } }
+                .let { GameGenreDistribution(it) }
+        }
 
-            override fun serialize(encoder: Encoder, value: GameGenreDistribution) {
-                encoder.encodeString(value.genres.joinToString("") { it.ordinal.toString() })
-            }
+        override fun serialize(encoder: Encoder, value: GameGenreDistribution) {
+            encoder.encodeString(value.genres.joinToString("") { it.ordinal.toString() })
         }
     }
 

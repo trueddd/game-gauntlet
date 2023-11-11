@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import org.koin.core.annotation.Single
 
-@Single
+@Single(binds = [StateHolder::class, ParticipantProvider::class, ParticipantStateProvider::class])
 class StateHolderImpl : StateHolder {
 
     private val _globalStateFlow = MutableStateFlow(globalState())

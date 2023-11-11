@@ -24,7 +24,7 @@ class GenreDistributionTest : EventGateTest() {
             assertEquals(expected = Game.Genre.Special, stint.last())
             assertContentEquals(expected = Game.Genre.entries.sorted(), stint.sorted())
         }
-        val layout = Json.encodeToString(GameGenreDistribution.serializer, eventGate.stateHolder.current.gameGenreDistribution)
+        val layout = Json.encodeToString(GameGenreDistribution.serializer(), eventGate.stateHolder.current.gameGenreDistribution)
             .replace(Game.Genre.Special.ordinal.toString(), "[]")
         Log.info(TAG, "Generated layout: $layout")
     }
