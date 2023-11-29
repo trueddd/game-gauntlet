@@ -66,6 +66,13 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(libs.fritz.core)
+                implementation(npm("tailwindcss", "3.3.5"))
+                implementation(devNpm("postcss", "8.4.31"))
+                implementation(devNpm("postcss-loader", "7.3.3"))
+                implementation(devNpm("autoprefixer", "10.4.16"))
+                implementation(devNpm("css-loader", "6.8.1"))
+                implementation(devNpm("style-loader", "3.3.3"))
+                implementation(devNpm("cssnano", "6.0.1"))
             }
         }
         val jvmTest by getting {

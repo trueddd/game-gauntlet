@@ -4,7 +4,10 @@ import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import dev.fritz2.core.*
-import dev.fritz2.remote.*
+import dev.fritz2.remote.Session
+import dev.fritz2.remote.body
+import dev.fritz2.remote.isOpen
+import dev.fritz2.remote.websocket
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.*
@@ -26,101 +29,36 @@ fun main() {
         val user = storeOf<Participant?>(null)
         val action = storeOf<Int?>(null)
         val arguments = storeOf("")
-        h1 { + "AGG2 page" }
-        table {
-            tr {
-                td {
+        div("flex flex-row justify-around") {
+            div("flex flex-row") {
+                div {
                     userSelector(user, globalState)
                 }
-                td {
+                div {
                     actionSelector(action)
                 }
-                td {
+                div {
                     argumentsInput(arguments)
                 }
-                td {
-                    button {
-                        + "Send"
+                div {
+                    button("inline-flex items-center rounded-md bg-indigo-500 font-medium text-indigo-50 px-2") {
+                        +"Send"
                         disabled(socket.isOpen.map { !it })
                         clicks handledBy { sendAction(socket, user, action, arguments) }
                     }
                 }
             }
+            div {
+                renderState(globalState)
+            }
         }
-        br {}
-        renderState(globalState)
+        renderMap(globalState)
     }
 }
 
-private fun RenderContext.renderState(globalStateFlow: StateFlow<GlobalState?>) {
-    globalStateFlow.filterNotNull().render { state ->
-        div {
-            p {
-                + state.toString()
-            }
-        }
-        table {
-            tr {
-                th {
-                    a { +"Player" }
-                }
-                state.players.keys.forEach {
-                    th {
-                        a { + it.name }
-                    }
-                }
-            }
-            tr {
-                td {
-                    a { + "Position" }
-                }
-                state.players.values.forEach {
-                    td {
-                        a { + it.position.toString() }
-                    }
-                }
-            }
-            tr {
-                td {
-                    a { + "Game" }
-                }
-                state.players.values.forEach { playerState ->
-                    td {
-                        playerState.currentGame?.game?.name?.let { a { + it } }
-                    }
-                }
-            }
-            tr {
-                td {
-                    a { + "Inventory" }
-                }
-                state.players.values.forEach { playerState ->
-                    td {
-                        a { + playerState.inventory.joinToString { "(${it.name})[${it.uid}]" } }
-                    }
-                }
-            }
-            tr {
-                td {
-                    a { + "Effects" }
-                }
-                state.players.values.forEach { playerState ->
-                    td {
-                        a { + playerState.effects.joinToString { "(${it.name})[${it.uid}]" } }
-                    }
-                }
-            }
-            tr {
-                td {
-                    a { + "Pending events" }
-                }
-                state.players.values.forEach { playerState ->
-                    td {
-                        a { + playerState.pendingEvents.joinToString { "(${it.name})[${it.uid}]" } }
-                    }
-                }
-            }
-        }
+fun RenderContext.renderFromState(globalStateFlow: StateFlow<GlobalState?>, block: Tag<*>.(GlobalState) -> Unit) {
+    globalStateFlow.renderNotNull { state ->
+        block(state)
     }
 }
 
