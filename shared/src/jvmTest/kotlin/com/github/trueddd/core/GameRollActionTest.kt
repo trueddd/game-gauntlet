@@ -14,15 +14,24 @@ import kotlin.test.assertNotEquals
 class GameRollActionTest : EventGateTest() {
 
     @Test
-    fun `roll game once`() = runTest {
+    fun `roll game on start`() = runTest {
         val participant = requireRandomParticipant()
         eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameRoll}")
+        assertEquals(expected = null, lastGameOf(participant))
+    }
+
+    @Test
+    fun `roll game once`() = runTest {
+        val participant = requireRandomParticipant()
+        handleAction(BoardMove(participant, diceValue = 3))
+        handleAction(GameRoll(participant, Game.Id(1)))
         assertNotEquals(illegal = null, lastGameOf(participant))
     }
 
     @Test
     fun `roll game twice`() = runTest {
         val participant = requireRandomParticipant()
+        handleAction(BoardMove(participant, diceValue = 2))
         handleAction(GameRoll(participant, Game.Id(0)))
         val currentGame = stateOf(participant).currentGame
         handleAction(GameRoll(participant, Game.Id(1)))

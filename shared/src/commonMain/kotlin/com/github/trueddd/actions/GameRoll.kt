@@ -35,6 +35,9 @@ data class GameRoll(
 
         override suspend fun handle(action: GameRoll, currentState: GlobalState): GlobalState {
             val currentGame = currentState[action.participant.name]?.gameHistory?.lastOrNull()
+            if (currentState.positionOf(action.participant) == 0) {
+                throw StateModificationException(action, "Cannot roll games on Start position")
+            }
             if (currentGame != null && !currentGame.status.isComplete) {
                 throw StateModificationException(action, "Current game is not finished ($currentGame)")
             }
