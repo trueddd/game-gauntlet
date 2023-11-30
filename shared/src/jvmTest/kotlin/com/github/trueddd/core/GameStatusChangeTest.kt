@@ -19,6 +19,7 @@ class GameStatusChangeTest : EventGateTest() {
     @Test
     fun `change status successfully`() = runTest {
         val participant = requireRandomParticipant()
+        eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.BoardMove}")
         eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameRoll}")
         eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameStatusChange}:1")
         assertEquals(expected = false, stateOf(participant).gameHistory.isEmpty())

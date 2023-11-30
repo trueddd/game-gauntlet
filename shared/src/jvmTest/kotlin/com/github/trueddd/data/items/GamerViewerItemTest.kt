@@ -1,6 +1,7 @@
 package com.github.trueddd.data.items
 
 import com.github.trueddd.EventGateTest
+import com.github.trueddd.actions.BoardMove
 import com.github.trueddd.actions.GameRoll
 import com.github.trueddd.actions.GameStatusChange
 import com.github.trueddd.actions.ItemReceive
@@ -18,6 +19,7 @@ class GamerViewerItemTest : EventGateTest() {
     fun `gamer item test 1`() = runTest {
         val user = requireRandomParticipant()
         val item = Gamer.create()
+        handleAction(BoardMove(user, diceValue = 3))
         handleAction(GameRoll(user, Game.Id(1)))
         handleAction(ItemReceive(user, item))
         handleAction(GameStatusChange(user, Game.Status.Finished))
@@ -33,6 +35,7 @@ class GamerViewerItemTest : EventGateTest() {
     fun `gamer item test 2`() = runTest {
         val user = requireRandomParticipant()
         val item = Gamer.create()
+        handleAction(BoardMove(user, diceValue = 2))
         handleAction(ItemReceive(user, item))
         handleAction(GameRoll(user, Game.Id(1)))
         handleAction(GameStatusChange(user, Game.Status.Finished))
@@ -45,6 +48,7 @@ class GamerViewerItemTest : EventGateTest() {
     fun `viewer item test`() = runTest {
         val user = requireRandomParticipant()
         val item = Viewer.create()
+        handleAction(BoardMove(user, diceValue = 3))
         handleAction(GameRoll(user, Game.Id(1)))
         handleAction(ItemReceive(user, item))
         handleAction(GameStatusChange(user, Game.Status.Finished))
@@ -61,6 +65,7 @@ class GamerViewerItemTest : EventGateTest() {
         val user = requireRandomParticipant()
         val gamerItem = Gamer.create()
         val viewerItem = Viewer.create()
+        handleAction(BoardMove(user, diceValue = 4))
         handleAction(GameRoll(user, Game.Id(1)))
         handleAction(ItemReceive(user, gamerItem))
         handleAction(GameStatusChange(user, Game.Status.Finished))

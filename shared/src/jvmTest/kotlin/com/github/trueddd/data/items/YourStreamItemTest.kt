@@ -17,6 +17,7 @@ class YourStreamItemTest : EventGateTest() {
     @Test
     fun `use 1`() = runTest {
         val user = requireRandomParticipant()
+        handleAction(BoardMove(user, diceValue = 3))
         handleAction(ItemReceive(user, YourStream.create()))
         assertEquals(expected = 1, effectsOf(user).size)
         handleAction(GameRoll(user, Game.Id(4)))

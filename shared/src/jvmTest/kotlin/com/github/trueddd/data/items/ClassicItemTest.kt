@@ -3,6 +3,7 @@ package com.github.trueddd.data.items
 import com.github.trueddd.EventGateTest
 import com.github.trueddd.actions.BoardMove
 import com.github.trueddd.actions.GameRoll
+import com.github.trueddd.actions.GameStatusChange
 import com.github.trueddd.actions.ItemReceive
 import com.github.trueddd.data.Game
 import com.github.trueddd.items.Classic
@@ -27,6 +28,7 @@ class ClassicItemTest : EventGateTest() {
     @Test
     fun `ensure buff received by everyone`() = runTest {
         val user = requireRandomParticipant()
+        handleAction(BoardMove(user, diceValue = 3))
         handleAction(GameRoll(user, Game.Id(5)))
         handleAction(ItemReceive(user, Classic.create()))
         eventGate.stateHolder.current.players.forEach { (_, state) ->
@@ -38,9 +40,11 @@ class ClassicItemTest : EventGateTest() {
     @Test
     fun `buff removal after next move`() = runTest {
         val user = requireRandomParticipant()
+        handleAction(BoardMove(user, diceValue = 2))
         handleAction(GameRoll(user, Game.Id(5)))
         handleAction(ItemReceive(user, Classic.create()))
-        handleAction(BoardMove(user, diceValue = 5))
+        handleAction(GameStatusChange(user, Game.Status.Finished))
+        handleAction(BoardMove(user, diceValue = 3))
         assertEquals(expected = 6, positionOf(user))
         assertTrue(effectsOf(user).isEmpty())
     }
