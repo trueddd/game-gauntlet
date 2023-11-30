@@ -1,11 +1,13 @@
 name: Deploy
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "master" ]
 
 jobs:
-  build:
+  build_backend:
+    name: Build backend
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -34,4 +36,30 @@ jobs:
         server: ${{ secrets.FTP_ADDRESS }}
         username: ${{ secrets.FTP_USER }}
         password: ${{ secrets.FTP_PASS }}
-        local-dir: ./build/libs/
+        local-dir: ./shared/build/libs/
+  build_frontend:
+    name: Build frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+      - name: Build JS artifacts
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: jsBrowserWebpack
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: deploy
+          FOLDER: shared/build/dist/js/productionExecutable
+          CLEAN: true
