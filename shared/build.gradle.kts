@@ -55,12 +55,16 @@ kotlin {
                 implementation(libs.ktor.server.content.negotiation)
                 implementation(libs.ktor.server.call.logging)
                 implementation(libs.ktor.server.cors)
+                implementation(libs.ktor.server.partial)
+                implementation(libs.ktor.server.autohead)
                 implementation(libs.ktor.server.headers.default)
                 implementation(libs.ktor.server.headers.conditional)
                 implementation(libs.ktor.server.auth.core)
                 implementation(libs.ktor.server.auth.jwt)
                 implementation(libs.ktor.serialization)
                 implementation(libs.koin.ktor)
+                implementation(libs.torrent.core)
+                implementation(libs.torrent.dht)
             }
         }
         val jsMain by getting {

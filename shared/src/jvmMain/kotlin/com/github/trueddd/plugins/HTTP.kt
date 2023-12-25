@@ -2,9 +2,11 @@ package com.github.trueddd.plugins
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.autohead.*
 import io.ktor.server.plugins.conditionalheaders.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
+import io.ktor.server.plugins.partialcontent.*
 
 fun Application.configureHTTP() {
     install(DefaultHeaders) {
@@ -20,4 +22,6 @@ fun Application.configureHTTP() {
         anyHost() // TODO: Remove it later.
     }
     install(ConditionalHeaders)
+    install(PartialContent)
+    install(AutoHeadResponse)
 }
