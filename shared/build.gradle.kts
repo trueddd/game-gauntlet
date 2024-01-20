@@ -70,6 +70,10 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(libs.fritz.core)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.js)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization)
                 implementation(npm("tailwindcss", "3.3.5"))
                 implementation(devNpm("postcss", "8.4.31"))
                 implementation(devNpm("postcss-loader", "7.3.3"))

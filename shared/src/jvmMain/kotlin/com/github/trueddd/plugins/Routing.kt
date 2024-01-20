@@ -17,7 +17,7 @@ import kotlin.coroutines.suspendCoroutine
 fun Application.configureRouting() {
     routing {
         staticFiles("/icons", File("src/jvmMain/resources/icons/items"))
-        get("/game") {
+        post("/game") {
             val fileToLoad = try {
                 call.receive<DownloadGameRequestBody>().name
             } catch (e: Exception) {
@@ -44,7 +44,7 @@ fun Application.configureRouting() {
                 .filter { it.nameWithoutExtension.equals(fileToLoad, ignoreCase = true) }
                 .firstOrNull() ?: run {
                     call.respond(HttpStatusCode.NotFound, "No game was found with name `$fileToLoad`")
-                    return@get
+                    return@post
                 }
             Files.copy(downloadedFile.toPath(), Environment.gamesDirectory.resolve(downloadedFile.name).toPath())
             currentDir.deleteRecursively()

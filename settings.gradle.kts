@@ -32,9 +32,10 @@ dependencyResolutionManagement {
             library("logging", "ch.qos.logback", "logback-classic").version("1.4.8")
 
             plugin("ktor", "io.ktor.plugin").versionRef(ktor)
-            library("ktor-server-core", "io.ktor", "ktor-server-core").versionRef(ktor)
             library("ktor-client-core", "io.ktor", "ktor-client-core").versionRef(ktor)
-            library("ktor-client-cio", "io.ktor", "ktor-client-okhttp").versionRef(ktor)
+            library("ktor-client-js", "io.ktor", "ktor-client-js").versionRef(ktor)
+            library("ktor-client-content-negotiation", "io.ktor", "ktor-client-content-negotiation").versionRef(ktor)
+            library("ktor-server-core", "io.ktor", "ktor-server-core").versionRef(ktor)
             library("ktor-server-netty", "io.ktor", "ktor-server-netty").versionRef(ktor)
             library("ktor-server-websockets", "io.ktor", "ktor-server-websockets").versionRef(ktor)
             library("ktor-server-content-negotiation", "io.ktor", "ktor-server-content-negotiation").versionRef(ktor)

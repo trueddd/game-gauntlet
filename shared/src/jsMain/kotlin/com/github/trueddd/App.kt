@@ -2,6 +2,7 @@ package com.github.trueddd
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.utils.WebEnvironment
 import dev.fritz2.core.RenderContext
 import dev.fritz2.core.Tag
 import dev.fritz2.core.render
@@ -18,7 +19,7 @@ fun main() {
     val decoder = Json {
         allowStructuredMapKeys = true
     }
-    val socket = websocket("ws://localhost:8102/state").connect()
+    val socket = websocket("ws://localhost:${WebEnvironment.ServerPort}/state").connect()
     val globalState = socket.messages.body
         .onEach { console.log(it) }
         .filterNot { it.startsWith("YOU") }
@@ -30,11 +31,14 @@ fun main() {
         val action = storeOf<Int?>(null)
         val arguments = storeOf("")
         div("flex flex-row justify-around p-4 gap-4") {
-            div("basis-1/4 flex flex-col gap-2") {
+            div("basis-1/5 flex flex-col gap-2") {
                 renderActionsBoard(globalState, user, action, arguments, socket)
             }
-            div("basis-3/4") {
+            div("basis-3/5") {
                 renderState(globalState)
+            }
+            div("basis-1/5") {
+                renderArchives()
             }
         }
         renderMap(globalState)
