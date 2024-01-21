@@ -55,17 +55,25 @@ kotlin {
                 implementation(libs.ktor.server.content.negotiation)
                 implementation(libs.ktor.server.call.logging)
                 implementation(libs.ktor.server.cors)
+                implementation(libs.ktor.server.partial)
+                implementation(libs.ktor.server.autohead)
                 implementation(libs.ktor.server.headers.default)
                 implementation(libs.ktor.server.headers.conditional)
                 implementation(libs.ktor.server.auth.core)
                 implementation(libs.ktor.server.auth.jwt)
                 implementation(libs.ktor.serialization)
                 implementation(libs.koin.ktor)
+                implementation(libs.torrent.core)
+                implementation(libs.torrent.dht)
             }
         }
         val jsMain by getting {
             dependencies {
                 implementation(libs.fritz.core)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.js)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization)
                 implementation(npm("tailwindcss", "3.3.5"))
                 implementation(devNpm("postcss", "8.4.31"))
                 implementation(devNpm("postcss-loader", "7.3.3"))

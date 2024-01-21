@@ -27,10 +27,14 @@ dependencyResolutionManagement {
             val ktor = version("ktor", "2.3.2")
             val jupiter = version("jupiter", "5.10.0")
             val fritz = version("fritz", "1.0-RC12")
+            val torrent = version("bt", "1.10")
 
             library("logging", "ch.qos.logback", "logback-classic").version("1.4.8")
 
             plugin("ktor", "io.ktor.plugin").versionRef(ktor)
+            library("ktor-client-core", "io.ktor", "ktor-client-core").versionRef(ktor)
+            library("ktor-client-js", "io.ktor", "ktor-client-js").versionRef(ktor)
+            library("ktor-client-content-negotiation", "io.ktor", "ktor-client-content-negotiation").versionRef(ktor)
             library("ktor-server-core", "io.ktor", "ktor-server-core").versionRef(ktor)
             library("ktor-server-netty", "io.ktor", "ktor-server-netty").versionRef(ktor)
             library("ktor-server-websockets", "io.ktor", "ktor-server-websockets").versionRef(ktor)
@@ -39,6 +43,8 @@ dependencyResolutionManagement {
             library("ktor-server-headers-default", "io.ktor", "ktor-server-default-headers").versionRef(ktor)
             library("ktor-server-headers-conditional", "io.ktor", "ktor-server-conditional-headers").versionRef(ktor)
             library("ktor-server-cors", "io.ktor", "ktor-server-cors").versionRef(ktor)
+            library("ktor-server-partial", "io.ktor", "ktor-server-partial-content").versionRef(ktor)
+            library("ktor-server-autohead", "io.ktor", "ktor-server-auto-head-response").versionRef(ktor)
             library("ktor-server-auth-core", "io.ktor", "ktor-server-auth").versionRef(ktor)
             library("ktor-server-auth-jwt", "io.ktor", "ktor-server-auth-jwt").versionRef(ktor)
             library("ktor-server-tests", "io.ktor", "ktor-server-tests").versionRef(ktor)
@@ -64,6 +70,9 @@ dependencyResolutionManagement {
 
             library("fritz-core", "dev.fritz2", "core").versionRef(fritz)
             library("fritz-annotation", "dev.fritz2", "lenses-annotation-processor").versionRef(fritz)
+
+            library("torrent-core", "com.github.atomashpolskiy", "bt-core").versionRef(torrent)
+            library("torrent-dht", "com.github.atomashpolskiy", "bt-dht").versionRef(torrent)
         }
     }
 }

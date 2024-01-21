@@ -27,3 +27,9 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         arguments: test --info
+    - name: Test report
+      if: success() || failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report.html
+        path: ./shared/build/reports/tests/jvmTest
