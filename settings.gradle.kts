@@ -28,6 +28,7 @@ dependencyResolutionManagement {
             val jupiter = version("jupiter", "5.10.0")
             val fritz = version("fritz", "1.0-RC12")
             val torrent = version("bt", "1.10")
+            val compose = version("compose", "1.6.0-alpha01")
 
             library("logging", "ch.qos.logback", "logback-classic").version("1.4.8")
 
@@ -64,7 +65,7 @@ dependencyResolutionManagement {
             library("kotlin-ksp-api", "com.google.devtools.ksp", "symbol-processing-api").versionRef(ksp)
 
             plugin("serialization", "org.jetbrains.kotlin.plugin.serialization").versionRef(kotlin)
-            library("serialization", "org.jetbrains.kotlinx", "kotlinx-serialization-json").version("1.6.0")
+            library("serialization", "org.jetbrains.kotlinx", "kotlinx-serialization-json").version("1.6.2")
 
             library("coroutines-test", "org.jetbrains.kotlinx", "kotlinx-coroutines-test").version("1.7.1")
 
@@ -73,6 +74,14 @@ dependencyResolutionManagement {
 
             library("torrent-core", "com.github.atomashpolskiy", "bt-core").versionRef(torrent)
             library("torrent-dht", "com.github.atomashpolskiy", "bt-dht").versionRef(torrent)
+
+            plugin("compose", "org.jetbrains.compose").versionRef(compose)
+            library("compose-runtime", "org.jetbrains.compose.runtime", "runtime").versionRef(compose)
+            library("compose-foundation", "org.jetbrains.compose.foundation", "foundation").versionRef(compose)
+            library("compose-material", "org.jetbrains.compose.material", "material").versionRef(compose)
+
+            library("uuid", "com.benasher44", "uuid").version("0.8.2")
+            library("datetime", "org.jetbrains.kotlinx", "kotlinx-datetime").version("0.5.0")
         }
     }
 }

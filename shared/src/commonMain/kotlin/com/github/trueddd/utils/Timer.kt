@@ -1,6 +1,10 @@
 package com.github.trueddd.utils
 
-expect object Timer {
+import kotlinx.datetime.Clock
 
-    fun currentTimeMillis(): Long
+object Timer {
+
+    fun currentTimeMillis(): Long {
+        return Clock.System.now().toEpochMilliseconds()
+    }
 }

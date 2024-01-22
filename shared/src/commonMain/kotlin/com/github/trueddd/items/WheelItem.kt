@@ -1,5 +1,6 @@
 package com.github.trueddd.items
 
+import com.benasher44.uuid.uuid4
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import kotlinx.serialization.Serializable
@@ -127,4 +128,6 @@ sealed class WheelItem {
     }
 }
 
-expect fun generateWheelItemUid(): String
+fun generateWheelItemUid(): String {
+    return uuid4().toString()
+}

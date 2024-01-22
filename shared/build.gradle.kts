@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.io.IOException
 
 plugins {
@@ -6,6 +8,7 @@ plugins {
     alias(libs.plugins.ktor)
     alias(libs.plugins.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.compose)
 }
 
 group = "com.trueddd.github"
@@ -33,10 +36,27 @@ kotlin {
         browser()
         binaries.executable()
     }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        moduleName = "wasmaggapp"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "aggwasm.js"
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    static = (static ?: mutableListOf()).apply {
+                        add(project.rootDir.path)
+                    }
+                }
+            }
+        }
+        binaries.executable()
+    }
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(libs.serialization)
+                implementation(libs.uuid)
+                implementation(libs.datetime)
                 implementation(project(":annotations"))
             }
         }
@@ -92,9 +112,18 @@ kotlin {
                 implementation(libs.coroutines.test)
             }
         }
-        val jsTest by getting {
+        val wasmJsMain by getting {
+            dependencies {
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.material)
+                implementation(libs.compose.foundation)
+            }
         }
     }
+}
+
+compose.experimental {
+    web.application {}
 }
 
 dependencies {
