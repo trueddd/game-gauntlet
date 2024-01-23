@@ -9,6 +9,8 @@ import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.declarations.IntoSetClassDeclaration
 import com.trueddd.github.annotations.IntoSet
 import com.trueddd.github.annotations.ItemFactory
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Module
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 
@@ -54,6 +56,11 @@ class IntoSetProcessor(
     }
 
     override fun processDeclarations(declarations: Iterable<IntoSetClassDeclaration>, fileSpec: FileSpec.Builder) {
+        val commonModuleSpec = TypeSpec.classBuilder("CommonModule")
+            .addAnnotation(Module::class)
+            .addAnnotation(ComponentScan::class)
+            .build()
+        fileSpec.addType(commonModuleSpec)
         declarations.toList()
             .groupBy { it.setName }
             .forEach { (type, declarations) ->

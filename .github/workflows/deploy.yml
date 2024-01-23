@@ -36,7 +36,7 @@ jobs:
         server: ${{ secrets.FTP_ADDRESS }}
         username: ${{ secrets.FTP_USER }}
         password: ${{ secrets.FTP_PASS }}
-        local-dir: ./shared/build/libs/
+        local-dir: ./backend/build/libs/
   build_frontend:
     name: Build frontend
     runs-on: ubuntu-latest
@@ -61,5 +61,5 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: deploy
-          FOLDER: shared/build/dist/js/productionExecutable
+          FOLDER: web/build/dist/js/productionExecutable
           CLEAN: true

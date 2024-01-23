@@ -1,5 +1,5 @@
 rootProject.name = "game-gauntlet"
-include("annotations", "di", "shared")
+include("annotations", "di", "common", "backend", "web")
 
 pluginManagement {
     repositories {
@@ -9,9 +9,6 @@ pluginManagement {
     }
     plugins {
         kotlin("multiplatform") version "1.9.20"
-        kotlin("plugin.serialization") version "1.9.20"
-        id("io.ktor.plugin") version "2.3.2"
-        id("com.google.devtools.ksp") version "1.9.20-1.0.14"
     }
 }
 
@@ -29,8 +26,12 @@ dependencyResolutionManagement {
             val fritz = version("fritz", "1.0-RC12")
             val torrent = version("bt", "1.10")
             val compose = version("compose", "1.6.0-alpha01")
+            val koin = version("koin", "3.5.3")
+            val koinKsp = version("koin-ksp", "1.3.0")
+            val kotlinPoet = version("kotlinpoet", "1.16.0")
+            val serialization = version("serialization", "1.6.2")
 
-            library("logging", "ch.qos.logback", "logback-classic").version("1.4.8")
+            library("logging", "ch.qos.logback", "logback-classic").version("1.4.1")
 
             plugin("ktor", "io.ktor.plugin").versionRef(ktor)
             library("ktor-client-core", "io.ktor", "ktor-client-core").versionRef(ktor)
@@ -55,19 +56,19 @@ dependencyResolutionManagement {
             library("test-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").versionRef(jupiter)
             library("test-jupiter-engine", "org.junit.jupiter", "junit-jupiter-engine").versionRef(jupiter)
 
-            library("koin-core", "io.insert-koin", "koin-core").version("3.4.2")
-            library("koin-ktor", "io.insert-koin", "koin-ktor").version("3.4.1")
-            library("koin-annotations", "io.insert-koin", "koin-annotations").version("1.2.2")
-            library("koin-ksp", "io.insert-koin", "koin-ksp-compiler").version("1.2.2")
+            library("koin-core", "io.insert-koin", "koin-core").versionRef(koin)
+            library("koin-ktor", "io.insert-koin", "koin-ktor").versionRef(koin)
+            library("koin-annotations", "io.insert-koin", "koin-annotations").versionRef(koinKsp)
+            library("koin-ksp", "io.insert-koin", "koin-ksp-compiler").versionRef(koinKsp)
 
             plugin("ksp", "com.google.devtools.ksp").versionRef(ksp)
-            library("kotlin-poet", "com.squareup", "kotlinpoet").version("1.14.2")
+            library("kotlin-poet", "com.squareup", "kotlinpoet").versionRef(kotlinPoet)
             library("kotlin-ksp-api", "com.google.devtools.ksp", "symbol-processing-api").versionRef(ksp)
 
             plugin("serialization", "org.jetbrains.kotlin.plugin.serialization").versionRef(kotlin)
-            library("serialization", "org.jetbrains.kotlinx", "kotlinx-serialization-json").version("1.6.2")
+            library("serialization", "org.jetbrains.kotlinx", "kotlinx-serialization-json").versionRef(serialization)
 
-            library("coroutines-test", "org.jetbrains.kotlinx", "kotlinx-coroutines-test").version("1.7.1")
+            library("coroutines-test", "org.jetbrains.kotlinx", "kotlinx-coroutines-test").version("1.7.3")
 
             library("fritz-core", "dev.fritz2", "core").versionRef(fritz)
             library("fritz-annotation", "dev.fritz2", "lenses-annotation-processor").versionRef(fritz)
