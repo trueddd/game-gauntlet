@@ -16,12 +16,13 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-js-wrappers") }
+        maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental") }
     }
     versionCatalogs {
         create("libs") {
             val kotlin = version("kotlin", "1.9.20")
             val ksp = version("ksp", "1.9.20-1.0.14")
-            val ktor = version("ktor", "2.3.2")
+            val ktor = version("ktor", "2.3.7")
             val jupiter = version("jupiter", "5.10.0")
             val fritz = version("fritz", "1.0-RC12")
             val torrent = version("bt", "1.10")

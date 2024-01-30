@@ -19,6 +19,7 @@ kotlin {
             commonWebpackConfig {
                 outputFileName = "aggwasm.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    port = 8081
                     static = (static ?: mutableListOf()).apply {
                         add(project.rootDir.path)
                     }
@@ -54,6 +55,10 @@ kotlin {
                 api(libs.compose.runtime)
                 api(libs.compose.material)
                 api(libs.compose.foundation)
+                implementation("io.ktor:ktor-client-core:3.0.0-wasm2")
+                implementation("io.ktor:ktor-client-js:3.0.0-wasm2")
+                implementation("io.ktor:ktor-client-content-negotiation:3.0.0-wasm2")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.0-wasm2")
             }
         }
     }
