@@ -27,7 +27,7 @@ dependencyResolutionManagement {
             val fritz = version("fritz", "1.0-RC12")
             val torrent = version("bt", "1.10")
             val compose = version("compose", "1.6.0-alpha01")
-            val koin = version("koin", "3.5.3")
+            val koin = version("koin", "3.6.0-wasm-alpha1")
             val koinKsp = version("koin-ksp", "1.3.0")
             val kotlinPoet = version("kotlinpoet", "1.16.0")
             val serialization = version("serialization", "1.6.2")

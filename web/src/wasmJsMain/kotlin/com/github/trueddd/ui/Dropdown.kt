@@ -1,4 +1,4 @@
-package com.github.trueddd
+package com.github.trueddd.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.trueddd.theme.Colors
 
 @Composable
 fun Dropdown(

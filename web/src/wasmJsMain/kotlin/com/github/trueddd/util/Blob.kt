@@ -1,4 +1,4 @@
-package com.github.trueddd
+package com.github.trueddd.util
 
 import io.ktor.http.*
 import org.khronos.webgl.Uint8Array

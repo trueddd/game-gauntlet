@@ -1,4 +1,4 @@
-package com.github.trueddd
+package com.github.trueddd.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import com.github.trueddd.theme.Colors
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant

@@ -1,4 +1,4 @@
-package com.github.trueddd
+package com.github.trueddd.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -11,6 +11,7 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.trueddd.theme.Colors
 
 @Composable
 fun RowScope.ArchivesW(

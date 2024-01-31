@@ -55,6 +55,7 @@ kotlin {
                 api(libs.compose.runtime)
                 api(libs.compose.material)
                 api(libs.compose.foundation)
+                implementation(libs.koin.core)
                 implementation("io.ktor:ktor-client-core:3.0.0-wasm2")
                 implementation("io.ktor:ktor-client-js:3.0.0-wasm2")
                 implementation("io.ktor:ktor-client-content-negotiation:3.0.0-wasm2")
