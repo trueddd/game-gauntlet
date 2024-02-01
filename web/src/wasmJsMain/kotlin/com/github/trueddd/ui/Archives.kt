@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.github.trueddd.theme.Colors
 
 @Composable
-fun RowScope.ArchivesW(
+fun RowScope.Archives(
     onSearchRequested: (String) -> Unit = {},
 ) {
     var gameName by remember { mutableStateOf("") }

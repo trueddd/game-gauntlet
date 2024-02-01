@@ -55,11 +55,11 @@ jobs:
       - name: Build JS artifacts
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: jsBrowserWebpack
+          arguments: wasmJsBrowserWebpack
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: deploy
-          FOLDER: web/build/dist/js/productionExecutable
+          FOLDER: web/build/dist/wasmJs/productionExecutable
           CLEAN: true

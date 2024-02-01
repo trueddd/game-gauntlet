@@ -24,7 +24,6 @@ dependencyResolutionManagement {
             val ksp = version("ksp", "1.9.20-1.0.14")
             val ktor = version("ktor", "2.3.7")
             val jupiter = version("jupiter", "5.10.0")
-            val fritz = version("fritz", "1.0-RC12")
             val torrent = version("bt", "1.10")
             val compose = version("compose", "1.6.0-alpha01")
             val koin = version("koin", "3.6.0-wasm-alpha1")
@@ -70,9 +69,6 @@ dependencyResolutionManagement {
             library("serialization", "org.jetbrains.kotlinx", "kotlinx-serialization-json").versionRef(serialization)
 
             library("coroutines-test", "org.jetbrains.kotlinx", "kotlinx-coroutines-test").version("1.7.3")
-
-            library("fritz-core", "dev.fritz2", "core").versionRef(fritz)
-            library("fritz-annotation", "dev.fritz2", "lenses-annotation-processor").versionRef(fritz)
 
             library("torrent-core", "com.github.atomashpolskiy", "bt-core").versionRef(torrent)
             library("torrent-dht", "com.github.atomashpolskiy", "bt-dht").versionRef(torrent)

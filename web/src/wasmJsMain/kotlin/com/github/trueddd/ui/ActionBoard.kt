@@ -27,7 +27,7 @@ private val actions = mapOf(
 )
 
 @Composable
-fun RowScope.ActionsBoardW(
+fun RowScope.ActionsBoard(
     globalState: GlobalState,
     sendAction: (String) -> Unit = {},
 ) {

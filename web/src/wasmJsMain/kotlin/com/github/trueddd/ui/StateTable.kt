@@ -63,7 +63,7 @@ private fun WheelItems(items: List<WheelItem>) {
 }
 
 @Composable
-fun RowScope.StateTableW(globalState: GlobalState) {
+fun RowScope.StateTable(globalState: GlobalState) {
     Column(
         modifier = Modifier
             .weight(4f)

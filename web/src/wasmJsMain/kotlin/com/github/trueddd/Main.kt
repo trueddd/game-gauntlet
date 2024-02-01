@@ -13,10 +13,10 @@ import com.github.trueddd.core.AppClient
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.di.module
 import com.github.trueddd.theme.Colors
-import com.github.trueddd.ui.ActionsBoardW
-import com.github.trueddd.ui.ArchivesW
-import com.github.trueddd.ui.MapW
-import com.github.trueddd.ui.StateTableW
+import com.github.trueddd.ui.ActionsBoard
+import com.github.trueddd.ui.Archives
+import com.github.trueddd.ui.Map
+import com.github.trueddd.ui.StateTable
 import org.koin.core.context.startKoin
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -65,10 +65,10 @@ private fun App(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            ActionsBoardW(globalState, onActionSent)
-            StateTableW(globalState)
-            ArchivesW(onSearchRequested)
+            ActionsBoard(globalState, onActionSent)
+            StateTable(globalState)
+            Archives(onSearchRequested)
         }
-        MapW(globalState)
+        Map(globalState)
     }
 }

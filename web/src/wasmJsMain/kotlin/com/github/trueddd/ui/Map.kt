@@ -3,20 +3,26 @@ package com.github.trueddd.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.Participant
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun MapW(globalState: GlobalState) {
+fun Map(globalState: GlobalState) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -31,9 +37,12 @@ fun MapW(globalState: GlobalState) {
             GenreLegend(Game.Genre.Special)
         }
         FlowRow {
-            MapCell(0, null)
+            val playersPositions = remember(globalState.players) {
+                globalState.players.entries.associate { (player, state) -> player to state.position }
+            }
+            MapCell(0, null, playersPositions)
             globalState.gameGenreDistribution.genres.forEachIndexed { index, cell ->
-                MapCell(index + 1, cell)
+                MapCell(index + 1, cell, playersPositions)
             }
         }
     }
@@ -49,8 +58,9 @@ private fun GenreLegend(genre: Game.Genre) {
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun MapCell(index: Int, cell: Game.Genre?) {
+private fun MapCell(index: Int, cell: Game.Genre?, playersPositions: Map<Participant, Int>) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -61,6 +71,32 @@ private fun MapCell(index: Int, cell: Game.Genre?) {
         Text(
             text = "$index",
         )
+        if (playersPositions.values.any { it == index }) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(4.dp)
+            ) {
+                playersPositions
+                    .filterValues { it == index }
+                    .forEach { (player, _) ->
+                        Text(
+                            text = player.displayName.first().uppercase(),
+                            color = Colors.Primary,
+                            textAlign = TextAlign.Center,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .background(Color.White, CircleShape)
+                                .border(2.dp, Colors.Primary, CircleShape)
+                                .padding(4.dp)
+                        )
+                    }
+            }
+        }
     }
 }
 
