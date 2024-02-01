@@ -31,5 +31,5 @@ jobs:
       if: success() || failure()
       uses: actions/upload-artifact@v4
       with:
-        name: test-report.html
-        path: ./shared/build/reports/tests/jvmTest
+        name: test-report
+        path: ./backend/build/reports/tests/jvmTest
