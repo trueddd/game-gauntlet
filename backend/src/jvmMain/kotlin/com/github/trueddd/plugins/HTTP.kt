@@ -1,6 +1,6 @@
 package com.github.trueddd.plugins
 
-import com.github.trueddd.utils.WebEnvironment
+import com.github.trueddd.utils.Environment
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.autohead.*
@@ -20,8 +20,7 @@ fun Application.configureHTTP() {
         allowMethod(HttpMethod.Patch)
         allowHeader(HttpHeaders.Authorization)
         allowHeader(HttpHeaders.ContentType)
-        allowHost(WebEnvironment.ClientAddress)
-        anyHost() // TODO: Remove it later.
+        allowHost(Environment.ClientAddress)
     }
     install(ConditionalHeaders)
     install(PartialContent)

@@ -2,13 +2,10 @@ package com.github.trueddd.plugins
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.github.trueddd.utils.Log
+import com.github.trueddd.utils.Environment
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.*
 
 object Jwt {
     const val AUDIENCE = "JWT_AUDIENCE"
@@ -20,7 +17,7 @@ object Jwt {
 fun Application.configureSecurity() {
     authentication {
         jwt {
-            val config = readJwtConfig()
+            val config = Environment.resolveConfig("jwt.properties")
             val jwtAudience = config.getProperty(Jwt.AUDIENCE)
             realm = config.getProperty(Jwt.REALM)
             verifier(
@@ -38,19 +35,5 @@ fun Application.configureSecurity() {
                 }
             }
         }
-    }
-}
-
-private fun currentDir(): Path {
-    return Paths.get(Log::class.java.protectionDomain.codeSource.location.toURI())
-}
-
-private fun readJwtConfig(): Properties {
-    val propertiesFile = currentDir().toFile().parentFile
-        .resolve("jwt.properties")
-    return if (propertiesFile.exists()) {
-        propertiesFile.inputStream().use { Properties().apply { load(it) } }
-    } else {
-        System.getenv().toProperties()
     }
 }

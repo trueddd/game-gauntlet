@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import java.io.IOException
 
 plugins {
     kotlin("multiplatform")
@@ -43,4 +44,52 @@ kotlin {
 
 compose.experimental {
     web.application {}
+}
+
+fun composePropertiesFromEnv(
+    fileName: String,
+    propertyKeys: List<String>,
+) {
+    val destinationDir = projectDir
+        .resolve("src")
+        .resolve("wasmJsMain")
+        .resolve("resources")
+    println(destinationDir.path)
+    val file = destinationDir.resolve(fileName)
+    if (!file.exists()) {
+        file.createNewFile()
+    } else {
+        file.writeText("")
+    }
+    val properties = propertyKeys
+        .associateWith { System.getenv(it) }
+        .filterValues { it != null }
+    val content = buildString {
+        append("window.env = {")
+        properties.forEach { (key, value) ->
+            append("\"$key\":\"$value\",")
+        }
+        append("};")
+    }
+    val stream = file.outputStream()
+    try {
+        stream.write(content.toByteArray())
+    } catch (e: IOException) {
+        e.printStackTrace()
+    } finally {
+        stream.close()
+    }
+}
+
+tasks.create("mutateResources") {
+    composePropertiesFromEnv(
+        fileName = "env.js",
+        propertyKeys = listOf(
+            "SERVER_ADDRESS",
+        )
+    )
+}
+
+tasks.named("compileKotlinWasmJs") {
+    dependsOn("mutateResources")
 }
