@@ -27,7 +27,7 @@ internal fun createTorrentClient(
 ) = Bt.client()
     .config(torrentClientConfig)
     .storage(FileSystemStorage(workingDirectory))
-    .magnet(Environment.gamesMagnetUri)
+    .magnet(Environment.GamesMagnetUri)
     .selector(RarestFirstSelector.rarest())
     .fileSelector { file ->
         val name = file.pathElements.last()

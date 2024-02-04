@@ -1,18 +1,44 @@
 package com.github.trueddd.utils
 
 import java.io.File
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.*
 
 object Environment {
 
-    val isDev: Boolean by lazy {
-        System.getenv("DEV") == "1"
+    private fun currentDir(): Path {
+        return Paths.get(Environment::class.java.protectionDomain.codeSource.location.toURI())
     }
 
-    val gamesDirectory: File by lazy {
-        File(System.getenv("GAMES_DIR"))
+    internal fun resolveConfig(name: String): Properties {
+        val propertiesFile = currentDir().toFile().parentFile.resolve(name)
+        return if (propertiesFile.exists()) {
+            propertiesFile.inputStream().use { Properties().apply { load(it) } }
+        } else {
+            System.getenv().toProperties()
+        }
     }
 
-    val gamesMagnetUri: String by lazy {
-        System.getenv("GAMES_MAGNET_URI")
+    private val appConfig by lazy { resolveConfig("app.properties") }
+
+    val IsDev: Boolean by lazy {
+        appConfig.getProperty("DEV") == "1"
+    }
+
+    val GamesDirectory: File by lazy {
+        if (IsDev) {
+            File(appConfig.getProperty("GAMES_DIR"))
+        } else {
+            currentDir().resolve("games").toFile()
+        }
+    }
+
+    val GamesMagnetUri: String by lazy {
+        appConfig.getProperty("GAMES_MAGNET_URI")
+    }
+
+    val ClientAddress: String by lazy {
+        appConfig.getProperty("CLIENT_ADDRESS")
     }
 }

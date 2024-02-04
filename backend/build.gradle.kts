@@ -79,31 +79,51 @@ tasks.named("build") {
     dependsOn(":common:build")
 }
 
+fun composePropertiesFromEnv(
+    fileName: String,
+    propertyKeys: List<String>,
+) {
+    val destinationDir = buildDir.resolve("libs")
+    val file = destinationDir.resolve(fileName)
+    if (!file.exists()) {
+        file.createNewFile()
+    } else {
+        file.writeText("")
+    }
+    val properties = propertyKeys
+        .associateWith { System.getenv(it) }
+        .filterValues { it != null }
+        .toProperties()
+    println(properties.toString())
+    val stream = file.outputStream()
+    try {
+        properties.store(stream, null)
+    } catch (e: IOException) {
+        e.printStackTrace()
+    } finally {
+        stream.close()
+    }
+}
+
 tasks.named("buildFatJar") {
     doLast {
-        val destinationDir = buildDir.resolve("libs")
-        val jwtFile = destinationDir.resolve("jwt.properties")
-        if (!jwtFile.exists()) {
-            jwtFile.createNewFile()
-        } else {
-            jwtFile.writeText("")
-        }
-        val properties = listOf(
-            "JWT_AUDIENCE",
-            "JWT_DOMAIN",
-            "JWT_REALM",
-            "JWT_SECRET",
-        ).associateWith { System.getenv(it) }
-            .filterValues { it != null }
-            .toProperties()
-        println(properties.toString())
-        val stream = jwtFile.outputStream()
-        try {
-            properties.store(stream, null)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } finally {
-            stream.close()
-        }
+        composePropertiesFromEnv(
+            fileName = "app.properties",
+            propertyKeys = listOf(
+                "DEV",
+                "GAMES_DIR",
+                "GAMES_MAGNET_URI",
+                "CLIENT_ADDRESS",
+            )
+        )
+        composePropertiesFromEnv(
+            fileName = "jwt.properties",
+            propertyKeys = listOf(
+                "JWT_AUDIENCE",
+                "JWT_DOMAIN",
+                "JWT_REALM",
+                "JWT_SECRET",
+            )
+        )
     }
 }

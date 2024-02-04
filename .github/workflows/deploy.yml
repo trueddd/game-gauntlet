@@ -30,6 +30,9 @@ jobs:
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
         JWT_DOMAIN: ${{ secrets.JWT_DOMAIN }}
         JWT_REALM: ${{ secrets.JWT_REALM }}
+        GAMES_DIR: ${{ secrets.GAMES_DIR }}
+        GAMES_MAGNET_URI: ${{ secrets.GAMES_MAGNET_URI }}
+        CLIENT_ADDRESS: ${{ secrets.CLIENT_ADDRESS }}
     - name: Upload Jar
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
@@ -56,10 +59,27 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: wasmJsBrowserWebpack
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        env:
+          SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
+      - name: Create build archive
+        uses: gradle/gradle-build-action@v2
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: deploy
-          FOLDER: web/build/dist/wasmJs/productionExecutable
-          CLEAN: true
+          arguments: createWebpackArchive
+      - name: Upload Pages archive
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: web/build/dist
+  deploy_frontend:
+    name: Deploy frontend to Pages
+    runs-on: ubuntu-latest
+    needs: build_frontend
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -21,13 +21,13 @@ fun Application.configureRouting() {
             val fileToLoad = try {
                 call.receive<DownloadGameRequestBody>().name
             } catch (e: Exception) {
-                if (Environment.isDev) {
+                if (Environment.IsDev) {
                     "Фишдом. Время праздников"
                 } else {
                     throw e
                 }
             }
-            val currentDir = Environment.gamesDirectory
+            val currentDir = Environment.GamesDirectory
                 .resolve(call.request.hashCode().toString())
                 .also { it.mkdir() }
             val client = createTorrentClient(fileToLoad, currentDir)
@@ -46,7 +46,7 @@ fun Application.configureRouting() {
                     call.respond(HttpStatusCode.NotFound, "No game was found with name `$fileToLoad`")
                     return@post
                 }
-            Files.copy(downloadedFile.toPath(), Environment.gamesDirectory.resolve(downloadedFile.name).toPath())
+            Files.copy(downloadedFile.toPath(), Environment.GamesDirectory.resolve(downloadedFile.name).toPath())
             currentDir.deleteRecursively()
             call.response.header(
                 HttpHeaders.ContentDisposition,
@@ -54,10 +54,10 @@ fun Application.configureRouting() {
                     .withParameter(ContentDisposition.Parameters.FileName, downloadedFile.name)
                     .toString()
             )
-            call.respondFile(Environment.gamesDirectory.resolve(downloadedFile.name))
+            call.respondFile(Environment.GamesDirectory.resolve(downloadedFile.name))
             // fixme: wrong filename in browser save dialog
             if (call.response.isSent) {
-                Environment.gamesDirectory.resolve(downloadedFile.name).delete()
+                Environment.GamesDirectory.resolve(downloadedFile.name).delete()
             }
         }
     }

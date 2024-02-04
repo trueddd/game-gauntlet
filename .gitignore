@@ -3,7 +3,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 .run
 kotlin-js-store/
-shared/src/jvmTest/resources/
+web/src/wasmJsMain/resources/env.js
 
 ### STS ###
 .apt_generated
