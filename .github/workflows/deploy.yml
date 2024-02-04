@@ -61,14 +61,11 @@ jobs:
           arguments: wasmJsBrowserWebpack
         env:
           SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
-      - name: Create build archive
-        uses: gradle/gradle-build-action@v2
+      - name: Upload Pages artifact
+        uses: actions/upload-artifact@v4
         with:
-          arguments: createWebpackArchive
-      - name: Upload Pages archive
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: web/build/dist
+          name: github-pages
+          path: web/build/dist/wasmJs/productionExecutable
   deploy_frontend:
     name: Deploy frontend to Pages
     runs-on: ubuntu-latest
