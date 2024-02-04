@@ -62,9 +62,8 @@ jobs:
         env:
           SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
       - name: Upload Pages artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v3.0.0
         with:
-          name: github-pages
           path: web/build/dist/wasmJs/productionExecutable
   deploy_frontend:
     name: Deploy frontend to Pages
