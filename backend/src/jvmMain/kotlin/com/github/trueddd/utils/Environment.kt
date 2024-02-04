@@ -27,7 +27,11 @@ object Environment {
     }
 
     val GamesDirectory: File by lazy {
-        File(appConfig.getProperty("GAMES_DIR"))
+        if (IsDev) {
+            File(appConfig.getProperty("GAMES_DIR"))
+        } else {
+            currentDir().resolve("games").toFile()
+        }
     }
 
     val GamesMagnetUri: String by lazy {

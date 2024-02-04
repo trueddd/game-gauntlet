@@ -93,3 +93,10 @@ tasks.create("mutateResources") {
 tasks.named("compileKotlinWasmJs") {
     dependsOn("mutateResources")
 }
+
+tasks.create<Tar>("createWebpackArchive") {
+    archiveFileName = "github-pages.tar"
+    from("$buildDir/dist/wasmJs/productionExecutable")
+    destinationDirectory = file("$buildDir/dist")
+    compression = Compression.GZIP
+}

@@ -61,10 +61,25 @@ jobs:
           arguments: wasmJsBrowserWebpack
         env:
           SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+      - name: Create build archive
+        uses: gradle/gradle-build-action@v2
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: deploy
-          FOLDER: web/build/dist/wasmJs/productionExecutable
-          CLEAN: true
+          arguments: createWebpackArchive
+      - name: Upload Pages archive
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: web/build/dist
+  deploy_frontend:
+    name: Deploy frontend to Pages
+    runs-on: ubuntu-latest
+    needs: build_frontend
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
