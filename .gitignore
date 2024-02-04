@@ -3,6 +3,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 .run
 kotlin-js-store/
+backend/src/jvmTest/resources/history
 web/src/wasmJsMain/resources/env.js
 
 ### STS ###
