@@ -39,7 +39,6 @@ jobs:
         heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
         heroku_app_name: "agg2"
         heroku_email: "dkuzmichn1ce@gmail.com"
-        procfile: "java: -Dserver.port=$PORT $JAVA_OPTS -jar fat.jar"
         appdir: "backend/build/libs"
   build_frontend:
     name: Build frontend
