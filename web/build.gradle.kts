@@ -54,7 +54,6 @@ fun composePropertiesFromEnv(
         .resolve("src")
         .resolve("wasmJsMain")
         .resolve("resources")
-    println(destinationDir.path)
     val file = destinationDir.resolve(fileName)
     if (!file.exists()) {
         file.createNewFile()
@@ -86,6 +85,7 @@ tasks.create("mutateResources") {
         fileName = "env.js",
         propertyKeys = listOf(
             "SERVER_ADDRESS",
+            "IS_DEV",
         )
     )
 }

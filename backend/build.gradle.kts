@@ -107,11 +107,6 @@ fun composePropertiesFromEnv(
 
 tasks.named("buildFatJar") {
     doLast {
-        copy {
-            from("$projectDir/src/jvmMain/resources")
-            include("Procfile")
-            into("$buildDir/libs")
-        }
         composePropertiesFromEnv(
             fileName = "app.properties",
             propertyKeys = listOf(

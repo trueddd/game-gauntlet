@@ -2,8 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.request.DownloadGameRequestBody
-import com.github.trueddd.util.serverAddress
-import com.github.trueddd.util.toBlob
+import com.github.trueddd.util.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -51,7 +50,7 @@ class AppClient(
             return
         }
         launch {
-            httpClient.webSocket("ws://${serverAddress()}/state") {
+            httpClient.webSocket("$wsProtocol://${serverAddress()}/state") {
                 launch {
                     for (action in actionsChannel) {
                         outgoing.send(Frame.Text(action))
@@ -78,7 +77,7 @@ class AppClient(
     fun searchGame(name: String) {
         launch {
             try {
-                val response = httpClient.post("http://${serverAddress()}/game") {
+                val response = httpClient.post("$httpProtocol://${serverAddress()}/game") {
                     contentType(ContentType.Application.Json)
                     setBody(DownloadGameRequestBody(name))
                     onDownload { bytesSentTotal, contentLength ->
