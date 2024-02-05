@@ -33,13 +33,14 @@ jobs:
         GAMES_DIR: ${{ secrets.GAMES_DIR }}
         GAMES_MAGNET_URI: ${{ secrets.GAMES_MAGNET_URI }}
         CLIENT_ADDRESS: ${{ secrets.CLIENT_ADDRESS }}
-    - name: Upload Jar
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+    - name: Deploy app to Heroku
+      uses: akhileshns/heroku-deploy@v3.13.15
       with:
-        server: ${{ secrets.FTP_ADDRESS }}
-        username: ${{ secrets.FTP_USER }}
-        password: ${{ secrets.FTP_PASS }}
-        local-dir: ./backend/build/libs/
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_app_name: "agg2"
+        heroku_email: "dkuzmichn1ce@gmail.com"
+        procfile: "java: -Dserver.port=$PORT $JAVA_OPTS -jar fat.jar"
+        appdir: "backend/build/libs"
   build_frontend:
     name: Build frontend
     runs-on: ubuntu-latest

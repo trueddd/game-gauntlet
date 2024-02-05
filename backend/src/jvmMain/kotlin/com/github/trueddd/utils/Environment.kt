@@ -20,6 +20,10 @@ object Environment {
         }
     }
 
+    val Port by lazy {
+        System.getenv("PORT")?.toIntOrNull() ?: 8081
+    }
+
     private val appConfig by lazy { resolveConfig("app.properties") }
 
     val IsDev: Boolean by lazy {
