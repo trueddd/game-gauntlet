@@ -127,3 +127,7 @@ tasks.named("buildFatJar") {
         )
     }
 }
+
+tasks.create("stage") {
+    dependsOn("buildFatJar")
+}
