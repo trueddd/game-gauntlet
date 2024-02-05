@@ -20,7 +20,10 @@ fun Application.configureHTTP() {
         allowMethod(HttpMethod.Patch)
         allowHeader(HttpHeaders.Authorization)
         allowHeader(HttpHeaders.ContentType)
-        allowHost(Environment.ClientAddress)
+        allowHost(
+            host = Environment.ClientAddress,
+            schemes = if (Environment.IsDev) listOf("ws", "http") else listOf("wss", "https")
+        )
     }
     install(ConditionalHeaders)
     install(PartialContent)
