@@ -18,6 +18,7 @@ sealed class WheelItem {
     abstract val id: Id
     abstract val name: String
     abstract val description: String
+    open val iconId: Int = id.value
 
     interface Factory {
         val itemId: Id

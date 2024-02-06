@@ -1,11 +1,14 @@
 package com.github.trueddd.plugins
 
 import com.github.trueddd.data.request.DownloadGameRequestBody
+import com.github.trueddd.di.getItemFactoriesSet
 import com.github.trueddd.utils.Environment
 import com.github.trueddd.utils.createTorrentClient
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.http.content.CachingOptions
 import io.ktor.server.http.content.*
+import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -16,7 +19,14 @@ import kotlin.coroutines.suspendCoroutine
 
 fun Application.configureRouting() {
     routing {
+        install(CachingHeaders) {
+            options { _, _ ->
+                CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60))
+            }
+        }
+
         staticFiles("/icons", File("src/jvmMain/resources/icons/items"))
+
         post("/game") {
             val fileToLoad = try {
                 call.receive<DownloadGameRequestBody>().name
@@ -43,9 +53,9 @@ fun Application.configureRouting() {
                 .filter { it.isFile }
                 .filter { it.nameWithoutExtension.equals(fileToLoad, ignoreCase = true) }
                 .firstOrNull() ?: run {
-                    call.respond(HttpStatusCode.NotFound, "No game was found with name `$fileToLoad`")
-                    return@post
-                }
+                call.respond(HttpStatusCode.NotFound, "No game was found with name `$fileToLoad`")
+                return@post
+            }
             Files.copy(downloadedFile.toPath(), Environment.GamesDirectory.resolve(downloadedFile.name).toPath())
             currentDir.deleteRecursively()
             call.response.header(
@@ -55,10 +65,15 @@ fun Application.configureRouting() {
                     .toString()
             )
             call.respondFile(Environment.GamesDirectory.resolve(downloadedFile.name))
-            // fixme: wrong filename in browser save dialog
             if (call.response.isSent) {
                 Environment.GamesDirectory.resolve(downloadedFile.name).delete()
             }
+        }
+
+        get("items") {
+            call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 3600))
+            val items = getItemFactoriesSet().map { it.create() }
+            call.respond(items)
         }
     }
 }

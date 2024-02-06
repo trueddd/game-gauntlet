@@ -6,9 +6,13 @@ import androidx.compose.ui.graphics.Color
 @Stable
 object Colors {
     val Background = Color(0xFF0F172A)
+    val DarkBackground = Color(0xFF020617)
     val SecondaryBackground = Color(0xFF1E293B)
     val Text = Color(0xFFF3F4F6)
     val Primary = Color(0xFF1D4ED8)
+    val Warning = Color(0xFFFBBF24)
+    val Error = Color(0xFFF87171)
+    val Success = Color(0xFF4ADE80)
     object Genre {
         val Runner = Color(0xFFF87171)
         val Business = Color(0xFF60A5FA)

@@ -2,7 +2,6 @@ package com.github.trueddd.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -11,16 +10,19 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.trueddd.core.AppClient
+import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
 
 @Composable
-fun RowScope.Archives(
-    onSearchRequested: (String) -> Unit = {},
+fun Archives(
+    modifier: Modifier = Modifier,
 ) {
+    val appClient = remember { get<AppClient>() }
     var gameName by remember { mutableStateOf("") }
     Column(
-        modifier = Modifier
-            .weight(1f)
+        modifier = modifier
+            .padding(16.dp)
             .background(Colors.SecondaryBackground, RoundedCornerShape(8.dp))
             .padding(16.dp)
     ) {
@@ -30,7 +32,7 @@ fun RowScope.Archives(
             onValueChange = { gameName = it },
         )
         Button(
-            onClick = { onSearchRequested(gameName) },
+            onClick = { appClient.searchGame(gameName) },
             enabled = gameName.isNotBlank(),
         ) {
             Text(text = "Search")

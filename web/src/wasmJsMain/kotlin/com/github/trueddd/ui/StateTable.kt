@@ -63,10 +63,12 @@ private fun WheelItems(items: List<WheelItem>) {
 }
 
 @Composable
-fun RowScope.StateTable(globalState: GlobalState) {
+fun StateTable(
+    globalState: GlobalState,
+    modifier: Modifier = Modifier,
+) {
     Column(
-        modifier = Modifier
-            .weight(4f)
+        modifier = modifier
             .background(Colors.SecondaryBackground, RoundedCornerShape(8.dp))
             .padding(16.dp)
     ) {

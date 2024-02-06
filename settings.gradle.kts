@@ -49,6 +49,7 @@ dependencyResolutionManagement {
             library("ktor-server-autohead", "io.ktor", "ktor-server-auto-head-response").versionRef(ktor)
             library("ktor-server-auth-core", "io.ktor", "ktor-server-auth").versionRef(ktor)
             library("ktor-server-auth-jwt", "io.ktor", "ktor-server-auth-jwt").versionRef(ktor)
+            library("ktor-server-caching", "io.ktor", "ktor-server-caching-headers").versionRef(ktor)
             library("ktor-server-tests", "io.ktor", "ktor-server-tests").versionRef(ktor)
             library("ktor-serialization", "io.ktor", "ktor-serialization-kotlinx-json").versionRef(ktor)
 
@@ -80,6 +81,9 @@ dependencyResolutionManagement {
 
             library("uuid", "com.benasher44", "uuid").version("0.8.2")
             library("datetime", "org.jetbrains.kotlinx", "kotlinx-datetime").version("0.5.0")
+
+//            library("coil-core", "io.coil-kt.coil3", "coil").version("3.0.0-alpha01-wasm")
+//            library("coil-compose", "io.coil-kt.coil3", "coil-compose").version("3.0.0-alpha01-wasm")
         }
     }
 }
