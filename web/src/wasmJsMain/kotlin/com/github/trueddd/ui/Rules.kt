@@ -2,6 +2,8 @@ package com.github.trueddd.ui
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -14,6 +16,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,6 +24,8 @@ import com.github.trueddd.core.AppClient
 import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.theme.Colors
+import com.github.trueddd.ui.widget.AsyncImage
+import com.github.trueddd.util.color
 
 @Composable
 fun Rules(
@@ -37,8 +42,8 @@ fun Rules(
         val lazyListState = rememberLazyListState()
         LazyColumn(
             state = lazyListState,
-            contentPadding = PaddingValues(all = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 32.dp, vertical = 48.dp),
+            verticalArrangement = Arrangement.spacedBy(48.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .simpleVerticalScrollbar(
@@ -48,24 +53,30 @@ fun Rules(
                 )
         ) {
             items(items) { item ->
-                Row() {
-//                    Image(
-//                        bitmap = ImageBitmap(),
-//                        contentDescription = "Icon of ${item.name}",
-//                        modifier = Modifier
-//                            .size(48.dp)
-//                    )
+                Row {
+                    AsyncImage(
+                        model = appClient.getWheelItemIconUrl(item.iconId),
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(Color.White)
+                            .border(4.dp, item.color, RectangleShape)
+                            .padding(8.dp)
+                    )
+                    Spacer(
+                        modifier = Modifier
+                            .width(16.dp)
+                    )
                     // TODO: add selection for text
                     //  https://github.com/JetBrains/compose-multiplatform/issues/4036
                     //  Possible workaround:
                     //  https://github.com/JetBrains/compose-multiplatform/issues/1450#issuecomment-1700968377
-                    Column() {
+                    Column {
                         Text(
                             text = item.name,
                             fontSize = 16.sp,
                         )
                         Text(
-                            text = item.description,
+                            text = item.description.replace("\n", ""),
                             fontSize = 14.sp,
                         )
                     }

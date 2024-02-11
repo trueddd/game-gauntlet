@@ -8,7 +8,7 @@ pluginManagement {
         mavenCentral()
     }
     plugins {
-        kotlin("multiplatform") version "1.9.20"
+        kotlin("multiplatform") version "1.9.22"
     }
 }
 
@@ -17,15 +17,17 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-js-wrappers") }
         maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental") }
+        maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+        maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
     }
     versionCatalogs {
         create("libs") {
-            val kotlin = version("kotlin", "1.9.20")
-            val ksp = version("ksp", "1.9.20-1.0.14")
-            val ktor = version("ktor", "2.3.7")
+            val kotlin = version("kotlin", "1.9.22")
+            val ksp = version("ksp", "1.9.22-1.0.17")
+            val ktor = version("ktor", "2.3.8")
             val jupiter = version("jupiter", "5.10.0")
             val torrent = version("bt", "1.10")
-            val compose = version("compose", "1.6.0-alpha01")
+            val compose = version("compose", "1.6.0-beta02")
             val koin = version("koin", "3.6.0-wasm-alpha1")
             val koinKsp = version("koin-ksp", "1.3.0")
             val kotlinPoet = version("kotlinpoet", "1.16.0")
@@ -81,9 +83,6 @@ dependencyResolutionManagement {
 
             library("uuid", "com.benasher44", "uuid").version("0.8.2")
             library("datetime", "org.jetbrains.kotlinx", "kotlinx-datetime").version("0.5.0")
-
-//            library("coil-core", "io.coil-kt.coil3", "coil").version("3.0.0-alpha01-wasm")
-//            library("coil-compose", "io.coil-kt.coil3", "coil-compose").version("3.0.0-alpha01-wasm")
         }
     }
 }

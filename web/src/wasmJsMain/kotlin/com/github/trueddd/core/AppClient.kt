@@ -9,7 +9,9 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.*
 import io.ktor.websocket.*
 import kotlinx.browser.document
 import kotlinx.coroutines.*
@@ -89,6 +91,19 @@ class AppClient(
         runnerJob = null
     }
 
+    suspend fun loadImage(url: String): ByteArray? {
+        return withContext(coroutineContext) {
+            try {
+                httpClient.get(url) {
+                    contentType(ContentType.Image.PNG)
+                }.bodyAsChannel().toByteArray()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
     fun searchGame(name: String) {
         launch {
             try {
@@ -116,7 +131,7 @@ class AppClient(
             try {
                 httpClient.get("$httpProtocol://${serverAddress()}/items") {
                     contentType(ContentType.Application.Json)
-                }.body()
+                }.body<List<WheelItem>>()
             } catch (e: Exception) {
                 e.printStackTrace()
                 emptyList()
