@@ -42,8 +42,9 @@ kotlin {
     }
 }
 
-compose.experimental {
-    web.application {}
+compose {
+    experimental.web.application {}
+    kotlinCompilerPlugin.set("1.5.8")
 }
 
 fun composePropertiesFromEnv(

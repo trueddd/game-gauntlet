@@ -45,6 +45,7 @@ kotlin {
                 implementation(libs.ktor.server.autohead)
                 implementation(libs.ktor.server.headers.default)
                 implementation(libs.ktor.server.headers.conditional)
+                implementation(libs.ktor.server.caching)
                 implementation(libs.ktor.server.auth.core)
                 implementation(libs.ktor.server.auth.jwt)
                 implementation(libs.ktor.serialization)

@@ -6,10 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextOverflow
@@ -17,17 +15,8 @@ import androidx.compose.ui.unit.dp
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.theme.Colors
+import com.github.trueddd.util.color
 import com.github.trueddd.util.copyToClipBoard
-
-@Stable
-private val WheelItem.color: Color
-    get() = when (this) {
-        is WheelItem.PendingEvent -> Colors.WheelItem.PendingEvent
-        is WheelItem.Event -> Colors.WheelItem.Event
-        is WheelItem.InventoryItem -> Colors.WheelItem.InventoryItem
-        is WheelItem.Effect.Debuff -> Colors.WheelItem.Debuff
-        is WheelItem.Effect.Buff -> Colors.WheelItem.Buff
-    }
 
 @Composable
 private fun RowScope.TableCell(content: @Composable BoxScope.() -> Unit) {
@@ -63,10 +52,12 @@ private fun WheelItems(items: List<WheelItem>) {
 }
 
 @Composable
-fun RowScope.StateTable(globalState: GlobalState) {
+fun StateTable(
+    globalState: GlobalState,
+    modifier: Modifier = Modifier,
+) {
     Column(
-        modifier = Modifier
-            .weight(4f)
+        modifier = modifier
             .background(Colors.SecondaryBackground, RoundedCornerShape(8.dp))
             .padding(16.dp)
     ) {

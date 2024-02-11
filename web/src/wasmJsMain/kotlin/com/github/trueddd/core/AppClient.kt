@@ -2,13 +2,16 @@ package com.github.trueddd.core
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.request.DownloadGameRequestBody
+import com.github.trueddd.items.WheelItem
 import com.github.trueddd.util.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.*
 import io.ktor.websocket.*
 import kotlinx.browser.document
 import kotlinx.coroutines.*
@@ -32,7 +35,15 @@ class AppClient(
     val globalState: StateFlow<GlobalState?>
         get() = _globalState.asStateFlow()
 
+    private val _connectionState = MutableStateFlow<SocketState>(SocketState.Disconnected())
+    val connectionState: StateFlow<SocketState>
+        get() = _connectionState.asStateFlow()
+
     private val actionsChannel = Channel<String>(onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    fun getWheelItemIconUrl(id: Int): String {
+        return "$httpProtocol://${serverAddress()}/icons/$id.png"
+    }
 
     override val coroutineContext by lazy {
         Dispatchers.Default + SupervisorJob()
@@ -49,8 +60,10 @@ class AppClient(
             println("Client is already running")
             return
         }
-        launch {
+        runnerJob = launch {
+            _connectionState.value = SocketState.Connecting
             httpClient.webSocket("$wsProtocol://${serverAddress()}/state") {
+                _connectionState.value = SocketState.Connected
                 launch {
                     for (action in actionsChannel) {
                         outgoing.send(Frame.Text(action))
@@ -67,11 +80,28 @@ class AppClient(
                 }
             }
         }
+        runnerJob?.invokeOnCompletion { throwable ->
+            val error = throwable?.let { Error(it) }
+            _connectionState.value = SocketState.Disconnected(error)
+        }
     }
 
     fun stop() {
         runnerJob?.cancel()
         runnerJob = null
+    }
+
+    suspend fun loadImage(url: String): ByteArray? {
+        return withContext(coroutineContext) {
+            try {
+                httpClient.get(url) {
+                    contentType(ContentType.Image.PNG)
+                }.bodyAsChannel().toByteArray()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
     }
 
     fun searchGame(name: String) {
@@ -92,6 +122,19 @@ class AppClient(
                 link.click()
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+    }
+
+    suspend fun getItems(): List<WheelItem> {
+        return withContext(coroutineContext) {
+            try {
+                httpClient.get("$httpProtocol://${serverAddress()}/items") {
+                    contentType(ContentType.Application.Json)
+                }.body<List<WheelItem>>()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emptyList()
             }
         }
     }

@@ -25,6 +25,7 @@ import com.github.trueddd.data.Participant
 fun Map(globalState: GlobalState) {
     Column(
         modifier = Modifier
+            .padding(16.dp)
             .fillMaxWidth()
     ) {
         FlowRow {
