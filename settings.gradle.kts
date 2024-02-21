@@ -13,6 +13,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     repositories {
         mavenCentral()
         maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-js-wrappers") }
@@ -83,6 +84,10 @@ dependencyResolutionManagement {
 
             library("uuid", "com.benasher44", "uuid").version("0.8.2")
             library("datetime", "org.jetbrains.kotlinx", "kotlinx-datetime").version("0.5.0")
+
+            library("postgres-driver", "org.postgresql:postgresql:42.7.1")
+            library("exposed-core", "org.jetbrains.exposed", "exposed-core").version("0.47.0")
+            library("exposed-jdbc", "org.jetbrains.exposed", "exposed-jdbc").version("0.47.0")
         }
     }
 }

@@ -12,13 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.trueddd.theme.Colors
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.theme.Colors
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -83,18 +82,21 @@ private fun MapCell(index: Int, cell: Game.Genre?, playersPositions: Map<Partici
                 playersPositions
                     .filterValues { it == index }
                     .forEach { (player, _) ->
-                        Text(
-                            text = player.displayName.first().uppercase(),
-                            color = Colors.Primary,
-                            textAlign = TextAlign.Center,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
+                        Box(
                             modifier = Modifier
                                 .size(24.dp)
                                 .background(Color.White, CircleShape)
                                 .border(2.dp, Colors.Primary, CircleShape)
-                                .padding(4.dp)
-                        )
+                        ) {
+                            Text(
+                                text = player.displayName.first().uppercase(),
+                                color = Colors.Primary,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                            )
+                        }
                     }
             }
         }

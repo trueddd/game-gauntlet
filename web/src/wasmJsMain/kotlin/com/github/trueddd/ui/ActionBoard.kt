@@ -94,7 +94,6 @@ fun ActionsBoard(
                         append(":$it")
                     }
                 }.removeSuffix(":")
-                println("sending `$message`")
                 sendAction(message)
             },
             enabled = user != null && socketState is SocketState.Connected,

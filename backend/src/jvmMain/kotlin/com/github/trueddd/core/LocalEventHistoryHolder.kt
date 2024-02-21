@@ -11,11 +11,9 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.koin.core.annotation.Single
 import java.io.File
 import java.util.*
 
-@Single(binds = [EventHistoryHolder::class])
 open class LocalEventHistoryHolder(
     private val actionHandlerRegistry: ActionHandlerRegistry,
 ) : EventHistoryHolder {

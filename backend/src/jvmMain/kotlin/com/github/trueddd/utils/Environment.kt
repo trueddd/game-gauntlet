@@ -45,4 +45,16 @@ object Environment {
     val ClientAddress: String by lazy {
         appConfig.getProperty("CLIENT_ADDRESS")
     }
+
+    val DatabaseUrl: String by lazy {
+        appConfig.getProperty("DB_URL")
+    }
+
+    val DatabaseUser: String by lazy {
+        appConfig.getProperty("DB_USER")
+    }
+
+    val DatabasePassword: String by lazy {
+        appConfig.getProperty("DB_PASS")
+    }
 }

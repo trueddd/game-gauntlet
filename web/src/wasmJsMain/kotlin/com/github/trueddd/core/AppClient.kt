@@ -49,9 +49,10 @@ class AppClient(
         Dispatchers.Default + SupervisorJob()
     }
 
-    fun sendAction(action: String) {
+    fun sendCommand(command: Command) {
         launch {
-            actionsChannel.send(action)
+            println("sending `${command.value}`")
+            actionsChannel.send(command.value)
         }
     }
 
