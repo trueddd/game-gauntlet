@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.trueddd.core.AppClient
+import com.github.trueddd.core.Command
 import com.github.trueddd.core.SocketState
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.di.get
@@ -27,11 +28,18 @@ fun Dashboard(
         ActionsBoard(
             globalState = globalState,
             socketState = socketState,
-            sendAction = { appClient.sendAction(it) },
+            sendAction = { appClient.sendCommand(Command.Action(it)) },
             modifier = Modifier
         )
         StateTable(
             globalState = globalState,
+            modifier = Modifier
+                .weight(1f)
+        )
+        GlobalStateManagement(
+            socketState = socketState,
+            onSaveRequested = { appClient.sendCommand(Command.Save) },
+            onRestoreRequested = { appClient.sendCommand(Command.Restore) },
             modifier = Modifier
         )
     }

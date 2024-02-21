@@ -32,9 +32,14 @@ class EventGateImpl(
         return true
     }
 
-    override fun start() {
-        Log.info(TAG, "Starting...")
+    override fun startNoLoad() {
         eventManager.startHandling()
+    }
+
+    override suspend fun start() {
+        Log.info(TAG, "Starting...")
+        val savedHistory = historyHolder.load()
+        eventManager.startHandling(savedHistory)
     }
 
     override fun stop() {

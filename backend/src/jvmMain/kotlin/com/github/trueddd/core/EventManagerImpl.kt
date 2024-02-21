@@ -34,11 +34,6 @@ class EventManagerImpl(
 
     private val handledActionsFlow = MutableSharedFlow<EventManager.HandledAction>()
 
-    // todo: make it explicit
-    init {
-        startEventHandling()
-    }
-
     private suspend fun sendAction(action: Action) {
         Log.info(TAG, "Consuming action: $action")
         actionsPipe.send(action)

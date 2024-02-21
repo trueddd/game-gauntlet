@@ -25,7 +25,7 @@ kotlin {
     jvm {
         withJava()
         compilations.all {
-            kotlinOptions.jvmTarget = "11"
+            kotlinOptions.jvmTarget = "17"
             kotlinOptions.freeCompilerArgs = listOf("-Xcontext-receivers")
         }
     }
@@ -52,6 +52,9 @@ kotlin {
                 implementation(libs.koin.ktor)
                 implementation(libs.torrent.core)
                 implementation(libs.torrent.dht)
+                implementation(libs.exposed.core)
+                implementation(libs.exposed.jdbc)
+                implementation(libs.postgres.driver)
             }
         }
         val jvmTest by getting {
@@ -84,8 +87,8 @@ fun composePropertiesFromEnv(
     fileName: String,
     propertyKeys: List<String>,
 ) {
-    val destinationDir = buildDir.resolve("libs")
-    val file = destinationDir.resolve(fileName)
+    val destinationDir = layout.buildDirectory.dir("libs").get()
+    val file = destinationDir.file(fileName).asFile
     if (!file.exists()) {
         file.createNewFile()
     } else {
