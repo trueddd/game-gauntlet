@@ -2,16 +2,15 @@ package com.github.trueddd.gateway
 
 import com.github.trueddd.core.Command
 import com.github.trueddd.core.EventGate
+import com.github.trueddd.core.Response
+import com.github.trueddd.utils.Environment
 import com.github.trueddd.utils.Log
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.koin.ktor.ext.inject
 
 private const val TAG = "EventGate"
@@ -23,25 +22,18 @@ fun Routing.setupEventGate() {
     }
 
     webSocket("/state") {
-        val encoder = Json {
-            allowStructuredMapKeys = true
-        }
-        val verbalState = call.parameters.contains("verbal", "1")
         eventGate.stateHolder.globalStateFlow
             .onStart { Log.info(TAG, "Listening to global state in session ${this@webSocket}") }
-            .onEach { state ->
-                val encoded = if (verbalState) {
-                    "New game state: $state"
-                } else {
-                    encoder.encodeToString(state)
-                }
-                outgoing.send(Frame.Text(encoded))
-            }
+            .map { Response.State(it) }
+            .onEach { outgoing.sendResponse(it) }
+            .onCompletion { Log.info(TAG, "Ending global state session ${this@webSocket}") }
             .launchIn(this)
         for (frame in incoming) {
             if (frame is Frame.Text) {
                 val text = frame.readText()
-                outgoing.send(Frame.Text("YOU SAID: $text"))
+                if (Environment.IsDev) {
+                    outgoing.sendResponse(Response.Info("YOU SAID: $text"))
+                }
                 when (val command = Command.parseCommand(text)) {
                     is Command.Start -> eventGate.eventManager.startHandling()
                     is Command.Disconnect -> close(CloseReason(
@@ -56,9 +48,19 @@ fun Routing.setupEventGate() {
                     }
                     is Command.Action -> eventGate.parseAndHandle(command.payload)
                     is Command.Reset -> eventGate.resetState()
-                    null -> outgoing.send(Frame.Text("Unrecognised command: $text"))
+                    null -> outgoing.sendResponse(Response.Error(Exception("Unrecognised command: `$text`")))
                 }
             }
         }
     }
+
+    webSocket("/actions") {
+        for (action in eventGate.historyHolder.actionsChannel) {
+            outgoing.sendResponse(Response.UserAction(action))
+        }
+    }
+}
+
+private suspend fun SendChannel<Frame>.sendResponse(response: Response) {
+    send(Frame.Text(response.serialized))
 }

@@ -7,7 +7,9 @@ import com.github.trueddd.data.globalState
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -35,17 +37,20 @@ open class LocalEventHistoryHolder(
 
     private val monitor = Mutex(locked = false)
 
+    override val actionsChannel = Channel<Action>()
+
+    override suspend fun getActions(): List<Action> {
+        return monitor.withLock { latestEvents.toList() }
+    }
+
     override suspend fun pushEvent(action: Action) {
-        monitor.lock()
-        latestEvents.push(action)
-        monitor.unlock()
+        monitor.withLock { latestEvents.push(action) }
+        actionsChannel.send(action)
     }
 
     override suspend fun save(globalState: GlobalState) {
         Log.info(TAG, "Saving Global state")
-        monitor.lock()
-        val eventsToSave = latestEvents.toList()
-        monitor.unlock()
+        val eventsToSave = getActions()
         val mapLayout = Json.encodeToString(GameGenreDistribution.serializer(), globalState.gameGenreDistribution)
         val events = eventsToSave
             .asReversed()
