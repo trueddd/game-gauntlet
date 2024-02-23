@@ -40,6 +40,7 @@ fun Dashboard(
             socketState = socketState,
             onSaveRequested = { appClient.sendCommand(Command.Save) },
             onRestoreRequested = { appClient.sendCommand(Command.Restore) },
+            onResetRequested = { appClient.sendCommand(Command.Reset) },
             modifier = Modifier
         )
     }

@@ -48,4 +48,12 @@ class EventGateImpl(
         stateHolder.update { globalState() }
         historyHolder.drop()
     }
+
+    override fun resetState() {
+        Log.info(TAG, "Resetting in-memory state...")
+        eventManager.stopHandling()
+        stateHolder.update { globalState() }
+        historyHolder.drop()
+        eventManager.startHandling()
+    }
 }

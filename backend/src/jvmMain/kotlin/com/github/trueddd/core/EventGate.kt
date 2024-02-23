@@ -22,4 +22,6 @@ interface EventGate {
     fun startNoLoad()
 
     fun stop()
+
+    fun resetState()
 }

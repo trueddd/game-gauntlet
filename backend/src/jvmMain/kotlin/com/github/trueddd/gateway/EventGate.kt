@@ -55,6 +55,7 @@ fun Routing.setupEventGate() {
                         eventGate.eventManager.startHandling(initState = restored)
                     }
                     is Command.Action -> eventGate.parseAndHandle(command.payload)
+                    is Command.Reset -> eventGate.resetState()
                     null -> outgoing.send(Frame.Text("Unrecognised command: $text"))
                 }
             }
