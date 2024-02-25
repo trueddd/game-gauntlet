@@ -6,15 +6,14 @@ import com.github.trueddd.di.getItemFactoriesSet
 import com.github.trueddd.utils.Environment
 import com.github.trueddd.utils.createTorrentClient
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
-import io.ktor.http.content.CachingOptions
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
-import java.io.File
 import java.nio.file.Files
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -29,7 +28,7 @@ fun Application.configureRouting() {
             }
         }
 
-        staticFiles("/icons", File("src/jvmMain/resources/icons/items"))
+        staticResources("/icons", "icons/items")
 
         get("/actions") {
             call.respond(eventGate.historyHolder.getActions())
