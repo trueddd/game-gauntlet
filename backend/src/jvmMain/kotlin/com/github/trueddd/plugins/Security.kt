@@ -17,7 +17,7 @@ object Jwt {
 fun Application.configureSecurity() {
     authentication {
         jwt {
-            val config = Environment.resolveConfig("jwt.properties")
+            val config = Environment.resolveConfig()
             val jwtAudience = config.getProperty(Jwt.AUDIENCE)
             realm = config.getProperty(Jwt.REALM)
             verifier(

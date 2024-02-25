@@ -1,5 +1,3 @@
-import java.io.IOException
-
 plugins {
     kotlin("multiplatform")
     application
@@ -81,55 +79,6 @@ dependencies {
 
 tasks.named("build") {
     dependsOn(":common:build")
-}
-
-fun composePropertiesFromEnv(
-    fileName: String,
-    propertyKeys: List<String>,
-) {
-    val destinationDir = layout.buildDirectory.dir("libs").get()
-    val file = destinationDir.file(fileName).asFile
-    if (!file.exists()) {
-        file.createNewFile()
-    } else {
-        file.writeText("")
-    }
-    val properties = propertyKeys
-        .associateWith { System.getenv(it) }
-        .filterValues { it != null }
-        .toProperties()
-    println(properties.toString())
-    val stream = file.outputStream()
-    try {
-        properties.store(stream, null)
-    } catch (e: IOException) {
-        e.printStackTrace()
-    } finally {
-        stream.close()
-    }
-}
-
-tasks.named("buildFatJar") {
-    doLast {
-        composePropertiesFromEnv(
-            fileName = "app.properties",
-            propertyKeys = listOf(
-                "DEV",
-                "GAMES_DIR",
-                "GAMES_MAGNET_URI",
-                "CLIENT_ADDRESS",
-            )
-        )
-        composePropertiesFromEnv(
-            fileName = "jwt.properties",
-            propertyKeys = listOf(
-                "JWT_AUDIENCE",
-                "JWT_DOMAIN",
-                "JWT_REALM",
-                "JWT_SECRET",
-            )
-        )
-    }
 }
 
 tasks.create("stage") {
