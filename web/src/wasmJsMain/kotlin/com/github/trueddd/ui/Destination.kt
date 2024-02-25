@@ -1,5 +1,8 @@
 package com.github.trueddd.ui
 
+import androidx.compose.runtime.Stable
+
+@Stable
 sealed class Destination(val name: String) {
 
     companion object {
