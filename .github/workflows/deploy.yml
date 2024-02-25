@@ -10,9 +10,9 @@ jobs:
     name: Build frontend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -20,15 +20,15 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@v1
+        uses: gradle/wrapper-validation-action@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
       - name: Build JS artifacts
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: wasmJsBrowserWebpack
+        run: ./gradlew wasmJsBrowserWebpack
         env:
           SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3.0.0
+        uses: actions/upload-pages-artifact@v3
         with:
           path: web/build/dist/wasmJs/productionExecutable
   deploy_frontend:

@@ -24,7 +24,7 @@ kotlin {
                 api(project(":annotations"))
                 implementation(libs.serialization)
                 implementation(libs.uuid)
-                implementation(libs.datetime)
+                api(libs.datetime)
             }
         }
         val commonTest by getting {

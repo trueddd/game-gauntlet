@@ -21,6 +21,11 @@ sealed class Command(val value: String) {
     data object Restore : Command("load")
 
     /**
+     * Reset current store
+     */
+    data object Reset : Command("reset")
+
+    /**
      * Disconnects client from socket
      */
     data object Disconnect : Command("bye")
@@ -38,6 +43,7 @@ sealed class Command(val value: String) {
                 input == "save" -> Save
                 input == "load" -> Restore
                 input == "bye" -> Disconnect
+                input == "reset" -> Reset
                 else -> null
             }
         }

@@ -1,5 +1,6 @@
 package com.github.trueddd.plugins
 
+import com.github.trueddd.core.EventGate
 import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.di.getItemFactoriesSet
 import com.github.trueddd.utils.Environment
@@ -12,12 +13,15 @@ import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.koin.ktor.ext.inject
 import java.io.File
 import java.nio.file.Files
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 fun Application.configureRouting() {
+    val eventGate by inject<EventGate>()
+
     routing {
         install(CachingHeaders) {
             options { _, _ ->
@@ -26,6 +30,10 @@ fun Application.configureRouting() {
         }
 
         staticFiles("/icons", File("src/jvmMain/resources/icons/items"))
+
+        get("/actions") {
+            call.respond(eventGate.historyHolder.getActions())
+        }
 
         post("/game") {
             val fileToLoad = try {

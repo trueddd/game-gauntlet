@@ -1,12 +1,13 @@
 package com.github.trueddd
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.hoverable
-import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -26,8 +27,6 @@ import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.*
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
@@ -71,6 +70,7 @@ private fun App(
         val destinations = Destination.all()
         var destination by remember { mutableStateOf(destinations.first()) }
         TopPanel(
+            currentDestination = destination,
             destinations = destinations,
             onDestinationChanged = { destination = it },
             modifier = Modifier
@@ -114,6 +114,7 @@ private fun App(
 
 @Composable
 private fun TopPanel(
+    currentDestination: Destination,
     destinations: List<Destination>,
     modifier: Modifier = Modifier,
     onDestinationChanged: (Destination) -> Unit = {},
@@ -133,24 +134,41 @@ private fun TopPanel(
                 )
             }
             val interactionSource = remember { MutableInteractionSource() }
-            val hovered by interactionSource.interactions
-                .filter { it is HoverInteraction }
-                .map { it is HoverInteraction.Enter }
-                .collectAsState(initial = false)
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
+                    .heightIn(min = 52.dp)
                     .weight(1f)
-                    .background(if (hovered) Colors.SecondaryBackground else Colors.DarkBackground)
+                    .background(Colors.DarkBackground)
                     .pointerHoverIcon(PointerIcon.Hand)
-                    .hoverable(interactionSource)
-                    .clickable { onDestinationChanged(destination) }
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        onClick = { onDestinationChanged(destination) },
+                    )
             ) {
-                Text(
-                    text = destination.name,
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier
-                        .padding(12.dp)
-                )
+                ) {
+                    Text(
+                        text = destination.name,
+                        modifier = Modifier
+                    )
+                    AnimatedVisibility(
+                        visible = currentDestination == destination,
+                        modifier = Modifier,
+                        enter = expandVertically(),
+                        exit = shrinkVertically(),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(4.dp)
+                                .background(Colors.Primary, CircleShape)
+                        )
+                    }
+                }
             }
         }
     }

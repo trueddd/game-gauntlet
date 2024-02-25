@@ -1,12 +1,10 @@
 package com.github.trueddd.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.trueddd.actions.Action
 import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.Command
 import com.github.trueddd.core.SocketState
@@ -25,22 +23,46 @@ fun Dashboard(
         modifier = modifier
             .padding(16.dp)
     ) {
-        ActionsBoard(
-            globalState = globalState,
-            socketState = socketState,
-            sendAction = { appClient.sendCommand(Command.Action(it)) },
-            modifier = Modifier
-        )
-        StateTable(
-            globalState = globalState,
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .weight(1f)
-        )
-        GlobalStateManagement(
-            socketState = socketState,
-            onSaveRequested = { appClient.sendCommand(Command.Save) },
-            onRestoreRequested = { appClient.sendCommand(Command.Restore) },
+        ) {
+            ActionsBoard(
+                globalState = globalState,
+                socketState = socketState,
+                sendAction = { appClient.sendCommand(Command.Action(it)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+            GlobalStateManagement(
+                socketState = socketState,
+                onSaveRequested = { appClient.sendCommand(Command.Save) },
+                onRestoreRequested = { appClient.sendCommand(Command.Restore) },
+                onResetRequested = { appClient.sendCommand(Command.Reset) },
+                modifier = Modifier
+            )
+        }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
-        )
+                .weight(3f)
+        ) {
+            var actions by remember { mutableStateOf(emptyList<Action>()) }
+            LaunchedEffect(Unit) {
+                appClient.getActionsFlow()
+                    .collect {
+                        actions = it + actions
+                    }
+            }
+            StateTable(
+                globalState = globalState,
+                modifier = Modifier
+            )
+            ActionsLog(
+                actions = actions,
+                modifier = Modifier
+            )
+        }
     }
 }

@@ -27,5 +27,5 @@ val module = module {
         }
     }
 
-    single { AppClient(httpClient = get(), decoder = get()) }
+    single { AppClient(httpClient = get()) }
 }

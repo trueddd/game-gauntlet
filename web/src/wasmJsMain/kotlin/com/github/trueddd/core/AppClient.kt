@@ -1,9 +1,13 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.items.WheelItem
-import com.github.trueddd.util.*
+import com.github.trueddd.util.httpProtocol
+import com.github.trueddd.util.serverAddress
+import com.github.trueddd.util.toBlob
+import com.github.trueddd.util.wsProtocol
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -17,16 +21,13 @@ import kotlinx.browser.document
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.serialization.json.Json
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.*
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.url.URL
 
 class AppClient(
     private val httpClient: HttpClient,
-    private val decoder: Json,
 ) : CoroutineScope {
 
     private var runnerJob: Job? = null
@@ -72,12 +73,13 @@ class AppClient(
                 }
                 for (frame in incoming) {
                     val textFrame = frame as? Frame.Text ?: continue
-                    val data = textFrame.readText()
-                    if (data.startsWith("YOU SAID")) {
-                        continue
+                    val data = Response.parse(textFrame.readText().also { println(it) }) ?: continue
+                    when (data) {
+                        is Response.UserAction -> continue
+                        is Response.Error -> println("Error occured: ${data.exception.message}")
+                        is Response.Info -> println("Message from server: ${data.message}")
+                        is Response.State -> _globalState.emit(data.globalState)
                     }
-                    println("Received data: $data")
-                    decoder.decodeFromString<GlobalState>(data).let { _globalState.value = it }
                 }
             }
         }
@@ -90,6 +92,37 @@ class AppClient(
     fun stop() {
         runnerJob?.cancel()
         runnerJob = null
+    }
+
+    fun getActionsFlow(): Flow<List<Action>> {
+        return callbackFlow {
+            send(loadActions())
+            val session = httpClient.webSocketSession("$wsProtocol://${serverAddress()}/actions")
+            launch {
+                for (frame in session.incoming) {
+                    val textFrame = frame as? Frame.Text ?: continue
+                    val data = Response.parse(textFrame.readText()) ?: continue
+                    if (data is Response.UserAction) {
+                        println("New action received: ${data.action}")
+                        this@callbackFlow.send(listOf(data.action))
+                    }
+                }
+            }
+            awaitClose {
+                session.cancel()
+            }
+        }
+    }
+
+    private suspend fun loadActions(): List<Action> {
+        return try {
+            httpClient.get("$httpProtocol://${serverAddress()}/actions") {
+                contentType(ContentType.Application.Json)
+            }.body()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
     }
 
     suspend fun loadImage(url: String): ByteArray? {

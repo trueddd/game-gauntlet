@@ -9,7 +9,10 @@ import com.github.trueddd.utils.Environment
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -30,32 +33,36 @@ class DatabaseEventHistoryHolder(
 
     private val latestEvents = LinkedList<Action>()
 
+    override val actionsChannel = MutableSharedFlow<Action>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
     private val monitor = Mutex(locked = false)
 
-    private val database: Database by lazy {
-        Database.connect(
-            url = Environment.DatabaseUrl,
-            driver = "org.postgresql.Driver",
-            user = Environment.DatabaseUser,
-            password = Environment.DatabasePassword,
-        ).apply {
-            transaction {
-                SchemaUtils.createMissingTablesAndColumns(ActionsTable)
-            }
+    private val database = Database.connect(
+        url = Environment.DatabaseUrl,
+        driver = "org.postgresql.Driver",
+        user = Environment.DatabaseUser,
+        password = Environment.DatabasePassword,
+    ).apply {
+        transaction {
+            SchemaUtils.createMissingTablesAndColumns(ActionsTable)
         }
     }
 
+    override suspend fun getActions(): List<Action> {
+        return monitor.withLock { latestEvents.toList() }
+    }
+
     override suspend fun pushEvent(action: Action) {
-        monitor.lock()
-        latestEvents.push(action)
-        monitor.unlock()
+        monitor.withLock { latestEvents.push(action) }
+        actionsChannel.emit(action)
     }
 
     override suspend fun save(globalState: GlobalState) {
         Log.info(TAG, "Saving Global state")
-        monitor.lock()
-        val eventsToSave = latestEvents.toList()
-        monitor.unlock()
+        val eventsToSave = getActions()
         val mapLayout = Json.encodeToString(
             GameGenreDistribution.serializer(),
             globalState.gameGenreDistribution
@@ -77,9 +84,11 @@ class DatabaseEventHistoryHolder(
     }
 
     override suspend fun load(): GlobalState {
+        monitor.lock()
         val records = suspendedTransactionAsync(Dispatchers.IO, database) {
             ActionsTable.selectAll().map { it[ActionsTable.value] }
         }.await()
+        Log.info(TAG, "Records found: ${records.size}")
         if (records.isEmpty()) {
             return globalState()
         }
@@ -94,7 +103,7 @@ class DatabaseEventHistoryHolder(
         val initialState = globalState(genreDistribution = mapLayout)
         return events.fold(initialState) { state, action ->
             val handler = actionHandlerRegistry.handlerOf(action) ?: return@fold state
-            pushEvent(action)
+            latestEvents.push(action)
             try {
                 handler.handle(action, state)
             } catch (error: StateModificationException) {
@@ -103,7 +112,7 @@ class DatabaseEventHistoryHolder(
                 error.printStackTrace()
                 state
             }
-        }
+        }.also { monitor.unlock() }
     }
 
     override fun drop() {

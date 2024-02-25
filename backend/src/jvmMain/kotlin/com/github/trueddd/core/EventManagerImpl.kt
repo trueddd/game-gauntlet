@@ -3,12 +3,9 @@ package com.github.trueddd.core
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.utils.Log
+import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.sync.Mutex
 import org.koin.core.annotation.Single
 
@@ -32,8 +29,6 @@ class EventManagerImpl(
 
     private val eventHandlingMonitor = Mutex(false)
 
-    private val handledActionsFlow = MutableSharedFlow<EventManager.HandledAction>()
-
     private suspend fun sendAction(action: Action) {
         Log.info(TAG, "Consuming action: $action")
         actionsPipe.send(action)
@@ -46,12 +41,7 @@ class EventManagerImpl(
     }
 
     override suspend fun suspendConsumeAction(action: Action): EventManager.HandledAction {
-        val handledAction = handledActionsFlow
-            .onSubscription { sendAction(action) }
-            .filter { (id, issuedAt, _) -> id == action.id && issuedAt == action.issuedAt }
-            .first()
-        Log.info(TAG, "Action(${action.id}) handled")
-        return handledAction
+        return handleAction(action).also { Log.info(TAG, "Action(${action.id}) handled") }
     }
 
     override fun stopHandling() {
@@ -66,6 +56,25 @@ class EventManagerImpl(
         startEventHandling()
     }
 
+    private suspend fun handleAction(action: Action): EventManager.HandledAction {
+        val handler = actionHandlerRegistry.handlerOf(action)
+            ?: return EventManager.HandledAction(
+                action.id,
+                action.issuedAt,
+                StateModificationException(action, "No suitable handler found for action: $action")
+            )
+        eventHandlingMonitor.lock()
+        return try {
+            val result = handler.handle(action, stateHolder.globalStateFlow.value)
+            stateHolder.update { result }
+            EventManager.HandledAction(action.id, action.issuedAt)
+        } catch (error: Exception) {
+            EventManager.HandledAction(action.id, action.issuedAt, error)
+        } finally {
+            eventHandlingMonitor.unlock()
+        }
+    }
+
     private fun startEventHandling() {
         if (eventHandlingJob?.isActive == true) {
             Log.error(TAG, "EventManager is already running; skip start")
@@ -74,17 +83,7 @@ class EventManagerImpl(
         eventHandlingJob = launch {
             Log.info(TAG, "Starting")
             for (action in actionsPipe) {
-                val handler = actionHandlerRegistry.handlerOf(action) ?: continue
-                eventHandlingMonitor.lock()
-                try {
-                    val result = handler.handle(action, stateHolder.globalStateFlow.value)
-                    stateHolder.update { result }
-                    handledActionsFlow.emit(EventManager.HandledAction(action.id, action.issuedAt))
-                } catch (error: Exception) {
-                    handledActionsFlow.emit(EventManager.HandledAction(action.id, action.issuedAt, error))
-                } finally {
-                    eventHandlingMonitor.unlock()
-                }
+                handleAction(action)
             }
         }
     }
