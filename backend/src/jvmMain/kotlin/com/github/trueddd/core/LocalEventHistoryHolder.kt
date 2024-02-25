@@ -38,7 +38,10 @@ open class LocalEventHistoryHolder(
 
     private val monitor = Mutex(locked = false)
 
-    override val actionsChannel = MutableSharedFlow<Action>(onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    override val actionsChannel = MutableSharedFlow<Action>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
 
     override suspend fun getActions(): List<Action> {
         return monitor.withLock { latestEvents.toList() }
