@@ -1,15 +1,10 @@
 package com.github.trueddd.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.trueddd.actions.Action
 import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.Command
 import com.github.trueddd.core.SocketState
@@ -29,13 +24,16 @@ fun Dashboard(
             .padding(16.dp)
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .weight(1f)
         ) {
             ActionsBoard(
                 globalState = globalState,
                 socketState = socketState,
                 sendAction = { appClient.sendCommand(Command.Action(it)) },
                 modifier = Modifier
+                    .fillMaxWidth()
             )
             GlobalStateManagement(
                 socketState = socketState,
@@ -48,9 +46,15 @@ fun Dashboard(
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
-                .weight(1f)
+                .weight(3f)
         ) {
-            val actions by appClient.getActionsFlow().collectAsState(emptyList())
+            var actions by remember { mutableStateOf(emptyList<Action>()) }
+            LaunchedEffect(Unit) {
+                appClient.getActionsFlow()
+                    .collect {
+                        actions = it + actions
+                    }
+            }
             StateTable(
                 globalState = globalState,
                 modifier = Modifier

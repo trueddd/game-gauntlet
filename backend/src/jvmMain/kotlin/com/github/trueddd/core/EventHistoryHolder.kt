@@ -2,11 +2,11 @@ package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 
 interface EventHistoryHolder {
 
-    val actionsChannel: Channel<Action>
+    val actionsChannel: Flow<Action>
 
     suspend fun getActions(): List<Action>
 

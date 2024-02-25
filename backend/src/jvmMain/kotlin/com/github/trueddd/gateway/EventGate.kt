@@ -8,6 +8,7 @@ import com.github.trueddd.utils.Log
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -55,9 +56,10 @@ fun Routing.setupEventGate() {
     }
 
     webSocket("/actions") {
-        for (action in eventGate.historyHolder.actionsChannel) {
-            outgoing.sendResponse(Response.UserAction(action))
-        }
+        eventGate.historyHolder.actionsChannel
+            .onEach { outgoing.sendResponse(Response.UserAction(it)) }
+            .launchIn(this)
+        awaitCancellation()
     }
 }
 

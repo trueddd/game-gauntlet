@@ -10,7 +10,7 @@ import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -33,7 +33,10 @@ class DatabaseEventHistoryHolder(
 
     private val latestEvents = LinkedList<Action>()
 
-    override val actionsChannel = Channel<Action>(onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    override val actionsChannel = MutableSharedFlow<Action>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
 
     private val monitor = Mutex(locked = false)
 
@@ -54,7 +57,7 @@ class DatabaseEventHistoryHolder(
 
     override suspend fun pushEvent(action: Action) {
         monitor.withLock { latestEvents.push(action) }
-        actionsChannel.send(action)
+        actionsChannel.emit(action)
     }
 
     override suspend fun save(globalState: GlobalState) {

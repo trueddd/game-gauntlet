@@ -78,7 +78,7 @@ class AppClient(
                         is Response.UserAction -> continue
                         is Response.Error -> println("Error occured: ${data.exception.message}")
                         is Response.Info -> println("Message from server: ${data.message}")
-                        is Response.State -> _globalState.value = data.globalState
+                        is Response.State -> _globalState.emit(data.globalState)
                     }
                 }
             }
@@ -95,23 +95,21 @@ class AppClient(
     }
 
     fun getActionsFlow(): Flow<List<Action>> {
-        val actions = mutableListOf<Action>()
         return callbackFlow {
-            actions.addAll(loadActions())
-            send(actions)
-            val sessionJob = launch(coroutineContext) {
-                val session = httpClient.webSocketSession("$wsProtocol://${serverAddress()}/actions")
+            send(loadActions())
+            val session = httpClient.webSocketSession("$wsProtocol://${serverAddress()}/actions")
+            launch {
                 for (frame in session.incoming) {
                     val textFrame = frame as? Frame.Text ?: continue
                     val data = Response.parse(textFrame.readText()) ?: continue
                     if (data is Response.UserAction) {
-                        actions.add(0, data.action)
-                        this@callbackFlow.send(actions)
+                        println("New action received: ${data.action}")
+                        this@callbackFlow.send(listOf(data.action))
                     }
                 }
             }
             awaitClose {
-                sessionJob.cancel()
+                session.cancel()
             }
         }
     }

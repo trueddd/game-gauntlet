@@ -1,11 +1,17 @@
 package com.github.trueddd.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -70,18 +76,41 @@ fun ActionsBoard(
             modifier = Modifier
         )
         Text(
-            text = "Arguments",
+            text = "Arguments (divided by `,`)",
             color = Colors.Text,
             modifier = Modifier
                 .padding(top = 8.dp)
         )
-        TextField(
-            value = arguments,
-            onValueChange = { arguments = it },
-            singleLine = true,
-            colors = TextFieldDefaults.textFieldColors(textColor = Colors.Text),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
-        )
+                .fillMaxWidth()
+        ) {
+            TextField(
+                value = arguments,
+                onValueChange = { arguments = it },
+                singleLine = true,
+                colors = TextFieldDefaults.textFieldColors(textColor = Colors.Text),
+                modifier = Modifier
+                    .weight(1f)
+            )
+            AnimatedVisibility(
+                visible = arguments.isNotEmpty(),
+                enter = expandHorizontally(),
+                exit = shrinkHorizontally(),
+                modifier = Modifier
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Clear arguments",
+                    tint = Colors.Primary,
+                    modifier = Modifier
+                        .pointerHoverIcon(PointerIcon.Hand)
+                        .clickable { arguments = "" }
+                )
+            }
+        }
         Button(
             onClick = {
                 val readyUser = user?.name ?: return@Button
