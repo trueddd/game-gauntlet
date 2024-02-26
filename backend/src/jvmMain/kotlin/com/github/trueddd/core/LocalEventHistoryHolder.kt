@@ -7,19 +7,14 @@ import com.github.trueddd.data.globalState
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
-import java.util.*
 
 open class LocalEventHistoryHolder(
     private val actionHandlerRegistry: ActionHandlerRegistry,
-) : EventHistoryHolder {
+) : BaseEventHistoryHolder() {
 
     companion object {
         private const val TAG = "EventHistoryHolder"
@@ -32,24 +27,6 @@ open class LocalEventHistoryHolder(
     private val historyHolderFile by lazy {
         File(saveLocation)
             .also { it.createNewFile() }
-    }
-
-    private val latestEvents = LinkedList<Action>()
-
-    private val monitor = Mutex(locked = false)
-
-    override val actionsChannel = MutableSharedFlow<Action>(
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-
-    override suspend fun getActions(): List<Action> {
-        return monitor.withLock { latestEvents.toList() }
-    }
-
-    override suspend fun pushEvent(action: Action) {
-        monitor.withLock { latestEvents.push(action) }
-        actionsChannel.emit(action)
     }
 
     override suspend fun save(globalState: GlobalState) {
@@ -96,9 +73,5 @@ open class LocalEventHistoryHolder(
                 }
             }
         }
-    }
-
-    override fun drop() {
-        latestEvents.clear()
     }
 }

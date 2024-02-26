@@ -9,10 +9,6 @@ plugins {
 kotlin {
     jvm {
     }
-    js(IR) {
-        browser()
-        binaries.library()
-    }
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
@@ -36,8 +32,6 @@ kotlin {
             dependencies {
                 api(project(":di"))
             }
-        }
-        val jsMain by getting {
         }
         val wasmJsMain by getting {
         }

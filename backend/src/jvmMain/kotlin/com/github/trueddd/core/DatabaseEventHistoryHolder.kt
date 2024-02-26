@@ -9,10 +9,6 @@ import com.github.trueddd.utils.Environment
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -20,25 +16,15 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.annotation.Single
-import java.util.*
 
 @Single(binds = [EventHistoryHolder::class])
 class DatabaseEventHistoryHolder(
     private val actionHandlerRegistry: ActionHandlerRegistry,
-) : EventHistoryHolder {
+) : BaseEventHistoryHolder() {
 
     companion object {
         private const val TAG = "DatabaseEventHistoryHolder"
     }
-
-    private val latestEvents = LinkedList<Action>()
-
-    override val actionsChannel = MutableSharedFlow<Action>(
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-
-    private val monitor = Mutex(locked = false)
 
     private val database = Database.connect(
         url = Environment.DatabaseUrl,
@@ -49,15 +35,6 @@ class DatabaseEventHistoryHolder(
         transaction {
             SchemaUtils.createMissingTablesAndColumns(ActionsTable)
         }
-    }
-
-    override suspend fun getActions(): List<Action> {
-        return monitor.withLock { latestEvents.toList() }
-    }
-
-    override suspend fun pushEvent(action: Action) {
-        monitor.withLock { latestEvents.push(action) }
-        actionsChannel.emit(action)
     }
 
     override suspend fun save(globalState: GlobalState) {
@@ -84,7 +61,7 @@ class DatabaseEventHistoryHolder(
     }
 
     override suspend fun load(): GlobalState {
-        monitor.lock()
+        mutex.lock()
         val records = suspendedTransactionAsync(Dispatchers.IO, database) {
             ActionsTable.selectAll().map { it[ActionsTable.value] }
         }.await()
@@ -112,10 +89,6 @@ class DatabaseEventHistoryHolder(
                 error.printStackTrace()
                 state
             }
-        }.also { monitor.unlock() }
-    }
-
-    override fun drop() {
-        latestEvents.clear()
+        }.also { mutex.unlock() }
     }
 }

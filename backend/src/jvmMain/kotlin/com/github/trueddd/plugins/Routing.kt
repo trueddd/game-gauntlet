@@ -1,10 +1,10 @@
 package com.github.trueddd.plugins
 
 import com.github.trueddd.core.EventGate
+import com.github.trueddd.core.GameLoader
 import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.di.getItemFactoriesSet
 import com.github.trueddd.utils.Environment
-import com.github.trueddd.utils.createTorrentClient
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -13,10 +13,8 @@ import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.koin.ktor.ext.get
 import org.koin.ktor.ext.inject
-import java.nio.file.Files
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 fun Application.configureRouting() {
     val eventGate by inject<EventGate>()
@@ -44,36 +42,20 @@ fun Application.configureRouting() {
                     throw e
                 }
             }
-            val currentDir = Environment.GamesDirectory
-                .resolve(call.request.hashCode().toString())
-                .also { it.mkdir() }
-            val client = createTorrentClient(fileToLoad, currentDir)
-            suspendCoroutine { con ->
-                client.startAsync({
-                    if (it.piecesRemaining == 0) {
-                        client.stop()
-                        con.resume(Unit)
-                    }
-                }, 1000L).join()
-            }
-            val downloadedFile = currentDir.walk()
-                .filter { it.isFile }
-                .filter { it.nameWithoutExtension.equals(fileToLoad, ignoreCase = true) }
-                .firstOrNull() ?: run {
+            val gameLoader = this@routing.get<GameLoader>()
+            val downloadedFile = gameLoader.loadGame(fileToLoad) ?: run {
                 call.respond(HttpStatusCode.NotFound, "No game was found with name `$fileToLoad`")
                 return@post
             }
-            Files.copy(downloadedFile.toPath(), Environment.GamesDirectory.resolve(downloadedFile.name).toPath())
-            currentDir.deleteRecursively()
             call.response.header(
                 HttpHeaders.ContentDisposition,
                 ContentDisposition.Attachment
                     .withParameter(ContentDisposition.Parameters.FileName, downloadedFile.name)
                     .toString()
             )
-            call.respondFile(Environment.GamesDirectory.resolve(downloadedFile.name))
+            call.respondFile(downloadedFile)
             if (call.response.isSent) {
-                Environment.GamesDirectory.resolve(downloadedFile.name).delete()
+                downloadedFile.delete()
             }
         }
 

@@ -55,7 +55,7 @@ fun Rules(
             items(items) { item ->
                 Row {
                     AsyncImage(
-                        model = appClient.getWheelItemIconUrl(item.iconId),
+                        model = appClient.router.wheelItemIconUrl(item.iconId),
                         modifier = Modifier
                             .size(48.dp)
                             .background(Color.White)
