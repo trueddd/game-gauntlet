@@ -20,7 +20,13 @@ interface EventManager {
         val id: Int,
         val issuedAt: Long,
         val error: Exception? = null,
-    )
+    ) {
+        companion object {
+            fun from(action: Action, error: Exception? = null): HandledAction {
+                return HandledAction(action.id, action.issuedAt, error)
+            }
+        }
+    }
 
     fun consumeAction(action: Action)
 

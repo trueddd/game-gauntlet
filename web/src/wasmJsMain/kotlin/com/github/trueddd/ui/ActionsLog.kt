@@ -16,8 +16,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.trueddd.actions.*
 import com.github.trueddd.theme.Colors
+import com.github.trueddd.utils.DefaultTimeZone
 import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 @Composable
@@ -51,7 +51,7 @@ private val Int.twoDigitString
 
 private fun Long.formatDate(): String {
     return Instant.fromEpochMilliseconds(this)
-        .toLocalDateTime(TimeZone.UTC)
+        .toLocalDateTime(DefaultTimeZone)
         .run {
             buildString {
                 append(hour.twoDigitString)

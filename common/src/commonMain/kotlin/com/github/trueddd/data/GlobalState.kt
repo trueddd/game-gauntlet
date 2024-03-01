@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GlobalState(
     val startDate: Long,
-    // TODO: Add end date check for input actions
     val endDate: Long,
     val players: Map<Participant, PlayerState>,
     val boardLength: Int,

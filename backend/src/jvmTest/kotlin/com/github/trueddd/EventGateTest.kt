@@ -51,7 +51,7 @@ abstract class EventGateTest {
     }
 
     @BeforeEach
-    fun startEventGate() {
+    open fun startEventGate() {
         eventGate.startNoLoad()
     }
 

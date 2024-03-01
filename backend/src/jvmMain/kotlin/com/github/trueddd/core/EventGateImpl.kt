@@ -1,5 +1,6 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.globalState
 import com.github.trueddd.utils.Log
 import org.koin.core.annotation.Single
@@ -32,8 +33,8 @@ class EventGateImpl(
         return true
     }
 
-    override fun startNoLoad() {
-        eventManager.startHandling()
+    override fun startNoLoad(initialState: GlobalState) {
+        eventManager.startHandling(initialState)
     }
 
     override suspend fun start() {

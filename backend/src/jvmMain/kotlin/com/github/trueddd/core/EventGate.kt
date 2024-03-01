@@ -1,5 +1,7 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.globalState
 import org.jetbrains.annotations.TestOnly
 
 interface EventGate {
@@ -19,7 +21,7 @@ interface EventGate {
     suspend fun start()
 
     @TestOnly
-    fun startNoLoad()
+    fun startNoLoad(initialState: GlobalState = globalState())
 
     fun stop()
 

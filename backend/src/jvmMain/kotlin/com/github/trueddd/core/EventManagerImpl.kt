@@ -57,10 +57,21 @@ class EventManagerImpl(
     }
 
     private suspend fun handleAction(action: Action): EventManager.HandledAction {
+        if (action.issuedAt >= stateHolder.current.endDate) {
+            return EventManager.HandledAction.from(
+                action,
+                StateModificationException(action, "Game is over")
+            )
+        }
+        if (action.issuedAt < stateHolder.current.startDate) {
+            return EventManager.HandledAction.from(
+                action,
+                StateModificationException(action, "Game is not started yet")
+            )
+        }
         val handler = actionHandlerRegistry.handlerOf(action)
-            ?: return EventManager.HandledAction(
-                action.id,
-                action.issuedAt,
+            ?: return EventManager.HandledAction.from(
+                action,
                 StateModificationException(action, "No suitable handler found for action: $action")
             )
         eventHandlingMonitor.lock()
