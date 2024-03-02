@@ -26,6 +26,7 @@ import com.github.trueddd.di.KoinIntegration
 import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.*
+import com.github.trueddd.ui.rules.Rules
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalComposeUiApi::class)

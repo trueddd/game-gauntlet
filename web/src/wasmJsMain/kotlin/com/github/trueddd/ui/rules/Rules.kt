@@ -1,22 +1,32 @@
-package com.github.trueddd.ui
+package com.github.trueddd.ui.rules
 
+import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,22 +37,104 @@ import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.widget.AsyncImage
 import com.github.trueddd.util.color
 
+private fun WheelItem.contains(text: String): Boolean {
+    return name.contains(text, ignoreCase = true) || description.contains(text, ignoreCase = true)
+}
+
+private fun WheelItem.isAnyOfTypes(types: List<WheelItemView>): Boolean {
+    return when (this) {
+        is WheelItem.Effect.Buff -> types.contains(WheelItemView.Buff)
+        is WheelItem.Effect.Debuff -> types.contains(WheelItemView.Debuff)
+        is WheelItem.InventoryItem -> types.contains(WheelItemView.Inventory)
+        is WheelItem.PendingEvent -> types.contains(WheelItemView.PendingEvent)
+        is WheelItem.Event -> types.contains(WheelItemView.Event)
+    }
+}
+
 @Composable
 fun Rules(
     modifier: Modifier = Modifier,
 ) {
     val appClient = remember { get<AppClient>() }
+    var searchText by remember { mutableStateOf("") }
+    var selectedTypes by remember { mutableStateOf(emptyList<WheelItemView>()) }
     var items by remember { mutableStateOf(emptyList<WheelItem>()) }
+    var visibleItems by remember { mutableStateOf(emptyList<WheelItem>()) }
     LaunchedEffect(Unit) {
         items = appClient.getItems()
+        visibleItems = items
+            .filter { it.contains(searchText) }
+            .filter { selectedTypes.isEmpty() || it.isAnyOfTypes(selectedTypes) }
+    }
+    LaunchedEffect(searchText, selectedTypes) {
+        visibleItems = items
+            .filter { it.contains(searchText) }
+            .filter { selectedTypes.isEmpty() || it.isAnyOfTypes(selectedTypes) }
     }
     Column(
         modifier = modifier
     ) {
+        TextField(
+            value = searchText,
+            onValueChange = { searchText = it },
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Colors.Text,
+                cursorColor = Colors.Primary,
+                focusedIndicatorColor = Colors.Primary,
+            ),
+            placeholder = {
+                Text(
+                    text = "Поиск...",
+                    color = Colors.TextSecondary,
+                )
+            },
+            trailingIcon = {
+                AnimatedVisibility(
+                    visible = searchText.isNotEmpty(),
+                    enter = slideInHorizontally { it } + fadeIn(),
+                    exit = slideOutHorizontally { it } + fadeOut(),
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Clear search",
+                        tint = Colors.Text,
+                        modifier = Modifier
+                            .clickable { searchText = "" }
+                            .pointerHoverIcon(PointerIcon.Hand)
+                    )
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 16.dp)
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(vertical = 16.dp)
+        ) {
+            WheelItemView.All.forEach {
+                WheelItemBadge(
+                    view = it,
+                    selected = selectedTypes.contains(it),
+                    onClick = {
+                        selectedTypes = if (selectedTypes.contains(it)) {
+                            selectedTypes - it
+                        } else {
+                            selectedTypes + it
+                        }
+                    }
+                )
+            }
+        }
         val lazyListState = rememberLazyListState()
         LazyColumn(
             state = lazyListState,
-            contentPadding = PaddingValues(horizontal = 32.dp, vertical = 48.dp),
+            contentPadding = PaddingValues(horizontal = 32.dp, vertical = 32.dp),
             verticalArrangement = Arrangement.spacedBy(48.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -52,7 +144,7 @@ fun Rules(
                     color = Colors.Primary
                 )
         ) {
-            items(items) { item ->
+            items(visibleItems) { item ->
                 Row {
                     AsyncImage(
                         model = appClient.router.wheelItemIconUrl(item.iconId),
