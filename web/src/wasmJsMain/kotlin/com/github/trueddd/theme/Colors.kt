@@ -9,6 +9,7 @@ object Colors {
     val DarkBackground = Color(0xFF020617)
     val SecondaryBackground = Color(0xFF1E293B)
     val Text = Color(0xFFF3F4F6)
+    val TextSecondary = Color(0xFF9CA3AF)
     val Primary = Color(0xFF1D4ED8)
     val Warning = Color(0xFFFBBF24)
     val Error = Color(0xFFF87171)

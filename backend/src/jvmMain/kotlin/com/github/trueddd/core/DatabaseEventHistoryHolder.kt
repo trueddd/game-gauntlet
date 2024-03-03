@@ -5,40 +5,31 @@ import com.github.trueddd.data.ActionsTable
 import com.github.trueddd.data.GameGenreDistribution
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.globalState
+import com.github.trueddd.utils.DefaultTimeZone
 import com.github.trueddd.utils.Environment
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.annotation.Single
-import java.util.*
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @Single(binds = [EventHistoryHolder::class])
 class DatabaseEventHistoryHolder(
     private val actionHandlerRegistry: ActionHandlerRegistry,
-) : EventHistoryHolder {
+) : BaseEventHistoryHolder() {
 
     companion object {
         private const val TAG = "DatabaseEventHistoryHolder"
     }
-
-    private val latestEvents = LinkedList<Action>()
-
-    override val actionsChannel = MutableSharedFlow<Action>(
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-
-    private val monitor = Mutex(locked = false)
 
     private val database = Database.connect(
         url = Environment.DatabaseUrl,
@@ -51,17 +42,9 @@ class DatabaseEventHistoryHolder(
         }
     }
 
-    override suspend fun getActions(): List<Action> {
-        return monitor.withLock { latestEvents.toList() }
-    }
-
-    override suspend fun pushEvent(action: Action) {
-        monitor.withLock { latestEvents.push(action) }
-        actionsChannel.emit(action)
-    }
-
     override suspend fun save(globalState: GlobalState) {
         Log.info(TAG, "Saving Global state")
+        val timeRange = "${globalState.startDate}:${globalState.endDate}"
         val eventsToSave = getActions()
         val mapLayout = Json.encodeToString(
             GameGenreDistribution.serializer(),
@@ -71,6 +54,7 @@ class DatabaseEventHistoryHolder(
             .asReversed()
             .joinToString("\n") { Json.encodeToString(it) }
         val text = buildString {
+            appendLine(timeRange)
             appendLine(mapLayout)
             append(events)
         }
@@ -84,7 +68,7 @@ class DatabaseEventHistoryHolder(
     }
 
     override suspend fun load(): GlobalState {
-        monitor.lock()
+        mutex.lock()
         val records = suspendedTransactionAsync(Dispatchers.IO, database) {
             ActionsTable.selectAll().map { it[ActionsTable.value] }
         }.await()
@@ -92,15 +76,23 @@ class DatabaseEventHistoryHolder(
         if (records.isEmpty()) {
             return globalState()
         }
-        val mapLayout = records.firstOrNull()?.let {
-            Json.decodeFromString(GameGenreDistribution.serializer(), it)
-        } ?: throw IllegalStateException("Distribution must be read, but actions list is empty")
-        val eventsContent = records.drop(1)
+        val (start, end) = records.getOrNull(0)
+            ?.split(":")
+            ?.let { (start, end) -> start.toLong() to end.toLong() }
+            ?: throw IllegalArgumentException("Error while parsing game time range")
+        val mapLayout = records.getOrNull(1)
+            ?.let { Json.decodeFromString(GameGenreDistribution.serializer(), it) }
+            ?: throw IllegalStateException("Distribution must be read, but actions list is empty")
+        val eventsContent = records.drop(2)
             .filter { it.isNotBlank() }
         val events = withContext(Dispatchers.Default) {
             eventsContent.map { Json.decodeFromString(Action.serializer(), it) }
         }
-        val initialState = globalState(genreDistribution = mapLayout)
+        val initialState = globalState(
+            genreDistribution = mapLayout,
+            startDateTime = Instant.fromEpochMilliseconds(start).toLocalDateTime(DefaultTimeZone),
+            activePeriod = (end - start).toDuration(DurationUnit.MILLISECONDS),
+        )
         return events.fold(initialState) { state, action ->
             val handler = actionHandlerRegistry.handlerOf(action) ?: return@fold state
             latestEvents.push(action)
@@ -112,10 +104,6 @@ class DatabaseEventHistoryHolder(
                 error.printStackTrace()
                 state
             }
-        }.also { monitor.unlock() }
-    }
-
-    override fun drop() {
-        latestEvents.clear()
+        }.also { mutex.unlock() }
     }
 }

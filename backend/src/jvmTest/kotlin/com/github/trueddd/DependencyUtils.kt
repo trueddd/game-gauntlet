@@ -9,7 +9,7 @@ import com.github.trueddd.di.getItemFactoriesSet
 
 internal fun provideEventGate(): EventGate {
     val stateHolder = StateHolderImpl()
-    val gamesProvider = GamesProviderImpl()
+    val gamesProvider = MockedGamesProvider()
     val itemRoller = ItemRollerImpl(getItemFactoriesSet())
     val actionHandlerRegistry = provideActionHandlerRegistry(gamesProvider, itemRoller)
     val inputParser = provideInputParser(stateHolder, gamesProvider, itemRoller)

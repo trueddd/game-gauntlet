@@ -4,10 +4,7 @@ import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.items.WheelItem
-import com.github.trueddd.util.httpProtocol
-import com.github.trueddd.util.serverAddress
 import com.github.trueddd.util.toBlob
-import com.github.trueddd.util.wsProtocol
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -30,6 +27,8 @@ class AppClient(
     private val httpClient: HttpClient,
 ) : CoroutineScope {
 
+    val router = ServerRouter()
+
     private var runnerJob: Job? = null
 
     private val _globalState = MutableStateFlow<GlobalState?>(null)
@@ -41,10 +40,6 @@ class AppClient(
         get() = _connectionState.asStateFlow()
 
     private val actionsChannel = Channel<String>(onBufferOverflow = BufferOverflow.DROP_OLDEST)
-
-    fun getWheelItemIconUrl(id: Int): String {
-        return "$httpProtocol://${serverAddress()}/icons/$id.png"
-    }
 
     override val coroutineContext by lazy {
         Dispatchers.Default + SupervisorJob()
@@ -64,7 +59,7 @@ class AppClient(
         }
         runnerJob = launch {
             _connectionState.value = SocketState.Connecting
-            httpClient.webSocket("$wsProtocol://${serverAddress()}/state") {
+            httpClient.webSocket(router.wsState) {
                 _connectionState.value = SocketState.Connected
                 launch {
                     for (action in actionsChannel) {
@@ -97,7 +92,7 @@ class AppClient(
     fun getActionsFlow(): Flow<List<Action>> {
         return callbackFlow {
             send(loadActions())
-            val session = httpClient.webSocketSession("$wsProtocol://${serverAddress()}/actions")
+            val session = httpClient.webSocketSession(router.wsActions)
             launch {
                 for (frame in session.incoming) {
                     val textFrame = frame as? Frame.Text ?: continue
@@ -116,7 +111,7 @@ class AppClient(
 
     private suspend fun loadActions(): List<Action> {
         return try {
-            httpClient.get("$httpProtocol://${serverAddress()}/actions") {
+            httpClient.get(router.httpActions) {
                 contentType(ContentType.Application.Json)
             }.body()
         } catch (e: Exception) {
@@ -141,7 +136,7 @@ class AppClient(
     fun searchGame(name: String) {
         launch {
             try {
-                val response = httpClient.post("$httpProtocol://${serverAddress()}/game") {
+                val response = httpClient.post(router.httpGame) {
                     contentType(ContentType.Application.Json)
                     setBody(DownloadGameRequestBody(name))
                     onDownload { bytesSentTotal, contentLength ->
@@ -163,7 +158,7 @@ class AppClient(
     suspend fun getItems(): List<WheelItem> {
         return withContext(coroutineContext) {
             try {
-                httpClient.get("$httpProtocol://${serverAddress()}/items") {
+                httpClient.get(router.httpItems) {
                     contentType(ContentType.Application.Json)
                 }.body<List<WheelItem>>()
             } catch (e: Exception) {
