@@ -74,15 +74,22 @@ class DatabaseEventHistoryHolder(
         }.await()
         Log.info(TAG, "Records found: ${records.size}")
         if (records.isEmpty()) {
+            mutex.unlock()
             return globalState()
         }
         val (start, end) = records.getOrNull(0)
             ?.split(":")
             ?.let { (start, end) -> start.toLong() to end.toLong() }
-            ?: throw IllegalArgumentException("Error while parsing game time range")
+            ?: run {
+                mutex.unlock()
+                throw IllegalArgumentException("Error while parsing game time range")
+            }
         val mapLayout = records.getOrNull(1)
             ?.let { Json.decodeFromString(GameGenreDistribution.serializer(), it) }
-            ?: throw IllegalStateException("Distribution must be read, but actions list is empty")
+            ?: run {
+                mutex.unlock()
+                throw IllegalStateException("Distribution must be read, but actions list is empty")
+            }
         val eventsContent = records.drop(2)
             .filter { it.isNotBlank() }
         val events = withContext(Dispatchers.Default) {

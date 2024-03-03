@@ -29,6 +29,7 @@ fun Application.configureRouting() {
         staticResources("/icons", "icons/items")
 
         get("/actions") {
+            call.caching = CachingOptions(CacheControl.NoCache(CacheControl.Visibility.Public))
             call.respond(eventGate.historyHolder.getActions())
         }
 

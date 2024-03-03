@@ -71,7 +71,7 @@ class AppClient(
                     val data = Response.parse(textFrame.readText().also { println(it) }) ?: continue
                     when (data) {
                         is Response.UserAction -> continue
-                        is Response.Error -> println("Error occured: ${data.exception.message}")
+                        is Response.Error -> println("Error occurred: ${data.exception.message}")
                         is Response.Info -> println("Message from server: ${data.message}")
                         is Response.State -> _globalState.emit(data.globalState)
                     }
@@ -110,13 +110,15 @@ class AppClient(
     }
 
     private suspend fun loadActions(): List<Action> {
-        return try {
-            httpClient.get(router.httpActions) {
-                contentType(ContentType.Application.Json)
-            }.body()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
+        return withContext(coroutineContext) {
+            try {
+                httpClient.get(router.httpActions) {
+                    contentType(ContentType.Application.Json)
+                }.body()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emptyList()
+            }
         }
     }
 
