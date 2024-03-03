@@ -10,7 +10,7 @@ fun globalState(
     startDateTime: LocalDateTime = Clock.System.now().toLocalDateTime(DefaultTimeZone),
     activePeriod: Duration = 21.days,
 ): GlobalState {
-    val startDateTimeInstant = startDateTime.toInstant(UtcOffset(hours = 3))
+    val startDateTimeInstant = startDateTime.toInstant(DefaultTimeZone)
     return GlobalState(
         startDate = startDateTimeInstant.toEpochMilliseconds(),
         endDate = (startDateTimeInstant + activePeriod).toEpochMilliseconds(),
