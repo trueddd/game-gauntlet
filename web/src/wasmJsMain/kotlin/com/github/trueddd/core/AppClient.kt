@@ -2,6 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.Participant
 import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.util.toBlob
@@ -153,6 +154,20 @@ class AppClient(
                 link.click()
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+    }
+
+    suspend fun verifyUser(token: String): Result<Participant> {
+        return withContext(coroutineContext) {
+            try {
+                httpClient.post(router.httpUser) {
+                    contentType(ContentType.Application.Json)
+                    parameter("token", token)
+                }.body<Participant>().let { Result.success(it) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.failure(e)
             }
         }
     }

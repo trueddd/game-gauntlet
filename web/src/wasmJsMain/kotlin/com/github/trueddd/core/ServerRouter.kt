@@ -44,5 +44,8 @@ class ServerRouter {
     val httpItems: String
         get() = http("items")
 
+    val httpUser: String
+        get() = http("user")
+
     fun wheelItemIconUrl(id: Int) = http("icons/$id.png")
 }

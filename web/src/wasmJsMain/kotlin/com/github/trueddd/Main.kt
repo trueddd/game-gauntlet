@@ -20,6 +20,8 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.CanvasBasedWindow
 import com.github.trueddd.core.AppClient
+import com.github.trueddd.core.AppState
+import com.github.trueddd.core.AuthManager
 import com.github.trueddd.core.SocketState
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.di.KoinIntegration
@@ -27,6 +29,7 @@ import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.*
 import com.github.trueddd.ui.rules.Rules
+import kotlinx.browser.window
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -58,6 +61,23 @@ private fun App(
     globalState: GlobalState?,
     socketState: SocketState,
 ) {
+    val destinations = Destination.all()
+    var destination by remember { mutableStateOf(destinations.first()) }
+    var appState by remember { mutableStateOf(AppState.default()) }
+    val authManager = remember { get<AuthManager>() }
+    LaunchedEffect(Unit) {
+        authManager.user?.let {
+            appState = appState.copy(user = it)
+            return@LaunchedEffect
+        }
+        val arguments = authManager.receiveHashParameters()
+        val participant = authManager.parseAuthResult(arguments).getOrNull()
+            ?: return@LaunchedEffect
+        authManager.user = participant
+        if (window.location.hash.isNotEmpty()) {
+            authManager.removeHashFromLocation()
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -68,8 +88,6 @@ private fun App(
             modifier = Modifier
                 .fillMaxWidth()
         )
-        val destinations = Destination.all()
-        var destination by remember { mutableStateOf(destinations.first()) }
         TopPanel(
             currentDestination = destination,
             destinations = destinations,
@@ -104,6 +122,12 @@ private fun App(
                     }
                     is Destination.Games -> {
                         Archives(
+                            modifier = Modifier
+                        )
+                    }
+                    is Destination.Profile -> {
+                        Profile(
+                            appState = appState,
                             modifier = Modifier
                         )
                     }

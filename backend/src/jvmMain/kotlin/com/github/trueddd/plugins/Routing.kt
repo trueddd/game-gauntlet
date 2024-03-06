@@ -2,6 +2,7 @@ package com.github.trueddd.plugins
 
 import com.github.trueddd.core.EventGate
 import com.github.trueddd.core.GameLoader
+import com.github.trueddd.core.HttpClient
 import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.di.getItemFactoriesSet
 import com.github.trueddd.utils.Environment
@@ -18,6 +19,7 @@ import org.koin.ktor.ext.inject
 
 fun Application.configureRouting() {
     val eventGate by inject<EventGate>()
+    val httpClient by inject<HttpClient>()
 
     routing {
         install(CachingHeaders) {
@@ -64,6 +66,26 @@ fun Application.configureRouting() {
             call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 3600))
             val items = getItemFactoriesSet().map { it.create() }
             call.respond(items)
+        }
+
+        post("user") {
+            call.caching = CachingOptions(CacheControl.NoCache(CacheControl.Visibility.Public))
+            val userToken = call.parameters["token"] ?: run {
+                call.respond(HttpStatusCode.BadRequest, "No access token passed")
+                return@post
+            }
+            val twitchUser = httpClient.getTwitchUser(userToken).getOrNull()
+                ?: run {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@post
+                }
+            val participant = eventGate.stateHolder.participants
+                .firstOrNull { it.name == twitchUser.login }
+                ?: run {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@post
+                }
+            call.respond(HttpStatusCode.OK, participant)
         }
     }
 }

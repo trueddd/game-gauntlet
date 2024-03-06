@@ -42,6 +42,7 @@ dependencyResolutionManagement {
             plugin("ktor", "io.ktor.plugin").versionRef(ktor)
             library("ktor-client-core", "io.ktor", "ktor-client-core").versionRef(ktor)
             library("ktor-client-js", "io.ktor", "ktor-client-js").versionRef(ktor)
+            library("ktor-client-cio", "io.ktor", "ktor-client-cio").versionRef(ktor)
             library("ktor-client-content-negotiation", "io.ktor", "ktor-client-content-negotiation").versionRef(ktor)
             library("ktor-server-core", "io.ktor", "ktor-server-core").versionRef(ktor)
             library("ktor-server-netty", "io.ktor", "ktor-server-netty").versionRef(ktor)

@@ -15,7 +15,7 @@ fun globalState(
         startDate = startDateTimeInstant.toEpochMilliseconds(),
         endDate = (startDateTimeInstant + activePeriod).toEpochMilliseconds(),
         players = mapOf(
-            Participant("megagamer") to PlayerState(),
+            Participant("truetripled") to PlayerState(),
             Participant("player") to PlayerState(),
             Participant("clutcher") to PlayerState(),
             Participant("dropper") to PlayerState(),

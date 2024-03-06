@@ -1,6 +1,7 @@
 package com.github.trueddd.di
 
 import com.github.trueddd.core.AppClient
+import com.github.trueddd.core.AuthManager
 import io.ktor.client.*
 import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -28,4 +29,6 @@ val module = module {
     }
 
     single { AppClient(httpClient = get()) }
+
+    single { AuthManager(appClient = get()) }
 }

@@ -87,6 +87,7 @@ tasks.create("mutateResources") {
         propertyKeys = listOf(
             "SERVER_ADDRESS",
             "IS_DEV",
+            "TWITCH_CLIENT_ID",
         )
     )
 }
