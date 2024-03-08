@@ -18,10 +18,12 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.github.trueddd.actions.Action
+import com.github.trueddd.core.AppState
 import com.github.trueddd.core.SocketState
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.theme.Colors
+import com.github.trueddd.util.isDevEnvironment
 import com.github.trueddd.util.updateTextFieldOnCtrlV
 
 private val actions = mapOf(
@@ -38,12 +40,18 @@ private val actions = mapOf(
 fun ActionsBoard(
     globalState: GlobalState,
     socketState: SocketState,
+    appState: AppState,
     sendAction: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     var user by remember { mutableStateOf<Participant?>(null) }
     var action by remember { mutableStateOf(Action.Key.BoardMove) }
     var arguments by remember { mutableStateOf(TextFieldValue("")) }
+    LaunchedEffect(appState.user) {
+        if (!isDevEnvironment()) {
+            user = appState.user
+        }
+    }
     Column(
         modifier = modifier
             .background(Colors.SecondaryBackground, RoundedCornerShape(8.dp))
@@ -53,15 +61,22 @@ fun ActionsBoard(
             text = "User",
             color = Colors.Text
         )
-        Dropdown(
-            globalState.players.keys.map { it.displayName },
-            onOptionSelected = { name ->
-                user = globalState.players.firstNotNullOfOrNull { (key, _) ->
-                    if (key.displayName == name) key else null
-                }
-            },
-            modifier = Modifier
-        )
+        if (isDevEnvironment()) {
+            Dropdown(
+                globalState.players.keys.map { it.displayName },
+                onOptionSelected = { name ->
+                    user = globalState.players.firstNotNullOfOrNull { (key, _) ->
+                        if (key.displayName == name) key else null
+                    }
+                },
+                modifier = Modifier
+            )
+        } else {
+            Text(
+                text = appState.user?.displayName ?: "You are unauthorized",
+                color = Colors.Text
+            )
+        }
         Text(
             text = "Action",
             color = Colors.Text,

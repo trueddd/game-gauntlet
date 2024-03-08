@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.trueddd.actions.Action
 import com.github.trueddd.core.AppClient
+import com.github.trueddd.core.AppState
 import com.github.trueddd.core.Command
 import com.github.trueddd.core.SocketState
 import com.github.trueddd.data.GlobalState
@@ -15,6 +16,7 @@ import com.github.trueddd.di.get
 fun Dashboard(
     globalState: GlobalState,
     socketState: SocketState,
+    appState: AppState,
     modifier: Modifier = Modifier,
 ) {
     val appClient = remember { get<AppClient>() }
@@ -32,6 +34,7 @@ fun Dashboard(
                 globalState = globalState,
                 socketState = socketState,
                 sendAction = { appClient.sendCommand(Command.Action(it)) },
+                appState = appState,
                 modifier = Modifier
                     .fillMaxWidth()
             )

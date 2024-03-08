@@ -117,6 +117,7 @@ private fun App(
                         Dashboard(
                             globalState = globalState,
                             socketState = socketState,
+                            appState = appState,
                             modifier = Modifier
                         )
                     }
