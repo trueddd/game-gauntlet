@@ -20,16 +20,15 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.CanvasBasedWindow
 import com.github.trueddd.core.AppClient
-import com.github.trueddd.core.AppState
 import com.github.trueddd.core.AuthManager
 import com.github.trueddd.core.SocketState
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.Participant
 import com.github.trueddd.di.KoinIntegration
 import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.*
 import com.github.trueddd.ui.rules.Rules
-import kotlinx.browser.window
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -63,20 +62,11 @@ private fun App(
 ) {
     val destinations = Destination.all()
     var destination by remember { mutableStateOf(destinations.first()) }
-    var appState by remember { mutableStateOf(AppState.default()) }
     val authManager = remember { get<AuthManager>() }
+    val user by authManager.userState.collectAsState()
     LaunchedEffect(Unit) {
-        authManager.user?.let {
-            appState = appState.copy(user = it)
-            return@LaunchedEffect
-        }
         val arguments = authManager.receiveHashParameters()
-        val participant = authManager.parseAuthResult(arguments).getOrNull()
-            ?: return@LaunchedEffect
-        authManager.user = participant
-        if (window.location.hash.isNotEmpty()) {
-            authManager.removeHashFromLocation()
-        }
+        authManager.auth(arguments)
     }
     Column(
         modifier = Modifier
@@ -92,6 +82,7 @@ private fun App(
             currentDestination = destination,
             destinations = destinations,
             onDestinationChanged = { destination = it },
+            participant = user,
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -117,7 +108,7 @@ private fun App(
                         Dashboard(
                             globalState = globalState,
                             socketState = socketState,
-                            appState = appState,
+                            participant = user,
                             modifier = Modifier
                         )
                     }
@@ -128,7 +119,7 @@ private fun App(
                     }
                     is Destination.Profile -> {
                         Profile(
-                            appState = appState,
+                            participant = user,
                             modifier = Modifier
                         )
                     }
@@ -142,6 +133,7 @@ private fun App(
 private fun TopPanel(
     currentDestination: Destination,
     destinations: List<Destination>,
+    participant: Participant?,
     modifier: Modifier = Modifier,
     onDestinationChanged: (Destination) -> Unit = {},
 ) {
@@ -166,10 +158,16 @@ private fun TopPanel(
                     .heightIn(min = 52.dp)
                     .weight(1f)
                     .background(Colors.DarkBackground)
-                    .pointerHoverIcon(PointerIcon.Hand)
+                    .pointerHoverIcon(
+                        if (!destination.isPrivate || participant != null)
+                            PointerIcon.Hand
+                        else
+                            PointerIcon.Default
+                    )
                     .clickable(
                         interactionSource = interactionSource,
                         indication = null,
+                        enabled = !destination.isPrivate || participant != null,
                         onClick = { onDestinationChanged(destination) },
                     )
             ) {

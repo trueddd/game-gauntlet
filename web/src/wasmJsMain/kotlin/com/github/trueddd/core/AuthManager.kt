@@ -5,6 +5,9 @@ import com.github.trueddd.util.authRedirectUri
 import com.github.trueddd.util.twitchClientId
 import io.ktor.http.*
 import kotlinx.browser.window
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -13,12 +16,27 @@ class AuthManager(
     private val appClient: AppClient,
 ) {
 
-    var user: Participant?
-        get() = window.localStorage.getItem("participant")
+    private companion object {
+        const val STORAGE_KEY = "participant"
+    }
+
+    private val _userState: MutableStateFlow<Participant?>
+    val userState: StateFlow<Participant?>
+        get() = _userState.asStateFlow()
+
+    init {
+        val user = window.localStorage.getItem("participant")
             ?.let { Json.decodeFromString<Participant>(it) }
-        set(value) {
-            window.localStorage.setItem("participant", value?.let { Json.encodeToString<Participant>(it) } ?: "")
+        _userState = MutableStateFlow(user)
+    }
+
+    private fun writeUser(participant: Participant?) {
+        if (participant == null) {
+            window.localStorage.removeItem(STORAGE_KEY)
+        } else {
+            window.localStorage.setItem("participant", Json.encodeToString(participant))
         }
+    }
 
     fun receiveHashParameters(): Map<String, String> {
         val hash = window.location.hash.removePrefix("#")
@@ -31,7 +49,7 @@ class AuthManager(
         return arguments
     }
 
-    fun removeHashFromLocation() {
+    private fun removeHashFromLocation() {
         window.location.replace(
             URLBuilder(window.location.toString()).apply {
                 fragment = ""
@@ -53,7 +71,13 @@ class AuthManager(
         window.location.replace(Url(url).toString())
     }
 
-    suspend fun parseAuthResult(parameters: Map<String, String>): Result<Participant> {
+    fun logout() {
+        window.localStorage.removeItem("auth_state")
+        window.localStorage.removeItem("participant")
+        _userState.value = null
+    }
+
+    private suspend fun parseAuthResult(parameters: Map<String, String>): Result<Participant> {
         if (!parameters.containsKey("state")) {
             return Result.failure(IllegalStateException("Response must contain state parameter"))
         }
@@ -65,5 +89,20 @@ class AuthManager(
         }
         val token = parameters["access_token"] ?: return Result.failure(IllegalStateException("No access token"))
         return appClient.verifyUser(token)
+    }
+
+    suspend fun auth(hashParameters: Map<String, String>): Result<Participant> {
+        val participant = parseAuthResult(hashParameters).let { result ->
+            if (result.isFailure) {
+                return result
+            } else {
+                result.getOrThrow()
+            }
+        }
+        writeUser(participant)
+        if (window.location.hash.isNotEmpty()) {
+            removeHashFromLocation()
+        }
+        return Result.success(participant)
     }
 }

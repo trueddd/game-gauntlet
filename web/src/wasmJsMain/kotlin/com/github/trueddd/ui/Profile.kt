@@ -10,14 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.trueddd.core.AppState
 import com.github.trueddd.core.AuthManager
+import com.github.trueddd.data.Participant
 import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
 
 @Composable
 fun Profile(
-    appState: AppState,
+    participant: Participant?,
     modifier: Modifier = Modifier,
 ) {
     val authManager = remember { get<AuthManager>() }
@@ -28,10 +28,15 @@ fun Profile(
             .padding(16.dp)
     ) {
         Text(text = "Profile")
-        if (appState.user != null) {
+        if (participant != null) {
             Text(
-                text = "User: ${appState.user.name}"
+                text = "User: ${participant.name}"
             )
+            Button(
+                onClick = { authManager.logout() },
+            ) {
+                Text(text = "Logout")
+            }
         } else {
             Button(
                 onClick = { authManager.requestAuth() },

@@ -18,7 +18,6 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.github.trueddd.actions.Action
-import com.github.trueddd.core.AppState
 import com.github.trueddd.core.SocketState
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
@@ -40,16 +39,16 @@ private val actions = mapOf(
 fun ActionsBoard(
     globalState: GlobalState,
     socketState: SocketState,
-    appState: AppState,
+    participant: Participant?,
     sendAction: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     var user by remember { mutableStateOf<Participant?>(null) }
     var action by remember { mutableStateOf(Action.Key.BoardMove) }
     var arguments by remember { mutableStateOf(TextFieldValue("")) }
-    LaunchedEffect(appState.user) {
+    LaunchedEffect(participant) {
         if (!isDevEnvironment()) {
-            user = appState.user
+            user = participant
         }
     }
     Column(
@@ -73,7 +72,7 @@ fun ActionsBoard(
             )
         } else {
             Text(
-                text = appState.user?.displayName ?: "You are unauthorized",
+                text = participant?.displayName ?: "You are unauthorized",
                 color = Colors.Text
             )
         }

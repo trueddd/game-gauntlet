@@ -9,9 +9,15 @@ sealed class Destination(val name: String) {
         fun all() = listOf(Rules, Map, Dashboard, Games, Profile)
     }
 
+    open val isPrivate = false
+
     data object Rules : Destination("Правила")
     data object Map : Destination("Карта")
-    data object Dashboard : Destination("Панель управления")
-    data object Games : Destination("Загрузка игр")
+    data object Dashboard : Destination("Панель управления") {
+        override val isPrivate = true
+    }
+    data object Games : Destination("Загрузка игр") {
+        override val isPrivate = true
+    }
     data object Profile : Destination("Профиль")
 }
