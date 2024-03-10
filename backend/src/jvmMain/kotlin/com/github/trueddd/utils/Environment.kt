@@ -52,4 +52,8 @@ object Environment {
     val DatabasePassword: String by lazy {
         appConfig.getProperty("DB_PASS")
     }
+
+    val TwitchClientId: String by lazy {
+        appConfig.getProperty("TWITCH_CLIENT_ID")
+    }
 }

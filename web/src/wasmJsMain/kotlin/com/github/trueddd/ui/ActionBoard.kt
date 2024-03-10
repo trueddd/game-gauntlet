@@ -22,6 +22,7 @@ import com.github.trueddd.core.SocketState
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.theme.Colors
+import com.github.trueddd.util.isDevEnvironment
 import com.github.trueddd.util.updateTextFieldOnCtrlV
 
 private val actions = mapOf(
@@ -38,12 +39,18 @@ private val actions = mapOf(
 fun ActionsBoard(
     globalState: GlobalState,
     socketState: SocketState,
+    participant: Participant?,
     sendAction: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     var user by remember { mutableStateOf<Participant?>(null) }
     var action by remember { mutableStateOf(Action.Key.BoardMove) }
     var arguments by remember { mutableStateOf(TextFieldValue("")) }
+    LaunchedEffect(participant) {
+        if (!isDevEnvironment()) {
+            user = participant
+        }
+    }
     Column(
         modifier = modifier
             .background(Colors.SecondaryBackground, RoundedCornerShape(8.dp))
@@ -53,15 +60,22 @@ fun ActionsBoard(
             text = "User",
             color = Colors.Text
         )
-        Dropdown(
-            globalState.players.keys.map { it.displayName },
-            onOptionSelected = { name ->
-                user = globalState.players.firstNotNullOfOrNull { (key, _) ->
-                    if (key.displayName == name) key else null
-                }
-            },
-            modifier = Modifier
-        )
+        if (isDevEnvironment()) {
+            Dropdown(
+                globalState.players.keys.map { it.displayName },
+                onOptionSelected = { name ->
+                    user = globalState.players.firstNotNullOfOrNull { (key, _) ->
+                        if (key.displayName == name) key else null
+                    }
+                },
+                modifier = Modifier
+            )
+        } else {
+            Text(
+                text = participant?.displayName ?: "You are unauthorized",
+                color = Colors.Text
+            )
+        }
         Text(
             text = "Action",
             color = Colors.Text,

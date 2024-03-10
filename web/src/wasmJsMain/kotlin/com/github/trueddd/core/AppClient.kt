@@ -1,6 +1,7 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
+import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.items.WheelItem
@@ -15,6 +16,7 @@ import io.ktor.http.*
 import io.ktor.util.*
 import io.ktor.websocket.*
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -52,6 +54,10 @@ class AppClient(
         }
     }
 
+    private fun savedJwtToken(): String? {
+        return window.localStorage.getItem(AuthManager.TOKEN_KEY)
+    }
+
     fun start() {
         if (runnerJob?.isActive == true) {
             println("Client is already running")
@@ -60,6 +66,11 @@ class AppClient(
         runnerJob = launch {
             _connectionState.value = SocketState.Connecting
             httpClient.webSocket(router.wsState) {
+                val token = savedJwtToken() ?: run {
+                    close()
+                    return@webSocket
+                }
+                outgoing.send(Frame.Text(token))
                 _connectionState.value = SocketState.Connected
                 launch {
                     for (action in actionsChannel) {
@@ -71,7 +82,7 @@ class AppClient(
                     val data = Response.parse(textFrame.readText().also { println(it) }) ?: continue
                     when (data) {
                         is Response.UserAction -> continue
-                        is Response.Error -> println("Error occured: ${data.exception.message}")
+                        is Response.Error -> println("Error occurred: ${data.exception.message}")
                         is Response.Info -> println("Message from server: ${data.message}")
                         is Response.State -> _globalState.emit(data.globalState)
                     }
@@ -110,13 +121,16 @@ class AppClient(
     }
 
     private suspend fun loadActions(): List<Action> {
-        return try {
-            httpClient.get(router.httpActions) {
-                contentType(ContentType.Application.Json)
-            }.body()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
+        return withContext(coroutineContext) {
+            try {
+                httpClient.get(router.httpActions) {
+                    bearerAuth(savedJwtToken()!!)
+                    contentType(ContentType.Application.Json)
+                }.body()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emptyList()
+            }
         }
     }
 
@@ -151,6 +165,20 @@ class AppClient(
                 link.click()
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+    }
+
+    suspend fun verifyUser(token: String): Result<AuthResponse> {
+        return withContext(coroutineContext) {
+            try {
+                httpClient.post(router.httpUser) {
+                    contentType(ContentType.Application.Json)
+                    parameter("token", token)
+                }.body<AuthResponse>().let { Result.success(it) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.failure(e)
             }
         }
     }

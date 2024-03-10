@@ -20,8 +20,10 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.CanvasBasedWindow
 import com.github.trueddd.core.AppClient
+import com.github.trueddd.core.AuthManager
 import com.github.trueddd.core.SocketState
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.Participant
 import com.github.trueddd.di.KoinIntegration
 import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
@@ -58,22 +60,30 @@ private fun App(
     globalState: GlobalState?,
     socketState: SocketState,
 ) {
+    val destinations = Destination.all()
+    var destination by remember { mutableStateOf(destinations.first()) }
+    val authManager = remember { get<AuthManager>() }
+    val user by authManager.userState.collectAsState()
+    LaunchedEffect(Unit) {
+        val arguments = authManager.receiveHashParameters()
+        authManager.auth(arguments)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Colors.Background)
     ) {
         InfoPanel(
-            socketState,
+            socketState = socketState,
+            participant = user,
             modifier = Modifier
                 .fillMaxWidth()
         )
-        val destinations = Destination.all()
-        var destination by remember { mutableStateOf(destinations.first()) }
         TopPanel(
             currentDestination = destination,
             destinations = destinations,
             onDestinationChanged = { destination = it },
+            participant = user,
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -82,31 +92,40 @@ private fun App(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            if (globalState != null) {
-                when (destination) {
-                    is Destination.Rules -> {
-                        Rules(
-                            modifier = Modifier
-                                .fillMaxSize()
-                        )
-                    }
-                    is Destination.Map -> {
+            when (destination) {
+                is Destination.Rules -> {
+                    Rules(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
+                is Destination.Map -> {
+                    if (globalState != null) {
                         Map(
                             globalState = globalState
                         )
                     }
-                    is Destination.Dashboard -> {
+                }
+                is Destination.Dashboard -> {
+                    if (globalState != null) {
                         Dashboard(
                             globalState = globalState,
                             socketState = socketState,
+                            participant = user,
                             modifier = Modifier
                         )
                     }
-                    is Destination.Games -> {
-                        Archives(
-                            modifier = Modifier
-                        )
-                    }
+                }
+                is Destination.Games -> {
+                    Archives(
+                        modifier = Modifier
+                    )
+                }
+                is Destination.Profile -> {
+                    Profile(
+                        participant = user,
+                        modifier = Modifier
+                    )
                 }
             }
         }
@@ -117,6 +136,7 @@ private fun App(
 private fun TopPanel(
     currentDestination: Destination,
     destinations: List<Destination>,
+    participant: Participant?,
     modifier: Modifier = Modifier,
     onDestinationChanged: (Destination) -> Unit = {},
 ) {
@@ -141,10 +161,16 @@ private fun TopPanel(
                     .heightIn(min = 52.dp)
                     .weight(1f)
                     .background(Colors.DarkBackground)
-                    .pointerHoverIcon(PointerIcon.Hand)
+                    .pointerHoverIcon(
+                        if (!destination.isPrivate || participant != null)
+                            PointerIcon.Hand
+                        else
+                            PointerIcon.Default
+                    )
                     .clickable(
                         interactionSource = interactionSource,
                         indication = null,
+                        enabled = !destination.isPrivate || participant != null,
                         onClick = { onDestinationChanged(destination) },
                     )
             ) {
@@ -178,6 +204,7 @@ private fun TopPanel(
 @Composable
 private fun InfoPanel(
     socketState: SocketState,
+    participant: Participant?,
     modifier: Modifier = Modifier
 ) {
     var infoPanelVisible by remember { mutableStateOf(false) }
@@ -185,7 +212,7 @@ private fun InfoPanel(
         if (socketState is SocketState.Connected) {
             delay(300L)
         }
-        infoPanelVisible = socketState !is SocketState.Connected
+        infoPanelVisible = socketState !is SocketState.Connected && participant != null
     }
     AnimatedVisibility(
         visible = infoPanelVisible,

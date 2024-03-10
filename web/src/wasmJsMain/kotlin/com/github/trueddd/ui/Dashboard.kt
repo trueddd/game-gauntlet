@@ -9,12 +9,14 @@ import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.Command
 import com.github.trueddd.core.SocketState
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.Participant
 import com.github.trueddd.di.get
 
 @Composable
 fun Dashboard(
     globalState: GlobalState,
     socketState: SocketState,
+    participant: Participant?,
     modifier: Modifier = Modifier,
 ) {
     val appClient = remember { get<AppClient>() }
@@ -32,6 +34,7 @@ fun Dashboard(
                 globalState = globalState,
                 socketState = socketState,
                 sendAction = { appClient.sendCommand(Command.Action(it)) },
+                participant = participant,
                 modifier = Modifier
                     .fillMaxWidth()
             )
