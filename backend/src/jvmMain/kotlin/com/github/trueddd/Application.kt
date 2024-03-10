@@ -8,11 +8,11 @@ import io.ktor.server.netty.*
 fun main() {
     embeddedServer(Netty, port = Environment.Port, host = "0.0.0.0") {
         configureDI()
-        configureSockets()
-        configureSerialization()
         configureMonitoring()
-        configureHTTP()
         configureSecurity()
+        configureSerialization()
+        configureHTTP()
+        configureSockets()
         configureRouting()
     }.start(wait = true)
 }

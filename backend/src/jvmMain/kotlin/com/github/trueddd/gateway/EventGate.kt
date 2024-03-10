@@ -3,6 +3,7 @@ package com.github.trueddd.gateway
 import com.github.trueddd.core.Command
 import com.github.trueddd.core.EventGate
 import com.github.trueddd.core.Response
+import com.github.trueddd.plugins.Jwt
 import com.github.trueddd.utils.Environment
 import com.github.trueddd.utils.Log
 import io.ktor.server.routing.*
@@ -23,11 +24,21 @@ fun Routing.setupEventGate() {
     }
 
     webSocket("/state") {
+        val token = (incoming.receive() as? Frame.Text)?.readText()
+        val user = try {
+            val decoded = Jwt.Verifier.verify(token)
+            val userName = decoded.getClaim("user").asString()
+            eventGate.stateHolder.participants.first { it.name == userName }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "User verification failed"))
+            return@webSocket
+        }
         eventGate.stateHolder.globalStateFlow
-            .onStart { Log.info(TAG, "Listening to global state in session ${this@webSocket}") }
+            .onStart { Log.info(TAG, "Starting $user`s session ${this@webSocket}") }
             .map { Response.State(it) }
             .onEach { outgoing.sendResponse(it) }
-            .onCompletion { Log.info(TAG, "Ending global state session ${this@webSocket}") }
+            .onCompletion { Log.info(TAG, "Ending $user`s session ${this@webSocket}") }
             .launchIn(this)
         for (frame in incoming) {
             if (frame is Frame.Text) {
@@ -49,7 +60,7 @@ fun Routing.setupEventGate() {
                     }
                     is Command.Action -> eventGate.parseAndHandle(command.payload)
                     is Command.Reset -> eventGate.resetState()
-                    null -> outgoing.sendResponse(Response.Error(Exception("Unrecognised command: `$text`")))
+                    null -> outgoing.sendErrorResponse("Unrecognised command: `$text`")
                 }
             }
         }
@@ -65,4 +76,8 @@ fun Routing.setupEventGate() {
 
 private suspend fun SendChannel<Frame>.sendResponse(response: Response) {
     send(Frame.Text(response.serialized))
+}
+
+private suspend fun SendChannel<Frame>.sendErrorResponse(error: String) {
+    send(Frame.Text(Response.Error(Exception(error)).serialized))
 }

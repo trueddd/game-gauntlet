@@ -1,5 +1,6 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.Participant
 import com.github.trueddd.util.authRedirectUri
 import com.github.trueddd.util.twitchClientId
@@ -16,8 +17,10 @@ class AuthManager(
     private val appClient: AppClient,
 ) {
 
-    private companion object {
-        const val STORAGE_KEY = "participant"
+    companion object {
+        const val USER_KEY = "participant"
+        const val TOKEN_KEY = "token"
+        const val STATE_KEY = "auth_state"
     }
 
     private val _userState: MutableStateFlow<Participant?>
@@ -25,17 +28,14 @@ class AuthManager(
         get() = _userState.asStateFlow()
 
     init {
-        val user = window.localStorage.getItem("participant")
+        val user = window.localStorage.getItem(USER_KEY)
             ?.let { Json.decodeFromString<Participant>(it) }
         _userState = MutableStateFlow(user)
     }
 
-    private fun writeUser(participant: Participant?) {
-        if (participant == null) {
-            window.localStorage.removeItem(STORAGE_KEY)
-        } else {
-            window.localStorage.setItem("participant", Json.encodeToString(participant))
-        }
+    private fun writeUser(authResponse: AuthResponse) {
+        window.localStorage.setItem(USER_KEY, Json.encodeToString(authResponse.user))
+        window.localStorage.setItem(TOKEN_KEY, authResponse.token)
     }
 
     fun receiveHashParameters(): Map<String, String> {
@@ -45,7 +45,6 @@ class AuthManager(
             ?.map { it.split("=") }
             ?.associate { it[0] to it[1] }
             ?: emptyMap()
-        println("arguments: $arguments")
         return arguments
     }
 
@@ -59,7 +58,7 @@ class AuthManager(
 
     fun requestAuth() {
         val state = Clock.System.now().hashCode().toString()
-        window.localStorage.setItem("auth_state", state)
+        window.localStorage.setItem(STATE_KEY, state)
         val url = buildString {
             append("https://id.twitch.tv/oauth2/authorize")
             append("?response_type=token")
@@ -72,16 +71,17 @@ class AuthManager(
     }
 
     fun logout() {
-        window.localStorage.removeItem("auth_state")
-        window.localStorage.removeItem("participant")
+        window.localStorage.removeItem(STATE_KEY)
+        window.localStorage.removeItem(USER_KEY)
+        window.localStorage.removeItem(TOKEN_KEY)
         _userState.value = null
     }
 
-    private suspend fun parseAuthResult(parameters: Map<String, String>): Result<Participant> {
+    private suspend fun parseAuthResult(parameters: Map<String, String>): Result<AuthResponse> {
         if (!parameters.containsKey("state")) {
             return Result.failure(IllegalStateException("Response must contain state parameter"))
         }
-        if (parameters["state"] != window.localStorage.getItem("auth_state")) {
+        if (parameters["state"] != window.localStorage.getItem(STATE_KEY)) {
             return Result.failure(IllegalStateException("State parameter does not match initial one"))
         }
         if (parameters.containsKey("error")) {
@@ -92,17 +92,17 @@ class AuthManager(
     }
 
     suspend fun auth(hashParameters: Map<String, String>): Result<Participant> {
-        val participant = parseAuthResult(hashParameters).let { result ->
+        val authResponse = parseAuthResult(hashParameters).let { result ->
             if (result.isFailure) {
-                return result
+                return Result.failure(result.exceptionOrNull()!!)
             } else {
                 result.getOrThrow()
             }
         }
-        writeUser(participant)
+        writeUser(authResponse)
         if (window.location.hash.isNotEmpty()) {
             removeHashFromLocation()
         }
-        return Result.success(participant)
+        return Result.success(authResponse.user)
     }
 }

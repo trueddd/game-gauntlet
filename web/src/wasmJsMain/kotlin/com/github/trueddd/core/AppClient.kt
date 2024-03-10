@@ -1,8 +1,8 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
+import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
 import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.util.toBlob
@@ -16,6 +16,7 @@ import io.ktor.http.*
 import io.ktor.util.*
 import io.ktor.websocket.*
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -53,6 +54,10 @@ class AppClient(
         }
     }
 
+    private fun savedJwtToken(): String? {
+        return window.localStorage.getItem(AuthManager.TOKEN_KEY)
+    }
+
     fun start() {
         if (runnerJob?.isActive == true) {
             println("Client is already running")
@@ -61,6 +66,11 @@ class AppClient(
         runnerJob = launch {
             _connectionState.value = SocketState.Connecting
             httpClient.webSocket(router.wsState) {
+                val token = savedJwtToken() ?: run {
+                    close()
+                    return@webSocket
+                }
+                outgoing.send(Frame.Text(token))
                 _connectionState.value = SocketState.Connected
                 launch {
                     for (action in actionsChannel) {
@@ -114,6 +124,7 @@ class AppClient(
         return withContext(coroutineContext) {
             try {
                 httpClient.get(router.httpActions) {
+                    bearerAuth(savedJwtToken()!!)
                     contentType(ContentType.Application.Json)
                 }.body()
             } catch (e: Exception) {
@@ -158,13 +169,13 @@ class AppClient(
         }
     }
 
-    suspend fun verifyUser(token: String): Result<Participant> {
+    suspend fun verifyUser(token: String): Result<AuthResponse> {
         return withContext(coroutineContext) {
             try {
                 httpClient.post(router.httpUser) {
                     contentType(ContentType.Application.Json)
                     parameter("token", token)
-                }.body<Participant>().let { Result.success(it) }
+                }.body<AuthResponse>().let { Result.success(it) }
             } catch (e: Exception) {
                 e.printStackTrace()
                 Result.failure(e)

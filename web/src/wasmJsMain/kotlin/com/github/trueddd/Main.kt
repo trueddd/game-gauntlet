@@ -74,7 +74,8 @@ private fun App(
             .background(Colors.Background)
     ) {
         InfoPanel(
-            socketState,
+            socketState = socketState,
+            participant = user,
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -91,20 +92,22 @@ private fun App(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            if (globalState != null) {
-                when (destination) {
-                    is Destination.Rules -> {
-                        Rules(
-                            modifier = Modifier
-                                .fillMaxSize()
-                        )
-                    }
-                    is Destination.Map -> {
+            when (destination) {
+                is Destination.Rules -> {
+                    Rules(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
+                is Destination.Map -> {
+                    if (globalState != null) {
                         Map(
                             globalState = globalState
                         )
                     }
-                    is Destination.Dashboard -> {
+                }
+                is Destination.Dashboard -> {
+                    if (globalState != null) {
                         Dashboard(
                             globalState = globalState,
                             socketState = socketState,
@@ -112,17 +115,17 @@ private fun App(
                             modifier = Modifier
                         )
                     }
-                    is Destination.Games -> {
-                        Archives(
-                            modifier = Modifier
-                        )
-                    }
-                    is Destination.Profile -> {
-                        Profile(
-                            participant = user,
-                            modifier = Modifier
-                        )
-                    }
+                }
+                is Destination.Games -> {
+                    Archives(
+                        modifier = Modifier
+                    )
+                }
+                is Destination.Profile -> {
+                    Profile(
+                        participant = user,
+                        modifier = Modifier
+                    )
                 }
             }
         }
@@ -201,6 +204,7 @@ private fun TopPanel(
 @Composable
 private fun InfoPanel(
     socketState: SocketState,
+    participant: Participant?,
     modifier: Modifier = Modifier
 ) {
     var infoPanelVisible by remember { mutableStateOf(false) }
@@ -208,7 +212,7 @@ private fun InfoPanel(
         if (socketState is SocketState.Connected) {
             delay(300L)
         }
-        infoPanelVisible = socketState !is SocketState.Connected
+        infoPanelVisible = socketState !is SocketState.Connected && participant != null
     }
     AnimatedVisibility(
         visible = infoPanelVisible,

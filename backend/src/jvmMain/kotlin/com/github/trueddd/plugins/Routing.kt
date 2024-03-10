@@ -3,12 +3,14 @@ package com.github.trueddd.plugins
 import com.github.trueddd.core.EventGate
 import com.github.trueddd.core.GameLoader
 import com.github.trueddd.core.HttpClient
+import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.di.getItemFactoriesSet
 import com.github.trueddd.utils.Environment
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
@@ -30,9 +32,11 @@ fun Application.configureRouting() {
 
         staticResources("/icons", "icons/items")
 
-        get("/actions") {
-            call.caching = CachingOptions(CacheControl.NoCache(CacheControl.Visibility.Public))
-            call.respond(eventGate.historyHolder.getActions())
+        authenticate {
+            get("/actions") {
+                call.caching = CachingOptions(CacheControl.NoCache(CacheControl.Visibility.Public))
+                call.respond(eventGate.historyHolder.getActions())
+            }
         }
 
         post("/game") {
@@ -85,7 +89,8 @@ fun Application.configureRouting() {
                     call.respond(HttpStatusCode.NotFound)
                     return@post
                 }
-            call.respond(HttpStatusCode.OK, participant)
+            val token = createJwtToken(twitchUser.login)
+            call.respond(HttpStatusCode.OK, AuthResponse(participant, token))
         }
     }
 }
