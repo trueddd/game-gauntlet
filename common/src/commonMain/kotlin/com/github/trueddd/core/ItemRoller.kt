@@ -6,5 +6,7 @@ interface ItemRoller {
 
     val allItemsFactories: Set<WheelItem.Factory>
 
+    val allItemsNames: List<String>
+
     fun pick(): WheelItem
 }

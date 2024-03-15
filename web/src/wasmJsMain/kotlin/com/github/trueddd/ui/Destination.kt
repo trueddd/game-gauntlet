@@ -6,7 +6,7 @@ import androidx.compose.runtime.Stable
 sealed class Destination(val name: String) {
 
     companion object {
-        fun all() = listOf(Rules, Map, Dashboard, Games, Profile)
+        fun all() = listOf(Rules, Map, Dashboard, Wheels, Games, Profile)
     }
 
     open val isPrivate = false
@@ -20,4 +20,5 @@ sealed class Destination(val name: String) {
         override val isPrivate = true
     }
     data object Profile : Destination("Профиль")
+    data object Wheels : Destination("Колеса")
 }

@@ -29,6 +29,7 @@ import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.*
 import com.github.trueddd.ui.rules.Rules
+import com.github.trueddd.ui.wheels.Wheels
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -125,6 +126,12 @@ private fun App(
                     Profile(
                         participant = user,
                         modifier = Modifier
+                    )
+                }
+                is Destination.Wheels -> {
+                    Wheels(
+                        modifier = Modifier
+                            .fillMaxSize()
                     )
                 }
             }
