@@ -20,7 +20,10 @@ data class ItemReceive(
         override val actionKey = Key.ItemReceive
 
         override fun generate(participant: Participant, arguments: List<String>): ItemReceive {
-            val item = itemRoller.pick()
+            val item = arguments.firstOrNull()?.toIntOrNull()?.let { WheelItem.Id(it) }
+                ?.let { itemId -> itemRoller.allItemsFactories.firstOrNull { it.itemId == itemId } }
+                ?.create()
+                ?: itemRoller.pick()
             return ItemReceive(participant, item)
         }
     }

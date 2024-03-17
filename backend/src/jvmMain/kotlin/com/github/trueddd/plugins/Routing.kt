@@ -3,6 +3,7 @@ package com.github.trueddd.plugins
 import com.github.trueddd.core.EventGate
 import com.github.trueddd.core.GameLoader
 import com.github.trueddd.core.HttpClient
+import com.github.trueddd.core.ItemRoller
 import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.di.getItemFactoriesSet
@@ -22,6 +23,7 @@ import org.koin.ktor.ext.inject
 fun Application.configureRouting() {
     val eventGate by inject<EventGate>()
     val httpClient by inject<HttpClient>()
+    val itemRoller by inject<ItemRoller>()
 
     routing {
         install(CachingHeaders) {
@@ -36,6 +38,12 @@ fun Application.configureRouting() {
             get("/actions") {
                 call.caching = CachingOptions(CacheControl.NoCache(CacheControl.Visibility.Public))
                 call.respond(eventGate.historyHolder.getActions())
+            }
+            route("/roll") {
+                get("/item") {
+                    call.caching = CachingOptions(CacheControl.NoCache(CacheControl.Visibility.Public))
+                    call.respond(itemRoller.pick())
+                }
             }
         }
 

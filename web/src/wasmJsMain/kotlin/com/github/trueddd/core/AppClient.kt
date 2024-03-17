@@ -3,7 +3,9 @@ package com.github.trueddd.core
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.Participant
 import com.github.trueddd.data.request.DownloadGameRequestBody
+import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.util.toBlob
 import io.ktor.client.*
@@ -86,6 +88,10 @@ class AppClient(
                         is Response.Info -> println("Message from server: ${data.message}")
                         is Response.State -> _globalState.emit(data.globalState)
                     }
+                }
+                if (runnerJob?.isActive == true) {
+                    runnerJob?.cancel(closeReason.await()?.message ?: "Unknown reason")
+                    get<AuthManager>().logout()
                 }
             }
         }
@@ -194,5 +200,24 @@ class AppClient(
                 emptyList()
             }
         }
+    }
+
+    suspend fun rollItem(): WheelItem? {
+        return withContext(coroutineContext) {
+            try {
+                httpClient.get(router.httpRollItem) {
+                    bearerAuth(savedJwtToken()!!)
+                    contentType(ContentType.Application.Json)
+                }.body<WheelItem>()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    // TODO: accept rolled wheel item in dialog
+    fun acceptRolledItem(item: WheelItem, user: Participant) {
+        sendCommand(Command.Action("${user.name}:${Action.Key.ItemReceive}:${item.id.value}"))
     }
 }

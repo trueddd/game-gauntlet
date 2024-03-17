@@ -129,10 +129,13 @@ private fun App(
                     )
                 }
                 is Destination.Wheels -> {
-                    Wheels(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    )
+                    if (user != null) {
+                        Wheels(
+                            participant = user!!,
+                            modifier = Modifier
+                                .fillMaxSize()
+                        )
+                    }
                 }
             }
         }

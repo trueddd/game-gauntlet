@@ -5,22 +5,29 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.trueddd.core.AppClient
+import com.github.trueddd.data.Participant
+import com.github.trueddd.di.get
+import com.github.trueddd.items.WheelItem
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.util.flatSpinAnimation
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
-import kotlin.random.Random
-import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.launch
 
 @Composable
 fun Wheels(
+    participant: Participant,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -47,41 +54,37 @@ fun Wheels(
             )
         }
         when (wheelType) {
-            WheelType.Items -> ItemsWheel()
+            WheelType.Items -> ItemsWheel(participant = participant)
             WheelType.Games -> {}
             WheelType.Players -> {}
         }
     }
 }
 
-data class SpinState(
-    val enabled: Boolean,
-    val duration: Long,
-    val targetPosition: Int,
-) {
-
-    companion object {
-        fun default() = SpinState(
-            enabled = false,
-            duration = 20.seconds.inWholeMilliseconds,
-            targetPosition = 0,
-        )
+private suspend fun handleRollItems(
+    spinState: SpinState,
+    items: List<WheelItem>,
+    appClient: AppClient
+): SpinState {
+    return if (spinState.enabled) {
+        spinState.copy(enabled = false, targetPosition = 0)
+    } else {
+        val item = appClient.rollItem()!!
+        spinState.copy(enabled = true, targetPosition = items.indexOf(item) + items.size * 3)
     }
-
-    val spinTime = Clock.System.now().toEpochMilliseconds()
-
-    private fun getRandomSpinDelta(range: Int): Int {
-        return range * 3 + Random.nextInt(range)
-    }
-
-    fun reset(targetPosition: Int = 3) = copy(enabled = false, targetPosition = targetPosition)
-    fun spin(range: Int) = copy(enabled = true, targetPosition = getRandomSpinDelta(range))
 }
 
 @Composable
-private fun ItemsWheel() {
-    val items = remember { (1..50).toList() }
-    var spinState by remember { mutableStateOf(SpinState.default()) }
+private fun ItemsWheel(
+    participant: Participant,
+) {
+    val appClient = remember { get<AppClient>() }
+    val scope = rememberCoroutineScope()
+    var items by remember { mutableStateOf(emptyList<WheelItem>()) }
+    LaunchedEffect(Unit) {
+        items = appClient.getItems()
+    }
+    var spinState by remember(items) { mutableStateOf(SpinState.default(itemsCount = items.size)) }
     var isRunning by remember(spinState.spinTime) { mutableStateOf(spinState.enabled) }
     LaunchedEffect(spinState.spinTime) {
         if (spinState.enabled) {
@@ -89,42 +92,64 @@ private fun ItemsWheel() {
             isRunning = false
         }
     }
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        val rotate by flatSpinAnimation(spinState, spinState.duration.toInt()) {
-        }
-        val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = 3)
-        LaunchedEffect(rotate) {
-            scrollState.scrollToItem(rotate)
-        }
-        Box(
-            modifier = Modifier,
+    if (items.isNotEmpty()) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
+            val itemHeight = 52.dp + 8.dp * 2
+            val rotate by flatSpinAnimation(spinState, spinState.duration.toInt()) {
+            }
+            val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = 3)
+            LaunchedEffect(rotate) {
+                if (spinState.enabled) {
+                    scrollState.animateScrollToItem(rotate)
+                } else {
+                    scrollState.scrollToItem(rotate)
+                }
+            }
             LazyColumn(
                 userScrollEnabled = false,
                 state = scrollState,
                 modifier = Modifier
-                    .height((52 * 7).dp)
+                    .padding(horizontal = 16.dp)
+                    .height(itemHeight * 7)
+                    .weight(2f)
+                    .align(Alignment.CenterVertically)
             ) {
                 items(Int.MAX_VALUE) { position ->
                     val item = items[position.rem(items.size)]
                     Text(
-                        text = "$item",
+                        text = item.name,
                         fontSize = 48.sp,
                         modifier = Modifier
+                            .padding(vertical = 8.dp)
                             .height(52.dp)
+                            .fillMaxWidth()
                     )
                 }
             }
-        }
-        Button(
-            onClick = { spinState = if (isRunning) spinState.reset(rotate) else spinState.spin(items.size) },
-        ) {
-            Text(
-                text = "Roll"
-            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 16.dp)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Button(
+                    shape = RoundedCornerShape(50),
+                    onClick = {
+                        scope.launch {
+                            spinState = handleRollItems(spinState, items, appClient)
+                        }
+                    },
+                    modifier = Modifier
+                        .pointerHoverIcon(PointerIcon.Hand)
+                ) {
+                    Text(
+                        text = if (isRunning) "Stop" else "Roll"
+                    )
+                }
+            }
         }
     }
 }
