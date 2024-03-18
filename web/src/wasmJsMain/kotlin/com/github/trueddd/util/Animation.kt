@@ -10,19 +10,23 @@ import com.github.trueddd.ui.wheels.SpinState
 @Composable
 fun flatSpinAnimation(
     state: SpinState,
-    spinDuration: Int,
     onFinished: () -> Unit = {},
 ): State<Int> {
-    val anim = remember(state.spinTime) {
-        TargetBasedAnimation(
-            animationSpec = tween(spinDuration, easing = FastOutSlowInEasing),
-            typeConverter = Int.VectorConverter,
-            initialValue = 0,
-            targetValue = state.targetPosition,
-        )
-    }
     var playTime by remember { mutableStateOf(0L) }
     val rotate = remember { mutableStateOf(0) }
+    val anim = remember(state) {
+        TargetBasedAnimation(
+            animationSpec = tween(state.duration.toInt(), easing = FastOutSlowInEasing),
+            typeConverter = Int.VectorConverter,
+            initialValue = rotate.value,
+            targetValue = with(state) {
+                if (!running) return@with 0
+                val delta = (targetPosition - initialPosition).let { if (it < 0) it + itemsCount else it }
+                val firstShift = (numberOfOptionsOnScreen / 2).takeIf { rotate.value == 0 } ?: 0
+                rotate.value + delta - firstShift + 2 * itemsCount
+            },
+        )
+    }
     LaunchedEffect(anim) {
         val startTime = withFrameNanos { it }
         do {

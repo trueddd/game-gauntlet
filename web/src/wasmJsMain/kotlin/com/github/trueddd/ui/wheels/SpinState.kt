@@ -1,23 +1,24 @@
 package com.github.trueddd.ui.wheels
 
-import kotlinx.datetime.Clock
 import kotlin.time.Duration.Companion.seconds
 
 data class SpinState(
-    val enabled: Boolean,
+    val running: Boolean,
     val duration: Long,
+    val initialPosition: Int,
     val targetPosition: Int,
     val itemsCount: Int,
+    val numberOfOptionsOnScreen: Int,
 ) {
 
     companion object {
         fun default(itemsCount: Int) = SpinState(
-            enabled = false,
+            running = false,
             duration = 20.seconds.inWholeMilliseconds,
+            initialPosition = 0,
             targetPosition = 0,
             itemsCount = itemsCount,
+            numberOfOptionsOnScreen = 7,
         )
     }
-
-    val spinTime = Clock.System.now().toEpochMilliseconds()
 }

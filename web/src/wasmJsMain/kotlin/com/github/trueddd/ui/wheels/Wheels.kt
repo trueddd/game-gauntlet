@@ -62,15 +62,25 @@ fun Wheels(
 }
 
 private suspend fun handleRollItems(
+    isRunning: Boolean,
     spinState: SpinState,
     items: List<WheelItem>,
     appClient: AppClient
 ): SpinState {
-    return if (spinState.enabled) {
-        spinState.copy(enabled = false, targetPosition = 0)
+    return if (isRunning) {
+        spinState.copy(
+            running = false,
+            initialPosition = 0,
+            targetPosition = 0
+        )
     } else {
         val item = appClient.rollItem()!!
-        spinState.copy(enabled = true, targetPosition = items.indexOf(item) + items.size * 3)
+        println(item.name)
+        spinState.copy(
+            running = true,
+            initialPosition = spinState.targetPosition,
+            targetPosition = items.indexOf(item)
+        )
     }
 }
 
@@ -85,10 +95,15 @@ private fun ItemsWheel(
         items = appClient.getItems()
     }
     var spinState by remember(items) { mutableStateOf(SpinState.default(itemsCount = items.size)) }
-    var isRunning by remember(spinState.spinTime) { mutableStateOf(spinState.enabled) }
-    LaunchedEffect(spinState.spinTime) {
-        if (spinState.enabled) {
+    var isRunning by remember { mutableStateOf(false) }
+    var itemPanel by remember { mutableStateOf<WheelItem?>(null) }
+    LaunchedEffect(spinState) {
+        if (spinState.running) {
+            isRunning = true
+            itemPanel = null
             delay(spinState.duration)
+            isRunning = false
+        } else {
             isRunning = false
         }
     }
@@ -98,11 +113,14 @@ private fun ItemsWheel(
                 .fillMaxSize()
         ) {
             val itemHeight = 52.dp + 8.dp * 2
-            val rotate by flatSpinAnimation(spinState, spinState.duration.toInt()) {
+            val scrollState = rememberLazyListState(
+                initialFirstVisibleItemIndex = spinState.numberOfOptionsOnScreen / 2
+            )
+            val rotate by flatSpinAnimation(spinState) {
+                itemPanel = items.getOrNull(spinState.targetPosition.rem(spinState.itemsCount))
             }
-            val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = 3)
             LaunchedEffect(rotate) {
-                if (spinState.enabled) {
+                if (isRunning) {
                     scrollState.animateScrollToItem(rotate)
                 } else {
                     scrollState.scrollToItem(rotate)
@@ -113,7 +131,7 @@ private fun ItemsWheel(
                 state = scrollState,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .height(itemHeight * 7)
+                    .height(itemHeight * spinState.numberOfOptionsOnScreen)
                     .weight(2f)
                     .align(Alignment.CenterVertically)
             ) {
@@ -121,7 +139,7 @@ private fun ItemsWheel(
                     val item = items[position.rem(items.size)]
                     Text(
                         text = item.name,
-                        fontSize = 48.sp,
+                        fontSize = 46.sp,
                         modifier = Modifier
                             .padding(vertical = 8.dp)
                             .height(52.dp)
@@ -129,7 +147,7 @@ private fun ItemsWheel(
                     )
                 }
             }
-            Box(
+            Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 16.dp)
@@ -139,7 +157,7 @@ private fun ItemsWheel(
                     shape = RoundedCornerShape(50),
                     onClick = {
                         scope.launch {
-                            spinState = handleRollItems(spinState, items, appClient)
+                            spinState = handleRollItems(isRunning, spinState, items, appClient)
                         }
                     },
                     modifier = Modifier
@@ -147,6 +165,11 @@ private fun ItemsWheel(
                 ) {
                     Text(
                         text = if (isRunning) "Stop" else "Roll"
+                    )
+                }
+                if (itemPanel != null) {
+                    Text(
+                        text = itemPanel!!.description
                     )
                 }
             }
