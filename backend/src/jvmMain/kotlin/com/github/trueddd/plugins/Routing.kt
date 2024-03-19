@@ -1,9 +1,6 @@
 package com.github.trueddd.plugins
 
-import com.github.trueddd.core.EventGate
-import com.github.trueddd.core.GameLoader
-import com.github.trueddd.core.HttpClient
-import com.github.trueddd.core.ItemRoller
+import com.github.trueddd.core.*
 import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.di.getItemFactoriesSet
@@ -17,6 +14,7 @@ import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.util.pipeline.*
 import org.koin.ktor.ext.get
 import org.koin.ktor.ext.inject
 
@@ -24,30 +22,38 @@ fun Application.configureRouting() {
     val eventGate by inject<EventGate>()
     val httpClient by inject<HttpClient>()
     val itemRoller by inject<ItemRoller>()
+    val gamesProvider by inject<GamesProvider>()
 
     routing {
-        install(CachingHeaders) {
-            options { _, _ ->
-                CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60))
-            }
-        }
+        install(CachingHeaders)
 
-        staticResources("/icons", "icons/items")
+        staticResources(Router.ICONS, "icons/items") {
+            cacheControl { listOf(CacheControl.MaxAge(maxAgeSeconds = 3600)) }
+        }
 
         authenticate {
-            get("/actions") {
-                call.caching = CachingOptions(CacheControl.NoCache(CacheControl.Visibility.Public))
+            get(Router.ACTIONS) {
                 call.respond(eventGate.historyHolder.getActions())
             }
-            route("/roll") {
-                get("/item") {
-                    call.caching = CachingOptions(CacheControl.NoCache(CacheControl.Visibility.Public))
-                    call.respond(itemRoller.pick())
-                }
+            get(Router.Wheels.PLAYERS) {
+                cache()
+                val user = call.userLogin!!
+                val items = eventGate.stateHolder.participants.filter { it.name != user }
+                call.respond(items)
+            }
+            get(Router.Wheels.ROLL_ITEMS) {
+                call.respond(itemRoller.pick())
+            }
+            get(Router.Wheels.ROLL_GAMES) {
+                call.respond(gamesProvider.roll())
+            }
+            get(Router.Wheels.ROLL_PLAYERS) {
+                val user = call.userLogin!!
+                call.respond(eventGate.stateHolder.participants.filter { it.name != user }.random())
             }
         }
 
-        post("/game") {
+        post(Router.LOAD_GAME) {
             val fileToLoad = try {
                 call.receive<DownloadGameRequestBody>().name
             } catch (e: Exception) {
@@ -74,14 +80,18 @@ fun Application.configureRouting() {
             }
         }
 
-        get("items") {
-            call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 3600))
+        get(Router.Wheels.ITEMS) {
+            cache()
             val items = getItemFactoriesSet().map { it.create() }
             call.respond(items)
         }
+        get(Router.Wheels.GAMES) {
+            cache()
+            val items = gamesProvider.listAll()
+            call.respond(items)
+        }
 
-        post("user") {
-            call.caching = CachingOptions(CacheControl.NoCache(CacheControl.Visibility.Public))
+        post(Router.USER) {
             val userToken = call.parameters["token"] ?: run {
                 call.respond(HttpStatusCode.BadRequest, "No access token passed")
                 return@post
@@ -101,4 +111,8 @@ fun Application.configureRouting() {
             call.respond(HttpStatusCode.OK, AuthResponse(participant, token))
         }
     }
+}
+
+fun PipelineContext<Unit, ApplicationCall>.cache(maxAgeSeconds: Int = 3600) {
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds))
 }

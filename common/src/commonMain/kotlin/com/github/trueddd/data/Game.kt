@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class Game(
     val id: Id,
     val name: String,
-    val link: String? = null,
+    val genre: Genre,
 ) {
 
     @Serializable

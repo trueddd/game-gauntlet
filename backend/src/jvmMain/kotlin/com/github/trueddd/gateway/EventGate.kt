@@ -4,6 +4,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException
 import com.github.trueddd.core.Command
 import com.github.trueddd.core.EventGate
 import com.github.trueddd.core.Response
+import com.github.trueddd.core.Router
 import com.github.trueddd.plugins.Jwt
 import com.github.trueddd.utils.Environment
 import com.github.trueddd.utils.Log
@@ -24,7 +25,7 @@ fun Routing.setupEventGate() {
         eventGate.start()
     }
 
-    webSocket("/state") {
+    webSocket(Router.STATE) {
         val token = (incoming.receive() as? Frame.Text)?.readText()
         val user = try {
             val decoded = Jwt.Verifier.verify(token)
@@ -70,7 +71,7 @@ fun Routing.setupEventGate() {
         }
     }
 
-    webSocket("/actions") {
+    webSocket(Router.ACTIONS) {
         eventGate.historyHolder.actionsChannel
             .onEach { outgoing.sendResponse(Response.UserAction(it)) }
             .launchIn(this)

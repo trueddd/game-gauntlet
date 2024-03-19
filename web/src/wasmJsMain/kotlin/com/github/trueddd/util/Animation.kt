@@ -15,12 +15,12 @@ fun flatSpinAnimation(
     var playTime by remember { mutableStateOf(0L) }
     val rotate = remember { mutableStateOf(0) }
     val anim = remember(state) {
+        if (!state.running) return@remember null
         TargetBasedAnimation(
             animationSpec = tween(state.duration.toInt(), easing = FastOutSlowInEasing),
             typeConverter = Int.VectorConverter,
             initialValue = rotate.value,
             targetValue = with(state) {
-                if (!running) return@with 0
                 val delta = (targetPosition - initialPosition).let { if (it < 0) it + itemsCount else it }
                 val firstShift = (numberOfOptionsOnScreen / 2).takeIf { rotate.value == 0 } ?: 0
                 rotate.value + delta - firstShift + 2 * itemsCount
@@ -28,6 +28,7 @@ fun flatSpinAnimation(
         )
     }
     LaunchedEffect(anim) {
+        if (anim == null) return@LaunchedEffect
         val startTime = withFrameNanos { it }
         do {
             playTime = withFrameNanos { it } - startTime

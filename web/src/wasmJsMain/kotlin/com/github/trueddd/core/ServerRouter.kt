@@ -15,40 +15,19 @@ class ServerRouter {
         ).buildString()
     }
 
-    private fun ws(path: String): String {
+    fun ws(path: String): String {
         return base(
             protocol = if (isDevEnvironment()) URLProtocol.WS else URLProtocol.WSS,
             path = path,
         )
     }
 
-    private fun http(path: String): String {
+    fun http(path: String): String {
         return base(
             protocol = if (isDevEnvironment()) URLProtocol.HTTP else URLProtocol.HTTPS,
             path = path,
         )
     }
-
-    val wsState: String
-        get() = ws("state")
-
-    val wsActions: String
-        get() = ws("actions")
-
-    val httpActions: String
-        get() = http("actions")
-
-    val httpGame: String
-        get() = http("game")
-
-    val httpItems: String
-        get() = http("items")
-
-    val httpUser: String
-        get() = http("user")
-
-    val httpRollItem: String
-        get() = http("roll/item")
 
     fun wheelItemIconUrl(id: Int) = http("icons/$id.png")
 }
