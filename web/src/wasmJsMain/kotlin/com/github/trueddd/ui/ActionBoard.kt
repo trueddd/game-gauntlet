@@ -7,9 +7,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -107,7 +107,6 @@ fun ActionsBoard(
                 value = arguments,
                 onValueChange = { arguments = it },
                 singleLine = true,
-                colors = TextFieldDefaults.textFieldColors(textColor = Colors.Text),
                 modifier = Modifier
                     .weight(1f)
                     .updateTextFieldOnCtrlV(arguments) { arguments = it }
@@ -143,7 +142,7 @@ fun ActionsBoard(
                 sendAction(message)
             },
             enabled = user != null && socketState is SocketState.Connected,
-            colors = ButtonDefaults.buttonColors(backgroundColor = Colors.Primary),
+            colors = ButtonDefaults.buttonColors(containerColor = Colors.Primary),
             modifier = Modifier
                 .padding(top = 8.dp)
                 .pointerHoverIcon(PointerIcon.Hand),

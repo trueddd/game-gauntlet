@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -17,7 +17,16 @@ import androidx.compose.ui.unit.sp
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.items.BoardTrap
 import com.github.trueddd.theme.Colors
+
+@Stable
+data class MapCellState(
+    val index: Int,
+    val genre: Game.Genre?,
+    val players: List<Participant>,
+    val traps: List<BoardTrap>,
+)
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -27,61 +36,81 @@ fun Map(globalState: GlobalState) {
             .padding(16.dp)
             .fillMaxWidth()
     ) {
-        FlowRow {
-            GenreLegend(Game.Genre.Runner)
-            GenreLegend(Game.Genre.ThreeInRow)
-            GenreLegend(Game.Genre.Shooter)
-            GenreLegend(Game.Genre.PointAndClick)
-            GenreLegend(Game.Genre.Business)
-            GenreLegend(Game.Genre.Puzzle)
-            GenreLegend(Game.Genre.Special)
+        val mapState = remember(globalState) {
+            buildList {
+                add(MapCellState(
+                    index = 0,
+                    genre = null,
+                    players = globalState.players.filterValues { it.position == 0 }.keys.toList(),
+                    traps = globalState.boardTraps.filterKeys { it == 0 }.values.toList()
+                ))
+                globalState.gameGenreDistribution.genres.forEachIndexed { index, genre ->
+                    add(MapCellState(
+                        index = index + 1,
+                        genre = genre,
+                        players = globalState.players.filterValues { it.position == index + 1 }.keys.toList(),
+                        traps = globalState.boardTraps.filterKeys { it == index + 1 }.values.toList()
+                    ))
+                }
+            }
         }
         FlowRow {
-            val playersPositions = remember(globalState.players) {
-                globalState.players.entries.associate { (player, state) -> player to state.position }
-            }
-            MapCell(0, null, playersPositions)
-            globalState.gameGenreDistribution.genres.forEachIndexed { index, cell ->
-                MapCell(index + 1, cell, playersPositions)
+            mapState.forEach {
+                MapCell(it)
             }
         }
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun GenreLegend(genre: Game.Genre) {
-    Text(
-        text = genre.name,
-        modifier = Modifier
-            .background(genre.color)
-            .padding(4.dp)
-    )
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun MapCell(index: Int, cell: Game.Genre?, playersPositions: Map<Participant, Int>) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .size(64.dp)
-            .background(cell.color)
-            .border(2.dp, Colors.Primary)
+private fun MapCell(state: MapCellState) {
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+        tooltip = {
+            RichTooltip(
+                title = {
+                    Text(
+                        text = if (state.index == 0) "Стартовая клетка" else "Клетка ${state.index}",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Column {
+                        when (state.genre) {
+                            Game.Genre.Special -> Text("Специальный сектор")
+                            null -> {}
+                            else -> Text("Жанр: ${state.genre.localized}")
+                        }
+                        if (state.players.isNotEmpty()) {
+                            Text("Игроки на клетке: ${state.players.joinToString { it.displayName }}")
+                        }
+                        if (state.traps.isNotEmpty()) {
+                            Text("Ловушки: ${state.traps.joinToString { it.name }}")
+                        }
+                    }
+                }
+            )
+        },
+        state = rememberTooltipState(isPersistent = true),
     ) {
-        Text(
-            text = "$index",
-        )
-        if (playersPositions.values.any { it == index }) {
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(4.dp)
-            ) {
-                playersPositions
-                    .filterValues { it == index }
-                    .forEach { (player, _) ->
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(64.dp)
+                .background(state.genre.color)
+                .border(2.dp, Colors.Primary)
+        ) {
+            Text(state.index.toString())
+            if (state.players.isNotEmpty()) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(4.dp)
+                ) {
+                    state.players.forEach {
                         Box(
                             modifier = Modifier
                                 .size(24.dp)
@@ -89,7 +118,7 @@ private fun MapCell(index: Int, cell: Game.Genre?, playersPositions: Map<Partici
                                 .border(2.dp, Colors.Primary, CircleShape)
                         ) {
                             Text(
-                                text = player.displayName.first().uppercase(),
+                                text = it.displayName.first().uppercase(),
                                 color = Colors.Primary,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
@@ -98,6 +127,7 @@ private fun MapCell(index: Int, cell: Game.Genre?, playersPositions: Map<Partici
                             )
                         }
                     }
+                }
             }
         }
     }
@@ -116,3 +146,14 @@ private val Game.Genre?.color: Color
         Game.Genre.Special -> Colors.Genre.Special
     }
 
+@Stable
+private val Game.Genre.localized: String
+    get() = when (this) {
+        Game.Genre.Runner -> "Бегалки"
+        Game.Genre.Business -> "Бизнес"
+        Game.Genre.Puzzle -> "Головоломки"
+        Game.Genre.PointAndClick -> "Поиск предметов"
+        Game.Genre.Shooter -> "Стрелялки"
+        Game.Genre.ThreeInRow -> "Три в ряд"
+        Game.Genre.Special -> "Специальный сектор"
+    }

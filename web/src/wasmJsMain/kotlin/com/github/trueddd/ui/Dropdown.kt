@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
@@ -59,14 +59,15 @@ fun Dropdown(
         ) {
             options.forEach { selectionOption ->
                 DropdownMenuItem(
+                    text = {
+                        Text(selectionOption)
+                    },
                     onClick = {
                         selectedOptionIndex.value = options.indexOf(selectionOption)
                         onOptionSelected(selectionOption)
                         expanded.value = false
                     }
-                ) {
-                    Text(text = selectionOption)
-                }
+                )
             }
         }
     }

@@ -229,9 +229,4 @@ class AppClient(
             }
         }
     }
-
-    // TODO: accept rolled wheel item in dialog
-    fun acceptRolledItem(item: WheelItem, user: Participant) {
-        sendCommand(Command.Action("${user.name}:${Action.Key.ItemReceive}:${item.id.value}"))
-    }
 }

@@ -7,8 +7,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +19,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.trueddd.core.AppClient
+import com.github.trueddd.core.Command
 import com.github.trueddd.data.Participant
 import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
@@ -38,7 +40,7 @@ fun Wheels(
         var wheelType by remember { mutableStateOf(WheelType.Items) }
         Row {
             Text(
-                text = "Items",
+                text = "Предметы",
                 color = if (wheelType == WheelType.Items) Color.White else Colors.Primary,
                 modifier = Modifier
                     .background(if (wheelType == WheelType.Items) Colors.Primary else Color.White)
@@ -46,7 +48,7 @@ fun Wheels(
                     .padding(4.dp)
             )
             Text(
-                text = "Players",
+                text = "Игроки",
                 color = if (wheelType == WheelType.Players) Color.White else Colors.Primary,
                 modifier = Modifier
                     .background(if (wheelType == WheelType.Players) Colors.Primary else Color.White)
@@ -54,7 +56,7 @@ fun Wheels(
                     .padding(4.dp)
             )
             Text(
-                text = "Games",
+                text = "Игры",
                 color = if (wheelType == WheelType.Games) Color.White else Colors.Primary,
                 modifier = Modifier
                     .background(if (wheelType == WheelType.Games) Colors.Primary else Color.White)
@@ -64,18 +66,19 @@ fun Wheels(
         }
         AnimatedContent(
             targetState = wheelType,
-        ) {
-            when (it) {
+        ) { type ->
+            when (type) {
                 WheelType.Items -> Wheel(
-                    participant = participant,
+                    type = WheelType.Items,
                     loadItems = { appClient.getItems() },
                     rollItemLambda = { appClient.rollItem()!! },
                     name = { name },
-                    description = { description }
+                    description = { description },
+                    applyAction = { appClient.sendCommand(Command.Action.itemReceive(participant, it.id)) },
                 )
 
                 WheelType.Games -> Wheel(
-                    participant = participant,
+                    type = WheelType.Games,
                     loadItems = { appClient.getGames() },
                     rollItemLambda = { appClient.rollGame()!! },
                     name = { name },
@@ -83,11 +86,11 @@ fun Wheels(
                 )
 
                 WheelType.Players -> Wheel(
-                    participant = participant,
+                    type = WheelType.Players,
                     loadItems = { appClient.getPlayers() },
                     rollItemLambda = { appClient.rollPlayer()!! },
                     name = { displayName },
-                    description = { displayName }
+                    description = { displayName },
                 )
             }
         }
@@ -118,11 +121,12 @@ private suspend fun <T> handleRollItems(
 
 @Composable
 private fun <T> Wheel(
-    participant: Participant,
+    type: WheelType,
     loadItems: suspend () -> List<T>,
     rollItemLambda: suspend () -> T,
     name: T.() -> String,
     description: T.() -> String,
+    applyAction: suspend (T) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     var items by remember { mutableStateOf(emptyList<T>()) }
@@ -131,11 +135,11 @@ private fun <T> Wheel(
     }
     var spinState by remember(items) { mutableStateOf(SpinState.default(itemsCount = items.size)) }
     var isRunning by remember { mutableStateOf(false) }
-    var itemPanel by remember { mutableStateOf<T?>(null) }
+    var rolledItem by remember { mutableStateOf<T?>(null) }
     LaunchedEffect(spinState) {
         if (spinState.running) {
             isRunning = true
-            itemPanel = null
+            rolledItem = null
             delay(spinState.duration)
             isRunning = false
         } else {
@@ -152,7 +156,7 @@ private fun <T> Wheel(
                 initialFirstVisibleItemIndex = spinState.numberOfOptionsOnScreen / 2
             )
             val rotate by flatSpinAnimation(spinState) {
-                itemPanel = items.getOrNull(spinState.targetPosition.rem(spinState.itemsCount))
+                rolledItem = items.getOrNull(spinState.targetPosition.rem(spinState.itemsCount))
             }
             LaunchedEffect(rotate) {
                 if (isRunning) {
@@ -189,23 +193,41 @@ private fun <T> Wheel(
                     .padding(end = 16.dp)
                     .align(Alignment.CenterVertically)
             ) {
-                Button(
-                    shape = RoundedCornerShape(50),
-                    onClick = {
-                        scope.launch {
-                            spinState = handleRollItems(isRunning, spinState, items, rollItemLambda)
-                        }
-                    },
-                    modifier = Modifier
-                        .pointerHoverIcon(PointerIcon.Hand)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(
-                        text = if (isRunning) "Stop" else "Roll"
-                    )
+                    Button(
+                        shape = RoundedCornerShape(50),
+                        onClick = {
+                            scope.launch {
+                                spinState = handleRollItems(isRunning, spinState, items, rollItemLambda)
+                            }
+                        },
+                        modifier = Modifier
+                            .pointerHoverIcon(PointerIcon.Hand)
+                    ) {
+                        Text(text = "Крутить")
+                    }
+                    if (type != WheelType.Players && rolledItem != null) {
+                        OutlinedButton(
+                            shape = RoundedCornerShape(50),
+                            onClick = { scope.launch { applyAction(rolledItem!!) } },
+                            modifier = Modifier
+                                .pointerHoverIcon(PointerIcon.Hand)
+                        ) {
+                            Text(
+                                text = when (type) {
+                                    WheelType.Items -> "Принять"
+                                    WheelType.Games -> "Сделать текущей"
+                                    WheelType.Players -> "Apply"
+                                }
+                            )
+                        }
+                    }
                 }
-                if (itemPanel != null) {
+                if (rolledItem != null) {
                     Text(
-                        text = itemPanel!!.description()
+                        text = rolledItem!!.description()
                     )
                 }
             }

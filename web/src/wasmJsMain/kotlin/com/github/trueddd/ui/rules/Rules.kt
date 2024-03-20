@@ -11,12 +11,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,8 +74,7 @@ fun Rules(
         TextField(
             value = searchText,
             onValueChange = { searchText = it },
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Colors.Text,
+            colors = TextFieldDefaults.colors(
                 cursorColor = Colors.Primary,
                 focusedIndicatorColor = Colors.Primary,
             ),
