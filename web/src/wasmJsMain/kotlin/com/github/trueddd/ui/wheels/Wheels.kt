@@ -175,6 +175,7 @@ private fun <T> Wheel(
                     Text(
                         text = item.name(),
                         fontSize = 46.sp,
+                        maxLines = 1,
                         modifier = Modifier
                             .padding(vertical = 8.dp)
                             .height(52.dp)

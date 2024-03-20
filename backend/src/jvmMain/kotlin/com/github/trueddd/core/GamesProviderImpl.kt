@@ -15,7 +15,7 @@ class GamesProviderImpl : GamesProvider {
 
     private fun decodeGenreOrNull(input: String): Game.Genre? {
         return try {
-            Json.decodeFromString<Game.Genre>(input)
+            Json.decodeFromString<Game.Genre>("\"$input\"")
         } catch (e: Exception) {
             null
         }
@@ -23,17 +23,11 @@ class GamesProviderImpl : GamesProvider {
 
     private val games = run {
         val fileContent = Paths.get("src/jvmMain/resources/games").toFile().readText()
-        Log.info(TAG, "games file length ${fileContent.length}")
         var parsedGamesCount = 0
         var corruptedGamesCount = 0
         val games = fileContent.lines()
             .mapNotNull { content ->
                 val (name, rawGenre) = content.split("|")
-                    .takeIf { it.isNotEmpty() }
-                    ?: run {
-                        corruptedGamesCount++
-                        return@mapNotNull null
-                    }
                 val genre = decodeGenreOrNull(rawGenre) ?: run {
                     corruptedGamesCount++
                     return@mapNotNull null
@@ -45,7 +39,11 @@ class GamesProviderImpl : GamesProvider {
     }
 
     override fun roll(genre: Game.Genre?): Game {
-        return games.random()
+        val gamesList = when (genre) {
+            null -> games
+            else -> games.filter { it.genre == genre }
+        }
+        return gamesList.random()
     }
 
     override fun getById(id: Game.Id): Game? {

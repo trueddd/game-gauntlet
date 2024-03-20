@@ -35,6 +35,11 @@ fun Application.configureRouting() {
             get(Router.ACTIONS) {
                 call.respond(eventGate.historyHolder.getActions())
             }
+            get(Router.Wheels.GAMES) {
+                cache()
+                val items = gamesProvider.listAll()
+                call.respond(items)
+            }
             get(Router.Wheels.PLAYERS) {
                 cache()
                 val user = call.userLogin!!
@@ -85,11 +90,6 @@ fun Application.configureRouting() {
             val items = getItemFactoriesSet().map { it.create() }
             call.respond(items)
         }
-        get(Router.Wheels.GAMES) {
-            cache()
-            val items = gamesProvider.listAll()
-            call.respond(items)
-        }
 
         post(Router.USER) {
             val userToken = call.parameters["token"] ?: run {
@@ -113,6 +113,10 @@ fun Application.configureRouting() {
     }
 }
 
-fun PipelineContext<Unit, ApplicationCall>.cache(maxAgeSeconds: Int = 3600) {
-    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds))
+fun PipelineContext<Unit, ApplicationCall>.cache() {
+    call.caching = if (Environment.IsDev) {
+        CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 10))
+    } else {
+        CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 600))
+    }
 }

@@ -2,6 +2,7 @@ package com.github.trueddd.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 
 @Serializable
 data class Game(
@@ -10,8 +11,9 @@ data class Game(
     val genre: Genre,
 ) {
 
+    @JvmInline
     @Serializable
-    data class Id(val value: Int)
+    value class Id(val value: Int)
 
     @Serializable
     enum class Status {
