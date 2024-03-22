@@ -37,7 +37,7 @@ sealed class WheelItemView(
 }
 
 @Composable
-fun WheelItemBadge(
+fun WheelItemChip(
     view: WheelItemView,
     selected: Boolean,
     onClick: () -> Unit = {},

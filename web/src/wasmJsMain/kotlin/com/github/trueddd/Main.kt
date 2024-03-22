@@ -1,16 +1,9 @@
 package com.github.trueddd
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -27,6 +20,7 @@ import com.github.trueddd.data.Participant
 import com.github.trueddd.di.KoinIntegration
 import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
+import com.github.trueddd.theme.DarkColors
 import com.github.trueddd.ui.*
 import com.github.trueddd.ui.rules.Rules
 import com.github.trueddd.ui.wheels.Wheels
@@ -45,8 +39,10 @@ fun main() {
         }
         val state by appClient.globalState.collectAsState()
         val socketState by appClient.connectionState.collectAsState()
-        MaterialTheme {
-            CompositionLocalProvider(LocalContentColor provides Colors.Text) {
+        MaterialTheme(
+            colorScheme = DarkColors,
+        ) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.primary) {
                 App(
                     globalState = state,
                     socketState = socketState,
@@ -72,7 +68,7 @@ private fun App(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Colors.Background)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         InfoPanel(
             socketState = socketState,
@@ -150,63 +146,36 @@ private fun TopPanel(
     modifier: Modifier = Modifier,
     onDestinationChanged: (Destination) -> Unit = {},
 ) {
-    Row(
+    NavigationBar(
         modifier = modifier
-            .height(IntrinsicSize.Min)
-            .background(Colors.DarkBackground)
     ) {
-        destinations.forEachIndexed { index, destination ->
-            if (index != 0) {
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(1.dp)
-                        .background(Colors.SecondaryBackground)
-                )
-            }
-            val interactionSource = remember { MutableInteractionSource() }
-            Box(
-                contentAlignment = Alignment.Center,
+        destinations.forEach { destination ->
+            NavigationBarItem(
+                selected = currentDestination == destination,
+                onClick = { onDestinationChanged(destination) },
+                enabled = !destination.isPrivate || participant != null,
+                icon = {
+                    Icon(
+                        imageVector = if (currentDestination == destination) {
+                            destination.icon
+                        } else {
+                            destination.disabledIcon
+                        },
+                        contentDescription = null,
+                    )
+                },
+                label = {
+                    Text(destination.name)
+                },
                 modifier = Modifier
-                    .heightIn(min = 52.dp)
-                    .weight(1f)
-                    .background(Colors.DarkBackground)
                     .pointerHoverIcon(
-                        if (!destination.isPrivate || participant != null)
+                        if (!destination.isPrivate || participant != null) {
                             PointerIcon.Hand
-                        else
+                        } else {
                             PointerIcon.Default
+                        }
                     )
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = null,
-                        enabled = !destination.isPrivate || participant != null,
-                        onClick = { onDestinationChanged(destination) },
-                    )
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier
-                ) {
-                    Text(
-                        text = destination.name,
-                        modifier = Modifier
-                    )
-                    AnimatedVisibility(
-                        visible = currentDestination == destination,
-                        modifier = Modifier,
-                        enter = expandVertically(),
-                        exit = shrinkVertically(),
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(4.dp)
-                                .background(Colors.Primary, CircleShape)
-                        )
-                    }
-                }
-            }
+            )
         }
     }
 }
@@ -245,6 +214,7 @@ private fun InfoPanel(
                     is SocketState.Connecting -> "Подключение к серверу..."
                     is SocketState.Connected -> "Подключение установлено"
                 },
+                color = Colors.White,
                 modifier = Modifier
                     .padding(4.dp)
                     .align(Alignment.Center)

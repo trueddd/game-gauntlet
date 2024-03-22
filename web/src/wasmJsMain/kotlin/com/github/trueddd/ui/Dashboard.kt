@@ -28,7 +28,7 @@ fun Dashboard(
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
-                .weight(1f)
+                .width(IntrinsicSize.Min)
         ) {
             ActionsBoard(
                 globalState = globalState,
@@ -49,7 +49,7 @@ fun Dashboard(
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
-                .weight(3f)
+                .fillMaxWidth()
         ) {
             var actions by remember { mutableStateOf(emptyList<Action>()) }
             LaunchedEffect(Unit) {

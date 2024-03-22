@@ -13,7 +13,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +33,6 @@ import androidx.compose.ui.unit.sp
 import com.github.trueddd.core.AppClient
 import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
-import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.widget.AsyncImage
 import com.github.trueddd.util.color
 
@@ -74,28 +76,16 @@ fun Rules(
         TextField(
             value = searchText,
             onValueChange = { searchText = it },
-            colors = TextFieldDefaults.colors(
-                cursorColor = Colors.Primary,
-                focusedIndicatorColor = Colors.Primary,
-            ),
-            placeholder = {
-                Text(
-                    text = "Поиск...",
-                    color = Colors.TextSecondary,
-                )
-            },
+            placeholder = { Text(text = "Поиск...") },
             trailingIcon = {
                 AnimatedVisibility(
                     visible = searchText.isNotEmpty(),
                     enter = slideInHorizontally { it } + fadeIn(),
                     exit = slideOutHorizontally { it } + fadeOut(),
-                    modifier = Modifier
-                        .padding(end = 8.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Clear search",
-                        tint = Colors.Text,
                         modifier = Modifier
                             .clickable { searchText = "" }
                             .pointerHoverIcon(PointerIcon.Hand)
@@ -114,7 +104,7 @@ fun Rules(
                 .padding(vertical = 16.dp)
         ) {
             WheelItemView.All.forEach {
-                WheelItemBadge(
+                WheelItemChip(
                     view = it,
                     selected = selectedTypes.contains(it),
                     onClick = {
@@ -137,7 +127,7 @@ fun Rules(
                 .simpleVerticalScrollbar(
                     state = lazyListState,
                     width = 4.dp,
-                    color = Colors.Primary
+                    color = MaterialTheme.colorScheme.primaryContainer
                 )
         ) {
             items(visibleItems) { item ->
@@ -162,10 +152,12 @@ fun Rules(
                         Text(
                             text = item.name,
                             fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onBackground,
                         )
                         Text(
                             text = item.description.replace("\n", ""),
                             fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onBackground,
                         )
                     }
                 }

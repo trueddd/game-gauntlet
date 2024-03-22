@@ -99,9 +99,12 @@ private fun MapCell(state: MapCellState) {
             modifier = Modifier
                 .size(64.dp)
                 .background(state.genre.color)
-                .border(2.dp, Colors.Primary)
+                .border(2.dp, MaterialTheme.colorScheme.secondaryContainer)
         ) {
-            Text(state.index.toString())
+            Text(
+                text = state.index.toString(),
+                color = MaterialTheme.colorScheme.onBackground
+            )
             if (state.players.isNotEmpty()) {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(2.dp),
@@ -114,12 +117,12 @@ private fun MapCell(state: MapCellState) {
                         Box(
                             modifier = Modifier
                                 .size(24.dp)
-                                .background(Color.White, CircleShape)
-                                .border(2.dp, Colors.Primary, CircleShape)
+                                .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape)
+                                .border(2.dp, MaterialTheme.colorScheme.onSecondaryContainer, CircleShape)
                         ) {
                             Text(
                                 text = it.displayName.first().uppercase(),
-                                color = Colors.Primary,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier

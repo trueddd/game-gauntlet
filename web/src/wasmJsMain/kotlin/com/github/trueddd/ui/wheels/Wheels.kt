@@ -1,28 +1,26 @@
 package com.github.trueddd.ui.wheels
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.Command
 import com.github.trueddd.data.Participant
 import com.github.trueddd.di.get
-import com.github.trueddd.theme.Colors
 import com.github.trueddd.util.flatSpinAnimation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -34,34 +32,27 @@ fun Wheels(
 ) {
     Column(
         modifier = modifier
-            .padding(top = 16.dp)
     ) {
         val appClient = remember { get<AppClient>() }
         var wheelType by remember { mutableStateOf(WheelType.Items) }
-        Row {
-            Text(
-                text = "Предметы",
-                color = if (wheelType == WheelType.Items) Color.White else Colors.Primary,
-                modifier = Modifier
-                    .background(if (wheelType == WheelType.Items) Colors.Primary else Color.White)
-                    .clickable { wheelType = WheelType.Items }
-                    .padding(4.dp)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(16.dp)
+        ) {
+            FilterChip(
+                selected = wheelType == WheelType.Items,
+                onClick = { wheelType = WheelType.Items },
+                label = { Text("Предметы") },
             )
-            Text(
-                text = "Игроки",
-                color = if (wheelType == WheelType.Players) Color.White else Colors.Primary,
-                modifier = Modifier
-                    .background(if (wheelType == WheelType.Players) Colors.Primary else Color.White)
-                    .clickable { wheelType = WheelType.Players }
-                    .padding(4.dp)
+            FilterChip(
+                selected = wheelType == WheelType.Players,
+                onClick = { wheelType = WheelType.Players },
+                label = { Text("Игроки") },
             )
-            Text(
-                text = "Игры",
-                color = if (wheelType == WheelType.Games) Color.White else Colors.Primary,
-                modifier = Modifier
-                    .background(if (wheelType == WheelType.Games) Colors.Primary else Color.White)
-                    .clickable { wheelType = WheelType.Games }
-                    .padding(4.dp)
+            FilterChip(
+                selected = wheelType == WheelType.Games,
+                onClick = { wheelType = WheelType.Games} ,
+                label = { Text("Игры") },
             )
         }
         AnimatedContent(
@@ -148,10 +139,13 @@ private fun <T> Wheel(
     }
     if (items.isNotEmpty()) {
         Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
+                .padding(16.dp)
                 .fillMaxSize()
         ) {
             val itemHeight = 52.dp + 8.dp * 2
+            val itemHeightPx = with(LocalDensity.current) { itemHeight.toPx() }
             val scrollState = rememberLazyListState(
                 initialFirstVisibleItemIndex = spinState.numberOfOptionsOnScreen / 2
             )
@@ -159,29 +153,36 @@ private fun <T> Wheel(
                 rolledItem = items.getOrNull(spinState.targetPosition.rem(spinState.itemsCount))
             }
             LaunchedEffect(rotate) {
-                if (isRunning) {
-                    scrollState.animateScrollToItem(rotate)
-                } else {
-                    scrollState.scrollToItem(rotate)
-                }
+                scrollState.animateScrollToItem(rotate)
             }
             LazyColumn(
                 userScrollEnabled = false,
                 state = scrollState,
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
                     .height(itemHeight * spinState.numberOfOptionsOnScreen)
-                    .weight(2f)
+                    .weight(3f)
+                    .padding(start = 64.dp)
                     .align(Alignment.CenterVertically)
             ) {
                 items(Int.MAX_VALUE) { position ->
                     val item = items[position.rem(items.size)]
+                    val fraction = remember {
+                        derivedStateOf {
+                            scrollState.layoutInfo.visibleItemsInfo
+                                .firstOrNull { it.index == position }
+                                ?.offset?.plus(itemHeightPx / 2)
+                                ?.div(itemHeightPx * spinState.numberOfOptionsOnScreen)
+                                ?.minus(0.5f)?.times(2)
+                                ?.let { 1f - it * it }?.coerceIn(0f .. 1f)
+                                ?: 0f
+                        }
+                    }
                     Text(
                         text = item.name(),
                         fontSize = 46.sp,
                         maxLines = 1,
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
+                            .padding(top = 8.dp, bottom = 8.dp, start = (64 * fraction.value).dp)
                             .height(52.dp)
                             .fillMaxWidth()
                     )
@@ -189,8 +190,7 @@ private fun <T> Wheel(
             }
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 16.dp)
+                    .weight(2f)
                     .align(Alignment.CenterVertically)
             ) {
                 Row(
