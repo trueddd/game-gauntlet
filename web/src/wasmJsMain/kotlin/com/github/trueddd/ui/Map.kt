@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -54,7 +55,10 @@ fun Map(globalState: GlobalState) {
                 }
             }
         }
-        FlowRow {
+        FlowRow(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
             mapState.forEach {
                 MapCell(it)
             }
@@ -98,8 +102,10 @@ private fun MapCell(state: MapCellState) {
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(64.dp)
-                .background(state.genre.color)
-                .border(2.dp, MaterialTheme.colorScheme.secondaryContainer)
+                .background(
+                    color = state.genre?.color?.let { Color(it) } ?: Colors.DefaultGenre,
+                    shape = RoundedCornerShape(8.dp)
+                )
         ) {
             Text(
                 text = state.index.toString(),
@@ -135,19 +141,6 @@ private fun MapCell(state: MapCellState) {
         }
     }
 }
-
-@Stable
-private val Game.Genre?.color: Color
-    get() = when (this) {
-        null -> Colors.Genre.Default
-        Game.Genre.Runner -> Colors.Genre.Runner
-        Game.Genre.Business -> Colors.Genre.Business
-        Game.Genre.Puzzle -> Colors.Genre.Puzzle
-        Game.Genre.PointAndClick -> Colors.Genre.PointAndClick
-        Game.Genre.Shooter -> Colors.Genre.Shooter
-        Game.Genre.ThreeInRow -> Colors.Genre.ThreeInRow
-        Game.Genre.Special -> Colors.Genre.Special
-    }
 
 @Stable
 private val Game.Genre.localized: String

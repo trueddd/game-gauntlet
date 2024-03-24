@@ -42,21 +42,5 @@ object Colors {
     val Success = Color(0xFF4ADE80)
     val Error = Color(0xFFF87171)
     val White = Color.White
-    object Genre {
-        val Runner = Color(0xFFF87171)
-        val Business = Color(0xFF60A5FA)
-        val Puzzle = Color(0xFFA78BFA)
-        val PointAndClick = Color(0xFF4ADE80)
-        val Shooter = Color(0xFFFBBF24)
-        val ThreeInRow = Color(0xFFFB923C)
-        val Special = Color(0xFF9CA3AF)
-        val Default = Color(0xFFECFDF5)
-    }
-    object WheelItem {
-        val Event = Color(0xFF06B6D4)
-        val PendingEvent = Color(0xFF14B8A6)
-        val InventoryItem = Color(0xFFF59E0B)
-        val Buff = Color(0xFF22C55E)
-        val Debuff = Color(0xFFEF4444)
-    }
+    val DefaultGenre = Color(0xFFECFDF5)
 }

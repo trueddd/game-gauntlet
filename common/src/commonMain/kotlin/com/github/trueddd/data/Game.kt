@@ -7,9 +7,15 @@ import kotlin.jvm.JvmInline
 @Serializable
 data class Game(
     val id: Id,
-    val name: String,
+    override val name: String,
     val genre: Genre,
-) {
+): Rollable {
+
+    override val description: String
+        get() = name
+
+    override val color: Long
+        get() = genre.color
 
     @JvmInline
     @Serializable
@@ -51,5 +57,16 @@ data class Game(
         ThreeInRow,
         @SerialName("special")
         Special;
+
+        val color: Long
+            get() = when (this) {
+                Runner -> 0xFFF87171
+                Business -> 0xFF60A5FA
+                Puzzle -> 0xFFA78BFA
+                PointAndClick -> 0xFF4ADE80
+                Shooter -> 0xFFFBBF24
+                ThreeInRow -> 0xFFFB923C
+                Special -> 0xFF9CA3AF
+            }
     }
 }

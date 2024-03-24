@@ -1,6 +1,7 @@
 package com.github.trueddd.ui.wheels
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,9 +22,9 @@ import androidx.compose.ui.unit.sp
 import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.Command
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.Rollable
 import com.github.trueddd.di.get
-import com.github.trueddd.util.color
-import com.github.trueddd.util.flatSpinAnimation
+import com.github.trueddd.util.positionSpinAnimation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -39,7 +40,9 @@ fun Wheels(
         var wheelType by remember { mutableStateOf(WheelType.Items) }
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(16.dp)
         ) {
             FilterChip(
                 selected = wheelType == WheelType.Items,
@@ -53,7 +56,7 @@ fun Wheels(
             )
             FilterChip(
                 selected = wheelType == WheelType.Games,
-                onClick = { wheelType = WheelType.Games} ,
+                onClick = { wheelType = WheelType.Games },
                 label = { Text("Игры") },
             )
         }
@@ -65,9 +68,6 @@ fun Wheels(
                     type = WheelType.Items,
                     loadItems = { appClient.getItems() },
                     rollItemLambda = { appClient.rollItem()!! },
-                    name = { name },
-                    description = { description },
-                    color = { color },
                     applyAction = { appClient.sendCommand(Command.Action.itemReceive(participant, it.id)) },
                 )
 
@@ -75,16 +75,12 @@ fun Wheels(
                     type = WheelType.Games,
                     loadItems = { appClient.getGames() },
                     rollItemLambda = { appClient.rollGame()!! },
-                    name = { name },
-                    description = { name },
                 )
 
                 WheelType.Players -> Wheel(
                     type = WheelType.Players,
                     loadItems = { appClient.getPlayers() },
                     rollItemLambda = { appClient.rollPlayer()!! },
-                    name = { displayName },
-                    description = { displayName },
                 )
             }
         }
@@ -114,13 +110,10 @@ private suspend fun <T> handleRollItems(
 }
 
 @Composable
-private fun <T> Wheel(
+private fun <T : Rollable> Wheel(
     type: WheelType,
     loadItems: suspend () -> List<T>,
     rollItemLambda: suspend () -> T,
-    name: T.() -> String,
-    description: T.() -> String,
-    color: (T.() -> Color)? = null,
     applyAction: suspend (T) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
@@ -150,13 +143,11 @@ private fun <T> Wheel(
         ) {
             val itemHeight = 52.dp
             val itemPadding = 12.dp
-            val itemShift = 64
+            val itemShift = 64.dp
             val wholeItemHeight = itemHeight + itemPadding * 2
             val wholeItemHeightPx = with(LocalDensity.current) { wholeItemHeight.toPx() }
-            val scrollState = rememberLazyListState(
-                initialFirstVisibleItemIndex = spinState.numberOfOptionsOnScreen / 2
-            )
-            val rotate by flatSpinAnimation(spinState) {
+            val scrollState = rememberLazyListState()
+            val rotate by positionSpinAnimation(spinState) {
                 rolledItem = items.getOrNull(spinState.targetPosition.rem(spinState.itemsCount))
             }
             LaunchedEffect(rotate) {
@@ -179,7 +170,7 @@ private fun <T> Wheel(
                                 ?.offset?.plus(wholeItemHeightPx / 2)
                                 ?.div(wholeItemHeightPx * spinState.numberOfOptionsOnScreen)
                                 ?.minus(0.5f)?.times(2)
-                                ?.let { 1f - it * it }?.coerceIn(0f .. 1f)
+                                ?.let { 1f - it * it }?.coerceIn(0f..1f)
                                 ?: 0f
                         }
                     }
@@ -189,8 +180,8 @@ private fun <T> Wheel(
                             .padding(
                                 top = itemPadding,
                                 bottom = itemPadding,
-                                start = (itemShift * fraction.value).dp,
-                                end = (itemShift * (1 - fraction.value)).dp
+                                start = itemShift * fraction.value,
+                                end = itemShift * (1 - fraction.value)
                             )
                             .height(itemHeight)
                             .fillMaxWidth()
@@ -202,15 +193,21 @@ private fun <T> Wheel(
                                 .fillMaxSize()
                                 .padding(horizontal = 16.dp)
                         ) {
-                            if (type == WheelType.Items && color != null) {
+                            if (type == WheelType.Items) {
                                 Spacer(
                                     modifier = Modifier
                                         .size(32.dp)
-                                        .border(4.dp, item.color(), CircleShape)
+                                        .run {
+                                            if (rolledItem == item) {
+                                                background(Color(item.color), CircleShape)
+                                            } else {
+                                                border(4.dp, Color(item.color), CircleShape)
+                                            }
+                                        }
                                 )
                             }
                             Text(
-                                text = item.name(),
+                                text = item.name,
                                 fontSize = 36.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -258,7 +255,7 @@ private fun <T> Wheel(
                 }
                 if (rolledItem != null) {
                     Text(
-                        text = rolledItem!!.description()
+                        text = rolledItem!!.description
                     )
                 }
             }

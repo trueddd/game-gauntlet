@@ -31,7 +31,6 @@ import com.github.trueddd.core.AppClient
 import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.ui.widget.AsyncImage
-import com.github.trueddd.util.color
 
 private fun WheelItem.contains(text: String): Boolean {
     return name.contains(text, ignoreCase = true) || description.contains(text, ignoreCase = true)
@@ -134,7 +133,7 @@ fun Rules(
                         modifier = Modifier
                             .size(48.dp)
                             .background(Color.White)
-                            .border(4.dp, item.color, RectangleShape)
+                            .border(4.dp, Color(item.color), RectangleShape)
                             .padding(8.dp)
                     )
                     Spacer(
