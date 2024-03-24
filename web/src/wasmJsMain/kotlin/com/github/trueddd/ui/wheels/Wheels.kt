@@ -1,26 +1,28 @@
 package com.github.trueddd.ui.wheels
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.Command
 import com.github.trueddd.data.Participant
 import com.github.trueddd.di.get
+import com.github.trueddd.util.color
 import com.github.trueddd.util.flatSpinAnimation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -65,6 +67,7 @@ fun Wheels(
                     rollItemLambda = { appClient.rollItem()!! },
                     name = { name },
                     description = { description },
+                    color = { color },
                     applyAction = { appClient.sendCommand(Command.Action.itemReceive(participant, it.id)) },
                 )
 
@@ -117,6 +120,7 @@ private fun <T> Wheel(
     rollItemLambda: suspend () -> T,
     name: T.() -> String,
     description: T.() -> String,
+    color: (T.() -> Color)? = null,
     applyAction: suspend (T) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
@@ -139,13 +143,16 @@ private fun <T> Wheel(
     }
     if (items.isNotEmpty()) {
         Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.spacedBy(32.dp),
             modifier = Modifier
-                .padding(16.dp)
+                .padding(vertical = 16.dp, horizontal = 64.dp)
                 .fillMaxSize()
         ) {
-            val itemHeight = 52.dp + 8.dp * 2
-            val itemHeightPx = with(LocalDensity.current) { itemHeight.toPx() }
+            val itemHeight = 52.dp
+            val itemPadding = 12.dp
+            val itemShift = 64
+            val wholeItemHeight = itemHeight + itemPadding * 2
+            val wholeItemHeightPx = with(LocalDensity.current) { wholeItemHeight.toPx() }
             val scrollState = rememberLazyListState(
                 initialFirstVisibleItemIndex = spinState.numberOfOptionsOnScreen / 2
             )
@@ -159,9 +166,8 @@ private fun <T> Wheel(
                 userScrollEnabled = false,
                 state = scrollState,
                 modifier = Modifier
-                    .height(itemHeight * spinState.numberOfOptionsOnScreen)
+                    .height(wholeItemHeight * spinState.numberOfOptionsOnScreen)
                     .weight(3f)
-                    .padding(start = 64.dp)
                     .align(Alignment.CenterVertically)
             ) {
                 items(Int.MAX_VALUE) { position ->
@@ -170,22 +176,47 @@ private fun <T> Wheel(
                         derivedStateOf {
                             scrollState.layoutInfo.visibleItemsInfo
                                 .firstOrNull { it.index == position }
-                                ?.offset?.plus(itemHeightPx / 2)
-                                ?.div(itemHeightPx * spinState.numberOfOptionsOnScreen)
+                                ?.offset?.plus(wholeItemHeightPx / 2)
+                                ?.div(wholeItemHeightPx * spinState.numberOfOptionsOnScreen)
                                 ?.minus(0.5f)?.times(2)
                                 ?.let { 1f - it * it }?.coerceIn(0f .. 1f)
                                 ?: 0f
                         }
                     }
-                    Text(
-                        text = item.name(),
-                        fontSize = 46.sp,
-                        maxLines = 1,
+                    Card(
+                        shape = RoundedCornerShape(percent = 50),
                         modifier = Modifier
-                            .padding(top = 8.dp, bottom = 8.dp, start = (64 * fraction.value).dp)
-                            .height(52.dp)
+                            .padding(
+                                top = itemPadding,
+                                bottom = itemPadding,
+                                start = (itemShift * fraction.value).dp,
+                                end = (itemShift * (1 - fraction.value)).dp
+                            )
+                            .height(itemHeight)
                             .fillMaxWidth()
-                    )
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp)
+                        ) {
+                            if (type == WheelType.Items && color != null) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .border(4.dp, item.color(), CircleShape)
+                                )
+                            }
+                            Text(
+                                text = item.name(),
+                                fontSize = 36.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
                 }
             }
             Column(

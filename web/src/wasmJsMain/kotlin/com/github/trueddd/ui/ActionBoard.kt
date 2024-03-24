@@ -56,7 +56,7 @@ fun ActionsBoard(
             onExpandedChange = { userExpanded = !userExpanded },
             modifier = Modifier
         ) {
-            TextField(
+            OutlinedTextField(
                 value = when {
                     user != null -> user!!.displayName
                     participant == null -> "You are unauthorized"
@@ -100,7 +100,7 @@ fun ActionsBoard(
             onExpandedChange = { actionExpanded = !actionExpanded },
             modifier = Modifier
         ) {
-            TextField(
+            OutlinedTextField(
                 value = actions[action] ?: "",
                 onValueChange = {},
                 readOnly = true,
@@ -124,7 +124,7 @@ fun ActionsBoard(
                 }
             }
         }
-        TextField(
+        OutlinedTextField(
             value = arguments,
             onValueChange = { arguments = it },
             singleLine = true,

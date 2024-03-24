@@ -13,10 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,7 +70,7 @@ fun Rules(
     Column(
         modifier = modifier
     ) {
-        TextField(
+        OutlinedTextField(
             value = searchText,
             onValueChange = { searchText = it },
             placeholder = { Text(text = "Поиск...") },
@@ -94,11 +91,11 @@ fun Rules(
             },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(top = 16.dp)
+                .padding(top = 32.dp)
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(vertical = 16.dp)
@@ -120,8 +117,8 @@ fun Rules(
         val lazyListState = rememberLazyListState()
         LazyColumn(
             state = lazyListState,
-            contentPadding = PaddingValues(horizontal = 32.dp, vertical = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(48.dp),
+            contentPadding = PaddingValues(horizontal = 48.dp, vertical = 48.dp),
+            verticalArrangement = Arrangement.spacedBy(32.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .simpleVerticalScrollbar(

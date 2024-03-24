@@ -49,7 +49,7 @@ fun WheelItemChip(
             .background(if (selected) view.color.copy(alpha = 0.2f) else Color.Transparent, shape)
             .border(
                 width = 1.dp,
-                color = if (selected) view.color.copy(alpha = 0.7f) else view.color.copy(alpha = 0.4f),
+                color = if (selected) view.color.copy(alpha = 0.8f) else view.color.copy(alpha = 0.6f),
                 shape = shape
             )
             .pointerHoverIcon(PointerIcon.Hand)
@@ -58,7 +58,7 @@ fun WheelItemChip(
     ) {
         Text(
             text = view.name,
-            color = if (selected) view.color else view.color.copy(alpha = 0.4f),
+            color = if (selected) view.color else view.color.copy(alpha = 0.6f),
         )
     }
 }
