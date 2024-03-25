@@ -2,11 +2,11 @@ package com.github.trueddd.util
 
 import androidx.compose.animation.core.*
 import androidx.compose.runtime.*
-import com.github.trueddd.ui.wheels.SpinState
+import com.github.trueddd.ui.wheels.WheelState
 
 @Composable
 fun positionSpinAnimation(
-    state: SpinState,
+    state: WheelState,
     onFinished: () -> Unit = {},
 ): State<Int> {
     var playTime by remember { mutableStateOf(0L) }
@@ -18,9 +18,9 @@ fun positionSpinAnimation(
             typeConverter = Int.VectorConverter,
             initialValue = rotate.value,
             targetValue = with(state) {
-                val delta = (targetPosition - initialPosition).let { if (it < 0) it + itemsCount else it }
+                val delta = (targetPosition - initialPosition).let { if (it < 0) it + items.size else it }
                 val firstShift = (numberOfOptionsOnScreen / 2).takeIf { rotate.value == 0 } ?: 0
-                rotate.value + delta - firstShift + 2 * itemsCount
+                rotate.value + delta - firstShift + 2 * items.size
             },
         )
     }
@@ -39,7 +39,7 @@ fun positionSpinAnimation(
 @Suppress("unused") // TODO: use pixel-based animation for smoother scroll
 @Composable
 fun offsetSpinAnimation(
-    state: SpinState,
+    state: WheelState,
     positionOffsetPx: Float,
     onFinished: () -> Unit = {},
 ): State<Float> {
@@ -53,9 +53,9 @@ fun offsetSpinAnimation(
             typeConverter = Float.VectorConverter,
             initialValue = 0f,
             targetValue = with(state) {
-                val delta = (targetPosition - initialPosition).let { if (it < 0) it + itemsCount else it }
+                val delta = (targetPosition - initialPosition).let { if (it < 0) it + items.size else it }
                 val firstShift = (numberOfOptionsOnScreen / 2).takeIf { targetPixelsOffset.value == 0f } ?: 0
-                (delta - firstShift + itemsCount) * positionOffsetPx
+                (delta - firstShift + items.size) * positionOffsetPx
             },
         )
     }

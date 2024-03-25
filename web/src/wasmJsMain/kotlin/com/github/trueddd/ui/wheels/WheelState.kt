@@ -1,23 +1,26 @@
 package com.github.trueddd.ui.wheels
 
+import com.github.trueddd.data.Rollable
 import kotlin.time.Duration.Companion.seconds
 
-data class SpinState(
+data class WheelState(
+    val type: WheelType,
+    val items: List<Rollable>,
     val running: Boolean,
     val duration: Long,
     val initialPosition: Int,
     val targetPosition: Int,
-    val itemsCount: Int,
     val numberOfOptionsOnScreen: Int,
 ) {
 
     companion object {
-        fun default(itemsCount: Int) = SpinState(
+        fun default(items: List<Rollable>, type: WheelType) = WheelState(
+            type = type,
+            items = items,
             running = false,
             duration = 20.seconds.inWholeMilliseconds,
             initialPosition = 0,
             targetPosition = 0,
-            itemsCount = itemsCount,
             numberOfOptionsOnScreen = 7,
         )
     }
