@@ -13,14 +13,18 @@ fun positionSpinAnimation(
     val rotate = remember { mutableStateOf(0) }
     val anim = remember(state) {
         if (!state.running) return@remember null
+        val startPosition = when {
+            rotate.value != 0 -> rotate.value // subsequent roll
+            state.initialPosition == 0 -> 0 // first roll, no saved
+            else -> state.initialPosition - state.numberOfOptionsOnScreen / 2 // first roll, saved is present
+        }
         TargetBasedAnimation(
             animationSpec = tween(state.duration.toInt(), easing = FastOutSlowInEasing),
             typeConverter = Int.VectorConverter,
-            initialValue = rotate.value,
+            initialValue = startPosition,
             targetValue = with(state) {
                 val delta = (targetPosition - initialPosition).let { if (it < 0) it + items.size else it }
-                val firstShift = (numberOfOptionsOnScreen / 2).takeIf { rotate.value == 0 } ?: 0
-                rotate.value + delta - firstShift + 2 * items.size
+                startPosition + delta + 2 * items.size
             },
         )
     }

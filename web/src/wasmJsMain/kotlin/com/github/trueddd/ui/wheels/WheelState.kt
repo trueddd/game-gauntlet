@@ -11,6 +11,7 @@ data class WheelState(
     val initialPosition: Int,
     val targetPosition: Int,
     val numberOfOptionsOnScreen: Int,
+    val rolledItem: Rollable?,
 ) {
 
     companion object {
@@ -22,6 +23,7 @@ data class WheelState(
             initialPosition = 0,
             targetPosition = 0,
             numberOfOptionsOnScreen = 7,
+            rolledItem = null,
         )
     }
 }

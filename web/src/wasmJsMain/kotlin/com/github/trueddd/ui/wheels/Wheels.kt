@@ -12,7 +12,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalDensity
@@ -20,13 +21,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.trueddd.core.AppClient
+import com.github.trueddd.core.AppStorage
 import com.github.trueddd.core.Command
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.Rollable
 import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.util.positionSpinAnimation
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,19 +42,22 @@ fun Wheels(
     ) {
         val scope = rememberCoroutineScope()
         val appClient = remember { get<AppClient>() }
-        var wheelState by remember { mutableStateOf(
-            WheelState.default(
-                items = emptyList(),
-                type = WheelType.Items
+        val appStorage = remember { get<AppStorage>() }
+        var wheelState by remember {
+            mutableStateOf(
+                WheelState.default(
+                    items = emptyList(),
+                    type = WheelType.Items
+                )
             )
-        ) }
+        }
         LaunchedEffect(wheelState.type) {
             val items = when (wheelState.type) {
                 WheelType.Items -> appClient.getItems()
                 WheelType.Games -> appClient.getGames()
                 WheelType.Players -> appClient.getPlayers()
             }
-            wheelState = wheelState.copy(items = items)
+            wheelState = appStorage.getSavedWheelState(items, wheelState.type)
         }
         SingleChoiceSegmentedButtonRow(
             modifier = Modifier
@@ -62,63 +66,90 @@ fun Wheels(
         ) {
             SegmentedButton(
                 selected = wheelState.type == WheelType.Items,
-                onClick = { wheelState = wheelState.copy(type = WheelType.Items) },
+                onClick = { wheelState = stateOnTabChange(WheelType.Items) },
                 label = { Text("Предметы") },
                 shape = RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50),
             )
             SegmentedButton(
                 selected = wheelState.type == WheelType.Players,
-                onClick = { wheelState = wheelState.copy(type = WheelType.Players) },
+                onClick = { wheelState = stateOnTabChange(WheelType.Players) },
                 label = { Text("Игроки") },
                 shape = RectangleShape,
             )
             SegmentedButton(
                 selected = wheelState.type == WheelType.Games,
-                onClick = { wheelState = wheelState.copy(type = WheelType.Games) },
+                onClick = { wheelState = stateOnTabChange(WheelType.Games) },
                 label = { Text("Игры") },
                 shape = RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50),
             )
         }
-        AnimatedContent(
-            targetState = wheelState.type,
-        ) { type ->
-            when (type) {
-                WheelType.Items -> Wheel(
-                    wheelState = wheelState,
-                    onApplyClicked = {
-                        if (it !is WheelItem) return@Wheel
-                        appClient.sendCommand(Command.Action.itemReceive(participant, it.id))
-                    },
-                    onRollClicked = {
-                        scope.launch {
-                            wheelState = handleRollItems(wheelState) { appClient.rollItem()!! }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Button(
+                shape = RoundedCornerShape(50),
+                enabled = !wheelState.running,
+                onClick = {
+                    scope.launch {
+                        wheelState = handleRollItems(wheelState) {
+                            when (wheelState.type) {
+                                WheelType.Items -> appClient.rollItem()!!
+                                WheelType.Games -> appClient.rollGame()!!
+                                WheelType.Players -> appClient.rollPlayer()!!
+                            }
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .pointerHoverIcon(if (wheelState.running) PointerIcon.Default else PointerIcon.Hand)
+            ) {
+                Text(text = "Крутить")
+            }
+            if (wheelState.type != WheelType.Players && wheelState.rolledItem != null) {
+                OutlinedButton(
+                    shape = RoundedCornerShape(50),
+                    onClick = {
+                        (wheelState.rolledItem as? WheelItem)?.let {
+                            appClient.sendCommand(Command.Action.itemReceive(participant, it.id))
                         }
                     },
-                    onRollFinished = { wheelState = wheelState.copy(running = false) },
-                )
-
-                WheelType.Games -> Wheel(
-                    wheelState = wheelState,
-                    onRollClicked = {
-                        scope.launch {
-                            wheelState = handleRollItems(wheelState) { appClient.rollGame()!! }
+                    modifier = Modifier
+                        .pointerHoverIcon(PointerIcon.Hand)
+                ) {
+                    Text(
+                        text = when (wheelState.type) {
+                            WheelType.Items -> "Принять"
+                            WheelType.Games -> "Сделать текущей"
+                            else -> "Apply"
                         }
-                    },
-                    onRollFinished = { wheelState = wheelState.copy(running = false) },
-                )
-
-                WheelType.Players -> Wheel(
-                    wheelState = wheelState,
-                    onRollClicked = {
-                        scope.launch {
-                            wheelState = handleRollItems(wheelState) { appClient.rollPlayer()!! }
-                        }
-                    },
-                    onRollFinished = { wheelState = wheelState.copy(running = false) },
-                )
+                    )
+                }
             }
         }
+        AnimatedContent(
+            targetState = wheelState.items,
+        ) {
+            Wheel(
+                wheelState = wheelState,
+                onRollFinished = {
+                    wheelState = wheelState.copy(
+                        running = false,
+                        rolledItem = wheelState.items.getOrNull(wheelState.targetPosition.rem(wheelState.items.size))
+                    )
+                    appStorage.saveWheelItemsState(wheelState)
+                },
+            )
+        }
     }
+}
+
+private fun stateOnTabChange(type: WheelType): WheelState {
+    return WheelState.default(
+        items = emptyList(),
+        type = type,
+    ).copy(rolledItem = null)
 }
 
 private suspend fun <T : Rollable> handleRollItems(
@@ -129,28 +160,20 @@ private suspend fun <T : Rollable> handleRollItems(
     return wheelState.copy(
         running = true,
         initialPosition = wheelState.targetPosition,
-        targetPosition = wheelState.items.indexOf(item)
+        targetPosition = wheelState.items.indexOf(item),
+        rolledItem = null,
     )
 }
 
 @Composable
 private fun Wheel(
     wheelState: WheelState,
-    onRollClicked: () -> Unit,
-    onApplyClicked: (Rollable) -> Unit = {},
     onRollFinished: () -> Unit,
 ) {
-    var isRunning by remember { mutableStateOf(false) }
-    var rolledItem by remember { mutableStateOf<Rollable?>(null) }
-    LaunchedEffect(wheelState) {
+    var rolledBefore by remember { mutableStateOf(false) }
+    LaunchedEffect(wheelState.running) {
         if (wheelState.running) {
-            println(wheelState.toString())
-            isRunning = true
-            rolledItem = null
-            delay(wheelState.duration)
-            isRunning = false
-        } else {
-            isRunning = false
+            rolledBefore = true
         }
     }
     Column(
@@ -158,37 +181,6 @@ private fun Wheel(
         modifier = Modifier
             .padding(vertical = 32.dp)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-        ) {
-            Button(
-                shape = RoundedCornerShape(50),
-                enabled = !isRunning,
-                onClick = onRollClicked,
-                modifier = Modifier
-                    .pointerHoverIcon(if (isRunning) PointerIcon.Default else PointerIcon.Hand)
-            ) {
-                Text(text = "Крутить")
-            }
-            if (wheelState.type != WheelType.Players && rolledItem != null) {
-                OutlinedButton(
-                    shape = RoundedCornerShape(50),
-                    onClick = { rolledItem?.let(onApplyClicked) },
-                    modifier = Modifier
-                        .pointerHoverIcon(PointerIcon.Hand)
-                ) {
-                    Text(
-                        text = when (wheelState.type) {
-                            WheelType.Items -> "Принять"
-                            WheelType.Games -> "Сделать текущей"
-                            WheelType.Players -> "Apply"
-                        }
-                    )
-                }
-            }
-        }
         if (wheelState.items.isNotEmpty()) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(64.dp),
@@ -202,13 +194,16 @@ private fun Wheel(
                 val wholeItemHeight = itemHeight + itemPadding * 2
                 val wholeItemHeightPx = with(LocalDensity.current) { wholeItemHeight.toPx() }
                 val scrollState = rememberLazyListState()
-                val rotate by positionSpinAnimation(wheelState) {
-                    rolledItem = wheelState.items.getOrNull(wheelState.targetPosition.rem(wheelState.items.size))
-                    isRunning = false
-                    onRollFinished()
-                }
+                val rotate by positionSpinAnimation(wheelState, onRollFinished)
                 LaunchedEffect(rotate) {
                     scrollState.animateScrollToItem(rotate)
+                    if (!rolledBefore && !wheelState.running) {
+                        val scrollPosition = wheelState.targetPosition
+                            .plus(wheelState.items.size)
+                            .minus(wheelState.numberOfOptionsOnScreen / 2)
+                            .rem(wheelState.items.size)
+                        scrollState.scrollToItem(scrollPosition)
+                    }
                 }
                 LazyColumn(
                     userScrollEnabled = false,
@@ -255,7 +250,7 @@ private fun Wheel(
                                         modifier = Modifier
                                             .size(32.dp)
                                             .run {
-                                                if (rolledItem == item) {
+                                                if (wheelState.rolledItem == item) {
                                                     background(Color(item.color), CircleShape)
                                                 } else {
                                                     border(4.dp, Color(item.color), CircleShape)
@@ -280,9 +275,9 @@ private fun Wheel(
                         .weight(2f)
                         .align(Alignment.CenterVertically)
                 ) {
-                    if (rolledItem != null) {
+                    if (wheelState.rolledItem != null) {
                         Text(
-                            text = rolledItem!!.description,
+                            text = wheelState.rolledItem.description,
                             fontSize = 24.sp,
                             lineHeight = 30.sp,
                         )
