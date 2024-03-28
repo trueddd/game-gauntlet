@@ -2,8 +2,11 @@ package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.AuthResponse
+import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.Participant
 import com.github.trueddd.data.request.DownloadGameRequestBody
+import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.util.toBlob
 import io.ktor.client.*
@@ -65,7 +68,7 @@ class AppClient(
         }
         runnerJob = launch {
             _connectionState.value = SocketState.Connecting
-            httpClient.webSocket(router.wsState) {
+            httpClient.webSocket(router.ws(Router.STATE)) {
                 val token = savedJwtToken() ?: run {
                     close()
                     return@webSocket
@@ -87,6 +90,13 @@ class AppClient(
                         is Response.State -> _globalState.emit(data.globalState)
                     }
                 }
+                if (runnerJob?.isActive == true) {
+                    val reason = closeReason.await()?.message ?: "Unknown reason"
+                    if (reason == Response.ErrorCode.AuthError || reason == Response.ErrorCode.TokenExpired) {
+                        get<AuthManager>().logout()
+                    }
+                    runnerJob?.cancel(reason)
+                }
             }
         }
         runnerJob?.invokeOnCompletion { throwable ->
@@ -103,7 +113,7 @@ class AppClient(
     fun getActionsFlow(): Flow<List<Action>> {
         return callbackFlow {
             send(loadActions())
-            val session = httpClient.webSocketSession(router.wsActions)
+            val session = httpClient.webSocketSession(router.ws(Router.ACTIONS))
             launch {
                 for (frame in session.incoming) {
                     val textFrame = frame as? Frame.Text ?: continue
@@ -123,7 +133,7 @@ class AppClient(
     private suspend fun loadActions(): List<Action> {
         return withContext(coroutineContext) {
             try {
-                httpClient.get(router.httpActions) {
+                httpClient.get(router.http(Router.ACTIONS)) {
                     bearerAuth(savedJwtToken()!!)
                     contentType(ContentType.Application.Json)
                 }.body()
@@ -150,7 +160,7 @@ class AppClient(
     fun searchGame(name: String) {
         launch {
             try {
-                val response = httpClient.post(router.httpGame) {
+                val response = httpClient.post(router.http(Router.LOAD_GAME)) {
                     contentType(ContentType.Application.Json)
                     setBody(DownloadGameRequestBody(name))
                     onDownload { bytesSentTotal, contentLength ->
@@ -172,7 +182,7 @@ class AppClient(
     suspend fun verifyUser(token: String): Result<AuthResponse> {
         return withContext(coroutineContext) {
             try {
-                httpClient.post(router.httpUser) {
+                httpClient.post(router.http(Router.USER)) {
                     contentType(ContentType.Application.Json)
                     parameter("token", token)
                 }.body<AuthResponse>().let { Result.success(it) }
@@ -183,15 +193,39 @@ class AppClient(
         }
     }
 
-    suspend fun getItems(): List<WheelItem> {
+    suspend fun getItems(): List<WheelItem> =
+        getJsonData(router.http(Router.Wheels.ITEMS)) ?: emptyList()
+
+    suspend fun getGames(): List<Game> =
+        getJsonData(router.http(Router.Wheels.GAMES), sendBearerToken = true) ?: emptyList()
+
+    suspend fun getPlayers(): List<Participant> =
+        getJsonData(router.http(Router.Wheels.PLAYERS), sendBearerToken = true) ?: emptyList()
+
+    suspend fun rollItem(): WheelItem? =
+        getJsonData(router.http(Router.Wheels.ROLL_ITEMS), sendBearerToken = true)
+
+    suspend fun rollGame(): Game? =
+        getJsonData(router.http(Router.Wheels.ROLL_GAMES), sendBearerToken = true)
+
+    suspend fun rollPlayer(): Participant? =
+        getJsonData(router.http(Router.Wheels.ROLL_PLAYERS), sendBearerToken = true)
+
+    private suspend inline fun <reified T> getJsonData(
+        urlString: String,
+        sendBearerToken: Boolean = false
+    ): T? {
         return withContext(coroutineContext) {
             try {
-                httpClient.get(router.httpItems) {
+                httpClient.get(urlString) {
+                    if (sendBearerToken) {
+                        bearerAuth(savedJwtToken()!!)
+                    }
                     contentType(ContentType.Application.Json)
-                }.body<List<WheelItem>>()
+                }.body<T>()
             } catch (e: Exception) {
                 e.printStackTrace()
-                emptyList()
+                null
             }
         }
     }

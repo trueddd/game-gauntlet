@@ -7,6 +7,11 @@ import kotlinx.serialization.json.Json
 
 sealed class Response {
 
+    object ErrorCode {
+        const val AuthError = "auth_error"
+        const val TokenExpired = "token_expired"
+    }
+
     companion object {
 
         private val encoder = Json {

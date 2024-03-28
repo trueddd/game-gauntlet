@@ -3,7 +3,9 @@ package com.github.trueddd.items
 import com.benasher44.uuid.uuid4
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.Rollable
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 
 /**
  * Wheel item is an item that can be rolled on the wheel and somehow affect player state.
@@ -12,12 +14,12 @@ import kotlinx.serialization.Serializable
  * @property id is an identifier of item - two items of the same type will have the same id
  */
 @Serializable
-sealed class WheelItem {
+sealed class WheelItem : Rollable {
 
     abstract val uid: String
     abstract val id: Id
-    abstract val name: String
-    abstract val description: String
+    abstract override val name: String
+    abstract override val description: String
     open val iconId: Int
         get() = id.value
 
@@ -26,8 +28,17 @@ sealed class WheelItem {
         fun create(): WheelItem
     }
 
+    object Colors {
+        const val EVENT = 0xFF06B6D4
+        const val PENDING_EVENT = 0xFF14B8A6
+        const val INVENTORY_ITEM = 0xFFF59E0B
+        const val BUFF = 0xFF22C55E
+        const val DEBUFF = 0xFFEF4444
+    }
+
+    @JvmInline
     @Serializable
-    data class Id(val value: Int) {
+    value class Id(val value: Int) {
         fun asString() = value.toString()
         companion object {
             val PowerThrow = Id(1)
@@ -109,24 +120,38 @@ sealed class WheelItem {
     }
 
     @Serializable
-    sealed class InventoryItem : WheelItem(), Usable
+    sealed class InventoryItem : WheelItem(), Usable {
+        override val color: Long
+            get() = Colors.INVENTORY_ITEM
+    }
 
     @Serializable
     sealed class Event : WheelItem() {
+        override val color: Long
+            get() = Colors.EVENT
         abstract suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState
     }
 
     @Serializable
-    sealed class PendingEvent : WheelItem(), Usable
+    sealed class PendingEvent : WheelItem(), Usable {
+        override val color: Long
+            get() = Colors.PENDING_EVENT
+    }
 
     @Serializable
     sealed class Effect : WheelItem() {
 
         @Serializable
-        sealed class Buff : Effect()
+        sealed class Buff : Effect() {
+            override val color: Long
+                get() = Colors.BUFF
+        }
 
         @Serializable
-        sealed class Debuff : Effect()
+        sealed class Debuff : Effect() {
+            override val color: Long
+                get() = Colors.DEBUFF
+        }
     }
 }
 

@@ -7,7 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import com.github.trueddd.theme.Colors
+import com.github.trueddd.items.WheelItem
 
 @Stable
 sealed class WheelItemView(
@@ -29,15 +29,15 @@ sealed class WheelItemView(
         val All = listOf(Buff, Debuff, Event, PendingEvent, Inventory)
     }
 
-    data object Buff : WheelItemView("Баффы", Colors.WheelItem.Buff)
-    data object Debuff : WheelItemView("Дебаффы", Colors.WheelItem.Debuff)
-    data object Event : WheelItemView("События", Colors.WheelItem.Event)
-    data object PendingEvent : WheelItemView("Интерактивные события", Colors.WheelItem.PendingEvent)
-    data object Inventory : WheelItemView("Предметы", Colors.WheelItem.InventoryItem)
+    data object Buff : WheelItemView("Баффы", Color(WheelItem.Colors.BUFF))
+    data object Debuff : WheelItemView("Дебаффы", Color(WheelItem.Colors.DEBUFF))
+    data object Event : WheelItemView("События", Color(WheelItem.Colors.EVENT))
+    data object PendingEvent : WheelItemView("Интерактивные события", Color(WheelItem.Colors.PENDING_EVENT))
+    data object Inventory : WheelItemView("Предметы", Color(WheelItem.Colors.INVENTORY_ITEM))
 }
 
 @Composable
-fun WheelItemBadge(
+fun WheelItemChip(
     view: WheelItemView,
     selected: Boolean,
     onClick: () -> Unit = {},
@@ -49,7 +49,7 @@ fun WheelItemBadge(
             .background(if (selected) view.color.copy(alpha = 0.2f) else Color.Transparent, shape)
             .border(
                 width = 1.dp,
-                color = if (selected) view.color.copy(alpha = 0.7f) else view.color.copy(alpha = 0.4f),
+                color = if (selected) view.color.copy(alpha = 0.8f) else view.color.copy(alpha = 0.6f),
                 shape = shape
             )
             .pointerHoverIcon(PointerIcon.Hand)
@@ -58,7 +58,7 @@ fun WheelItemBadge(
     ) {
         Text(
             text = view.name,
-            color = if (selected) view.color else view.color.copy(alpha = 0.4f),
+            color = if (selected) view.color else view.color.copy(alpha = 0.6f),
         )
     }
 }

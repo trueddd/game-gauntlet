@@ -11,12 +11,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,9 +30,7 @@ import androidx.compose.ui.unit.sp
 import com.github.trueddd.core.AppClient
 import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
-import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.widget.AsyncImage
-import com.github.trueddd.util.color
 
 private fun WheelItem.contains(text: String): Boolean {
     return name.contains(text, ignoreCase = true) || description.contains(text, ignoreCase = true)
@@ -74,32 +69,19 @@ fun Rules(
     Column(
         modifier = modifier
     ) {
-        TextField(
+        OutlinedTextField(
             value = searchText,
             onValueChange = { searchText = it },
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Colors.Text,
-                cursorColor = Colors.Primary,
-                focusedIndicatorColor = Colors.Primary,
-            ),
-            placeholder = {
-                Text(
-                    text = "Поиск...",
-                    color = Colors.TextSecondary,
-                )
-            },
+            placeholder = { Text(text = "Поиск...") },
             trailingIcon = {
                 AnimatedVisibility(
                     visible = searchText.isNotEmpty(),
                     enter = slideInHorizontally { it } + fadeIn(),
                     exit = slideOutHorizontally { it } + fadeOut(),
-                    modifier = Modifier
-                        .padding(end = 8.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Clear search",
-                        tint = Colors.Text,
                         modifier = Modifier
                             .clickable { searchText = "" }
                             .pointerHoverIcon(PointerIcon.Hand)
@@ -108,17 +90,17 @@ fun Rules(
             },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(top = 16.dp)
+                .padding(top = 32.dp)
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(vertical = 16.dp)
         ) {
             WheelItemView.All.forEach {
-                WheelItemBadge(
+                WheelItemChip(
                     view = it,
                     selected = selectedTypes.contains(it),
                     onClick = {
@@ -134,14 +116,14 @@ fun Rules(
         val lazyListState = rememberLazyListState()
         LazyColumn(
             state = lazyListState,
-            contentPadding = PaddingValues(horizontal = 32.dp, vertical = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(48.dp),
+            contentPadding = PaddingValues(horizontal = 48.dp, vertical = 48.dp),
+            verticalArrangement = Arrangement.spacedBy(32.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .simpleVerticalScrollbar(
                     state = lazyListState,
                     width = 4.dp,
-                    color = Colors.Primary
+                    color = MaterialTheme.colorScheme.primaryContainer
                 )
         ) {
             items(visibleItems) { item ->
@@ -151,7 +133,7 @@ fun Rules(
                         modifier = Modifier
                             .size(48.dp)
                             .background(Color.White)
-                            .border(4.dp, item.color, RectangleShape)
+                            .border(4.dp, Color(item.color), RectangleShape)
                             .padding(8.dp)
                     )
                     Spacer(
@@ -166,10 +148,12 @@ fun Rules(
                         Text(
                             text = item.name,
                             fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onBackground,
                         )
                         Text(
                             text = item.description.replace("\n", ""),
                             fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onBackground,
                         )
                     }
                 }

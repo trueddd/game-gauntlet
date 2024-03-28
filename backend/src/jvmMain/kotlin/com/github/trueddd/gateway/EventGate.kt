@@ -1,8 +1,10 @@
 package com.github.trueddd.gateway
 
+import com.auth0.jwt.exceptions.TokenExpiredException
 import com.github.trueddd.core.Command
 import com.github.trueddd.core.EventGate
 import com.github.trueddd.core.Response
+import com.github.trueddd.core.Router
 import com.github.trueddd.plugins.Jwt
 import com.github.trueddd.utils.Environment
 import com.github.trueddd.utils.Log
@@ -23,15 +25,18 @@ fun Routing.setupEventGate() {
         eventGate.start()
     }
 
-    webSocket("/state") {
+    webSocket(Router.STATE) {
         val token = (incoming.receive() as? Frame.Text)?.readText()
         val user = try {
             val decoded = Jwt.Verifier.verify(token)
             val userName = decoded.getClaim("user").asString()
             eventGate.stateHolder.participants.first { it.name == userName }
+        } catch (e: TokenExpiredException) {
+            close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, Response.ErrorCode.TokenExpired))
+            return@webSocket
         } catch (e: Exception) {
             e.printStackTrace()
-            close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "User verification failed"))
+            close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, Response.ErrorCode.AuthError))
             return@webSocket
         }
         eventGate.stateHolder.globalStateFlow
@@ -66,7 +71,7 @@ fun Routing.setupEventGate() {
         }
     }
 
-    webSocket("/actions") {
+    webSocket(Router.ACTIONS) {
         eventGate.historyHolder.actionsChannel
             .onEach { outgoing.sendResponse(Response.UserAction(it)) }
             .launchIn(this)

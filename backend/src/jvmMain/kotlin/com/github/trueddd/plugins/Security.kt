@@ -55,3 +55,6 @@ fun Application.configureSecurity() {
         }
     }
 }
+
+val ApplicationCall.userLogin: String?
+    get() = principal<JWTPrincipal>()?.get("user")

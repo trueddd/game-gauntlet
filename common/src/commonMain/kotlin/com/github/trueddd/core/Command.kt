@@ -1,5 +1,8 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.data.Participant
+import com.github.trueddd.items.WheelItem
+
 /**
  * Command represents an action sent by client to server.
  */
@@ -33,7 +36,17 @@ sealed class Command(val value: String) {
     /**
      * Game-related action (e.g. `throw a dice`)
      */
-    data class Action(val payload: String) : Command("do:$payload")
+    data class Action(val payload: String) : Command("do:$payload") {
+        companion object {
+            fun itemReceive(player: Participant, itemId: WheelItem.Id) = buildString {
+                append(player.name)
+                append(":")
+                append(com.github.trueddd.actions.Action.Key.ItemReceive)
+                append(":")
+                append(itemId.value)
+            }.let { Action(it) }
+        }
+    }
 
     companion object {
         fun parseCommand(input: String): Command? {

@@ -30,7 +30,7 @@ dependencyResolutionManagement {
             val ktor = version("ktor", "2.3.8")
             val jupiter = version("jupiter", "5.10.0")
             val torrent = version("bt", "1.10")
-            val compose = version("compose", "1.6.0")
+            val compose = version("compose", "1.6.1")
             val koin = version("koin", "3.6.0-wasm-alpha2")
             val koinKsp = version("koin-ksp", "1.3.1")
             val kotlinPoet = version("kotlinpoet", "1.16.0")
@@ -84,7 +84,7 @@ dependencyResolutionManagement {
             plugin("compose", "org.jetbrains.compose").versionRef(compose)
             library("compose-runtime", "org.jetbrains.compose.runtime", "runtime").versionRef(compose)
             library("compose-foundation", "org.jetbrains.compose.foundation", "foundation").versionRef(compose)
-            library("compose-material", "org.jetbrains.compose.material", "material").versionRef(compose)
+            library("compose-material", "org.jetbrains.compose.material3", "material3").versionRef(compose)
 
             library("uuid", "com.benasher44", "uuid").version("0.8.2")
             library("datetime", "org.jetbrains.kotlinx", "kotlinx-datetime").versionRef(datetime)
