@@ -4,7 +4,6 @@ import com.github.trueddd.data.Game
 import com.github.trueddd.utils.Log
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Single
-import java.nio.file.Paths
 
 @Single
 class GamesProviderImpl : GamesProvider {
@@ -22,18 +21,19 @@ class GamesProviderImpl : GamesProvider {
     }
 
     private val games = run {
-        val fileContent = Paths.get("src/jvmMain/resources/games").toFile().readText()
+        val fileContent = Thread.currentThread().contextClassLoader.getResourceAsStream("games")
+            ?.bufferedReader()?.readLines()
+            ?: throw IllegalStateException("No `games` file was found")
         var parsedGamesCount = 0
         var corruptedGamesCount = 0
-        val games = fileContent.lines()
-            .mapNotNull { content ->
-                val (name, rawGenre) = content.split("|")
-                val genre = decodeGenreOrNull(rawGenre) ?: run {
-                    corruptedGamesCount++
-                    return@mapNotNull null
-                }
-                Game(Game.Id(parsedGamesCount++), name, genre)
+        val games = fileContent.mapNotNull { content ->
+            val (name, rawGenre) = content.split("|")
+            val genre = decodeGenreOrNull(rawGenre) ?: run {
+                corruptedGamesCount++
+                return@mapNotNull null
             }
+            Game(Game.Id(parsedGamesCount++), name, genre)
+        }
         Log.info(TAG, "Games parsing result: ($parsedGamesCount/$corruptedGamesCount)")
         return@run games
     }
