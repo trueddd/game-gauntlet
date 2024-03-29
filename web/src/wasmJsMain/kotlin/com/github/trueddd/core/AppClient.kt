@@ -130,7 +130,7 @@ class AppClient(
         }
     }
 
-    private suspend fun loadActions(): List<Action> {
+    suspend fun loadActions(): List<Action> {
         return withContext(coroutineContext) {
             try {
                 httpClient.get(router.http(Router.ACTIONS)) {

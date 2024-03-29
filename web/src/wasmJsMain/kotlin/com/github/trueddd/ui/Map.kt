@@ -20,6 +20,7 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.items.BoardTrap
 import com.github.trueddd.theme.Colors
+import com.github.trueddd.util.localized
 
 @Stable
 data class MapCellState(
@@ -141,15 +142,3 @@ private fun MapCell(state: MapCellState) {
         }
     }
 }
-
-@Stable
-private val Game.Genre.localized: String
-    get() = when (this) {
-        Game.Genre.Runner -> "Бегалки"
-        Game.Genre.Business -> "Бизнес"
-        Game.Genre.Puzzle -> "Головоломки"
-        Game.Genre.PointAndClick -> "Поиск предметов"
-        Game.Genre.Shooter -> "Стрелялки"
-        Game.Genre.ThreeInRow -> "Три в ряд"
-        Game.Genre.Special -> "Специальный сектор"
-    }
