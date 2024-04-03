@@ -3,7 +3,6 @@ package com.github.trueddd.core
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.globalState
-import org.jetbrains.annotations.TestOnly
 
 /**
  * Event manager is a main component of the system.
@@ -28,10 +27,7 @@ interface EventManager {
         }
     }
 
-    fun consumeAction(action: Action)
-
-    @TestOnly
-    suspend fun suspendConsumeAction(action: Action): HandledAction
+    suspend fun consumeAction(action: Action): HandledAction
 
     fun stopHandling()
 

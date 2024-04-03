@@ -16,7 +16,7 @@ class GameRollActionTest : EventGateTest() {
     @Test
     fun `roll game on start`() = runTest {
         val participant = requireRandomParticipant()
-        eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameRoll}")
+        eventGate.parseAndHandle("${participant.name}:${Action.Key.GameRoll}")
         assertEquals(expected = null, lastGameOf(participant))
     }
 

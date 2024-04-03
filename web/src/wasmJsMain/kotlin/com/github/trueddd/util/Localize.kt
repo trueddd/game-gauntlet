@@ -2,6 +2,17 @@ package com.github.trueddd.util
 
 import androidx.compose.runtime.Stable
 import com.github.trueddd.data.Game
+import com.github.trueddd.items.WheelItem
+
+@Stable
+val WheelItem.typeLocalized: String
+    get() = when (this) {
+        is WheelItem.InventoryItem -> "Предмет"
+        is WheelItem.Effect.Buff -> "Бафф"
+        is WheelItem.Effect.Debuff -> "Дебафф"
+        is WheelItem.Event -> "Событие"
+        is WheelItem.PendingEvent -> "Отложенное событие"
+    }
 
 @Stable
 val Game.Genre.localized: String

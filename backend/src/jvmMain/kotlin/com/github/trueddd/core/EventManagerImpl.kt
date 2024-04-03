@@ -29,19 +29,14 @@ class EventManagerImpl(
 
     private val eventHandlingMonitor = Mutex(false)
 
-    private suspend fun sendAction(action: Action) {
-        Log.info(TAG, "Consuming action: $action")
-        actionsPipe.send(action)
-    }
-
-    override fun consumeAction(action: Action) {
-        launch {
-            sendAction(action)
+    override suspend fun consumeAction(action: Action): EventManager.HandledAction {
+        val result = handleAction(action)
+        if (result.error == null) {
+            Log.info(TAG, "Action(${action.id}) handled")
+        } else {
+            Log.info(TAG, "Action(${action.id}) handled with error: ${result.error}")
         }
-    }
-
-    override suspend fun suspendConsumeAction(action: Action): EventManager.HandledAction {
-        return handleAction(action).also { Log.info(TAG, "Action(${action.id}) handled") }
+        return result
     }
 
     override fun stopHandling() {
@@ -76,7 +71,7 @@ class EventManagerImpl(
             )
         eventHandlingMonitor.lock()
         return try {
-            val result = handler.handle(action, stateHolder.globalStateFlow.value)
+            val result = handler.handle(action, stateHolder.current)
             stateHolder.update { result }
             EventManager.HandledAction(action.id, action.issuedAt)
         } catch (error: Exception) {

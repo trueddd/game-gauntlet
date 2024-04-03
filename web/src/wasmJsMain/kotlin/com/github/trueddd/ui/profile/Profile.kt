@@ -5,31 +5,49 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.github.trueddd.actions.Action
 import com.github.trueddd.core.AppClient
+import com.github.trueddd.core.AuthManager
+import com.github.trueddd.core.ServerRouter
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.di.get
+import com.github.trueddd.items.Usable
+import com.github.trueddd.items.WheelItem
 import com.github.trueddd.theme.Colors
+import com.github.trueddd.ui.widget.AsyncImage
 import com.github.trueddd.util.localized
+import com.github.trueddd.util.typeLocalized
+import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 
 private object ProfileContentType {
     const val BACKGROUND = "background"
@@ -45,15 +63,16 @@ private val leftSideBarPadding = 32.dp
 @Composable
 fun ProfileScreen(
     currentParticipant: Participant?,
-    globalState: GlobalState,
+    globalState: GlobalState?,
     modifier: Modifier = Modifier,
 ) {
     val appClient = remember { get<AppClient>() }
+    val authManager = remember { get<AuthManager>() }
     var actions by remember { mutableStateOf(emptyList<Action>()) }
     LaunchedEffect(Unit) {
         actions = appClient.loadActions()
     }
-    var selected by remember { mutableStateOf(currentParticipant ?: globalState.players.keys.first()) }
+    var selected by remember { mutableStateOf(currentParticipant ?: globalState?.players?.keys?.firstOrNull()) }
     PermanentNavigationDrawer(
         drawerContent = {
             Column(
@@ -63,7 +82,7 @@ fun ProfileScreen(
                     .width(leftSideBarWidth)
                     .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(topEnd = 32.dp, bottomEnd = 32.dp))
             ) {
-                globalState.players.keys.forEach {
+                globalState?.players?.keys?.forEach {
                     NavigationDrawerItem(
                         label = { Text(it.displayName) },
                         selected = selected == it,
@@ -73,13 +92,24 @@ fun ProfileScreen(
                             .fillMaxWidth()
                     )
                 }
+                if (currentParticipant == null) {
+                    HorizontalDivider()
+                    NavigationDrawerItem(
+                        label = { Text("Войти") },
+                        selected = false,
+                        onClick = { authManager.requestAuth() },
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+                    )
+                }
             }
         },
         modifier = modifier
     ) {
-        if (actions.isNotEmpty()) {
+        if (actions.isNotEmpty() && globalState != null && selected != null) {
             Profile(
-                selectedPlayer = selected,
+                selectedPlayer = selected!!,
                 currentPlayer = currentParticipant,
                 globalState = globalState,
                 actions = actions,
@@ -88,7 +118,87 @@ fun ProfileScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@Stable
+private fun LocalDate.format(): String {
+    return buildString {
+        append(dayOfMonth.toString().padStart(2, '0'))
+        append('.')
+        append(monthNumber.toString().padStart(2, '0'))
+        append('.')
+        append(year)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun WheelItemView(
+    item: WheelItem,
+    onUse: () -> Unit = {}
+) {
+    val router = remember { get<ServerRouter>() }
+    val tooltipState = rememberTooltipState(isPersistent = true)
+    val scope = rememberCoroutineScope()
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+        tooltip = {
+            RichTooltip(
+                title = {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append(item.name)
+                            }
+                            append(" • ")
+                            withStyle(SpanStyle(color = Color(item.color))) {
+                                append(item.typeLocalized)
+                            }
+                        }
+                    )
+                },
+                text = { Text(item.description) },
+                action = if (item is Usable) { {
+                    TextButton(
+                        onClick = {
+                            onUse()
+                            tooltipState.dismiss()
+                        }
+                    ) {
+                        Text("Использовать")
+                    }
+                } } else null,
+                modifier = Modifier
+            )
+        },
+        enableUserInput = false,
+        state = tooltipState,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(72.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = {
+                        scope.launch {
+                            if (tooltipState.isVisible) tooltipState.dismiss() else tooltipState.show()
+                        }
+                    }
+                )
+                .background(Color(item.color), RoundedCornerShape(16.dp))
+                .pointerHoverIcon(PointerIcon.Hand)
+        ) {
+            AsyncImage(
+                model = router.wheelItemIconUrl(item.iconId),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(8.dp))
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 private fun Profile(
     selectedPlayer: Participant,
@@ -138,7 +248,7 @@ private fun Profile(
             }
             item(contentType = ProfileContentType.STATS) {
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier
                         .padding(start = leftSideBarWidth + leftSideBarPadding)
                         .padding(vertical = 36.dp)
@@ -151,10 +261,17 @@ private fun Profile(
                         modifier = Modifier
                             .weight(1f)
                     )
-                    Row(
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier
                             .weight(2f)
                     ) {
+                        globalState.stateOf(selectedPlayer).wheelItems.forEach { item ->
+                            WheelItemView(item) {
+                                println("Used ${item.name}")
+                            }
+                        }
                     }
                 }
             }
@@ -221,7 +338,7 @@ private fun Profile(
             turnsGroupedByDate.forEach { (date, turns) ->
                 item(contentType = ProfileContentType.DATE) {
                     Text(
-                        text = "${date.dayOfMonth}.${date.monthNumber}.${date.year}",
+                        text = date.format(),
                         color = Colors.White,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -248,7 +365,7 @@ private fun Profile(
                                     modifier = Modifier
                                         .weight(1f)
                                 ) {
-                                    Text(text = "${turn.start} -> ${turn.end}")
+                                    Text(text = "${turn.start} » ${turn.end}")
                                 }
                                 Box(
                                     contentAlignment = Alignment.Center,

@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.github.trueddd.actions.Action
 import com.github.trueddd.actions.BoardMove
@@ -83,12 +84,18 @@ private fun StatsItem(
                 .fillMaxWidth()
         ) {
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text(text = title)
+                Text(
+                    text = title,
+                    maxLines = 1,
+                    textAlign = TextAlign.Start,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .weight(1f)
+                )
                 Text(text = value)
             }
         }

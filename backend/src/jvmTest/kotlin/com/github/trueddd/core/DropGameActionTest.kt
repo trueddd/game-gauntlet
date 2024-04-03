@@ -17,7 +17,7 @@ class DropGameActionTest : EventGateTest() {
         val moveDiceValue = 6
         val dropDiceValue = 4
         handleAction(BoardMove(user, moveDiceValue))
-        eventGate.parseAndHandleSuspend("${user.name}:${Action.Key.GameRoll}")
+        eventGate.parseAndHandle("${user.name}:${Action.Key.GameRoll}")
         handleAction(GameDrop(user, dropDiceValue))
         assertTrue(inventoryOf(user).isEmpty())
         assertEquals(Game.Status.Dropped, lastGameOf(user)?.status)
@@ -30,7 +30,7 @@ class DropGameActionTest : EventGateTest() {
         val moveDiceValue = 5
         val dropDiceValue = 4
         handleAction(BoardMove(user, moveDiceValue))
-        eventGate.parseAndHandleSuspend("${user.name}:${Action.Key.GameRoll}")
+        eventGate.parseAndHandle("${user.name}:${Action.Key.GameRoll}")
         val item = SamuraiLunge.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid))

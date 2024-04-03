@@ -30,9 +30,8 @@ import org.w3c.dom.url.URL
 
 class AppClient(
     private val httpClient: HttpClient,
+    private val router: ServerRouter,
 ) : CoroutineScope {
-
-    val router = ServerRouter()
 
     private var runnerJob: Job? = null
 

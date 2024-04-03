@@ -21,16 +21,13 @@ class EventGateImpl(
 
     override suspend fun parseAndHandle(input: String): Boolean {
         val action = inputParser.parse(input) ?: return false
-        eventManager.consumeAction(action)
-        historyHolder.pushEvent(action)
-        return true
-    }
-
-    override suspend fun parseAndHandleSuspend(input: String): Boolean {
-        val action = inputParser.parse(input) ?: return false
-        eventManager.suspendConsumeAction(action)
-        historyHolder.pushEvent(action)
-        return true
+        val handledAction = eventManager.consumeAction(action)
+        if (handledAction.error == null) {
+            historyHolder.pushEvent(action)
+            return true
+        } else {
+            return false
+        }
     }
 
     override fun startNoLoad(initialState: GlobalState) {

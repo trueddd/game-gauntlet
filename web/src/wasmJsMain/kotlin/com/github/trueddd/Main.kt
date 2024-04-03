@@ -120,13 +120,11 @@ private fun App(
                     )
                 }
                 is Destination.Profile -> {
-                    if (globalState != null) {
-                        ProfileScreen(
-                            currentParticipant = user,
-                            globalState = globalState,
-                            modifier = Modifier
-                        )
-                    }
+                    ProfileScreen(
+                        currentParticipant = user,
+                        globalState = globalState,
+                        modifier = Modifier
+                    )
                 }
                 is Destination.Wheels -> {
                     if (user != null) {

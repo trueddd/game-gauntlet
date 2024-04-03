@@ -30,12 +30,12 @@ abstract class EventGateTest {
     protected fun positionOf(participant: Participant) = stateOf(participant).position
     protected fun lastGameOf(participant: Participant) = stateOf(participant).currentGame
 
-    protected suspend fun handleAction(action: Action) = eventGate.eventManager.suspendConsumeAction(action)
+    protected suspend fun handleAction(action: Action) = eventGate.eventManager.consumeAction(action)
 
     protected suspend fun makeMove(participant: Participant) {
-        eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.BoardMove}")
-        eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameRoll}")
-        eventGate.parseAndHandleSuspend("${participant.name}:${Action.Key.GameStatusChange}:1")
+        eventGate.parseAndHandle("${participant.name}:${Action.Key.BoardMove}")
+        eventGate.parseAndHandle("${participant.name}:${Action.Key.GameRoll}")
+        eventGate.parseAndHandle("${participant.name}:${Action.Key.GameStatusChange}:1")
     }
 
     protected suspend fun makeMovesUntilFinish(player: Participant) {

@@ -19,7 +19,7 @@ class LoyalModeratorItemTest : EventGateTest() {
         val debuff = WeakThrow.create()
         handleAction(ItemReceive(user, debuff))
         assertEquals(expected = 1, effectsOf(user).size)
-        eventGate.parseAndHandleSuspend("${user.name}:4:${item.uid}:${debuff.uid}")
+        eventGate.parseAndHandle("${user.name}:4:${item.uid}:${debuff.uid}")
         assertEquals(expected = 0, effectsOf(user).size)
         assertEquals(expected = 0, inventoryOf(user).size)
     }
