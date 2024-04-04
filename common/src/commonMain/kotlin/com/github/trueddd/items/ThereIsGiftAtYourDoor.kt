@@ -7,7 +7,8 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class ThereIsGiftAtYourDoor private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class ThereIsGiftAtYourDoor private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Participant?>> {
 
     companion object {
         fun create() = ThereIsGiftAtYourDoor(uid = generateWheelItemUid())
@@ -23,8 +24,19 @@ class ThereIsGiftAtYourDoor private constructor(override val uid: String) : Whee
         к следующему броску кубика.
     """.trimIndent()
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        return when (val target = arguments.getParticipantParameter(index = 0, globalState)) {
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Player(name = "Участник", optional = true))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Participant?> {
+        return Parameters.One(rawArguments.getParticipantParameter(index = 0, currentState, optional = true))
+    }
+
+    override suspend fun use(
+        usedBy: Participant,
+        globalState: GlobalState,
+        arguments: List<String>
+    ): GlobalState {
+        return when (val target = getParameters(arguments, globalState).parameter1 ?: usedBy) {
             usedBy -> globalState.updatePlayer(usedBy) { playerState ->
                 playerState.copy(
                     effects = playerState.effects + StayAfterGame.create(),

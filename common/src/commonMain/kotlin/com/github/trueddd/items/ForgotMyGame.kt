@@ -8,7 +8,8 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class ForgotMyGame private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class ForgotMyGame private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Boolean>> {
 
     companion object {
         fun create() = ForgotMyGame(uid = generateWheelItemUid())
@@ -20,8 +21,15 @@ class ForgotMyGame private constructor(override val uid: String) : WheelItem.Pen
 
     override val description = "При выпадении этого пункта стример может рероллнуть игру."
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Bool(name = "Рероллим?"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Boolean> {
+        return Parameters.One(rawArguments.getBooleanParameter()!!)
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val shouldReroll = arguments.getBooleanParameter()
+        val shouldReroll = getParameters(arguments, globalState).parameter1
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),

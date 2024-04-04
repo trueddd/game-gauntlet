@@ -8,7 +8,8 @@ import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
-class UnrecognizedDisk private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class UnrecognizedDisk private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Boolean>> {
 
     companion object {
         fun create() = UnrecognizedDisk(uid = generateWheelItemUid())
@@ -23,8 +24,15 @@ class UnrecognizedDisk private constructor(override val uid: String) : WheelItem
         Если игра пройдена за один стрим, получи +1 к следующему броску кубика.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Bool(name = "Пройдено за один стрим?"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Boolean> {
+        return Parameters.One(rawArguments.getBooleanParameter()!!)
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val completedWithinSingleStream = arguments.getBooleanParameter()
+        val completedWithinSingleStream = getParameters(arguments, globalState).parameter1
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),
@@ -47,6 +55,7 @@ class UnrecognizedDisk private constructor(override val uid: String) : WheelItem
         companion object {
             fun create() = Buff(uid = generateWheelItemUid())
         }
+
         override val id = Id.UnrecognizedDisk
         override val name = "Неопознанная дискета"
         override val description = "+${modifier.absoluteValue} к следующему броску кубика для перехода по секторам."

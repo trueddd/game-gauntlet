@@ -3,12 +3,63 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 
+sealed interface Parameters {
+    data class One<T1>(
+        val parameter1: T1
+    ) : Parameters
+    data class Two<T1, T2>(
+        val parameter1: T1,
+        val parameter2: T2
+    ) : Parameters
+    data class Three<T1, T2, T3>(
+        val parameter1: T1,
+        val parameter2: T2,
+        val parameter3: T3
+    ) : Parameters
+}
+
+interface Parametrized<P : Parameters> {
+    val parametersScheme: List<ParameterType>
+    fun getParameters(rawArguments: List<String>, currentState: GlobalState): P
+}
+
+enum class ItemSetType {
+    Personal,
+    Foreign,
+    Common
+}
+
+sealed class ParameterType {
+
+    abstract val name: String
+    open val optional: Boolean
+        get() = false
+
+    class Bool(override val name: String) : ParameterType()
+    class Int(override val name: String) : ParameterType()
+    class Player(
+        override val name: String,
+        val predicate: (Participant) -> Boolean = { true },
+        override val optional: Boolean = false
+    ) : ParameterType()
+    class Item(
+        override val name: String,
+        val predicate: ((WheelItem) -> Boolean) = { true },
+        val itemSetType: ItemSetType
+    ) : ParameterType()
+    class Genre(override val name: String) : ParameterType()
+}
+
 @Throws(IllegalArgumentException::class)
-fun List<String>.getBooleanParameter(index: Int = 0): Boolean {
+fun List<String>.getBooleanParameter(index: Int = 0, optional: Boolean = false): Boolean? {
     return when (val value = this.getOrNull(index)) {
         "1" -> true
         "0" -> false
-        else -> throw IllegalArgumentException("Boolean argument must be passed, but was $value")
+        else -> if (optional) {
+            null
+        } else {
+            throw IllegalArgumentException("Boolean argument must be passed, but was $value")
+        }
     }
 }
 
@@ -27,9 +78,15 @@ fun List<String>.getIntParameter(index: Int = 0): Int {
 }
 
 @Throws(IllegalArgumentException::class)
-fun List<String>.getParticipantParameter(index: Int = 0, globalState: GlobalState): Participant {
+fun List<String>.getParticipantParameter(
+    index: Int = 0,
+    globalState: GlobalState,
+    optional: Boolean = false
+): Participant? {
     val name = this.getOrNull(index)
-        ?: throw IllegalArgumentException("Player name must be specified as parameter with index $index")
-    return globalState.participantByName(name)
-        ?: throw IllegalArgumentException("No players were found with name $name")
+    return when {
+        name != null -> globalState.participantByName(name)
+        optional -> null
+        else -> throw IllegalArgumentException("Player name must be specified as parameter with index $index")
+    }
 }

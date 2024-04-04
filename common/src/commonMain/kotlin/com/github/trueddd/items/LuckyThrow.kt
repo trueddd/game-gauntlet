@@ -9,7 +9,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 @Serializable
-class LuckyThrow private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class LuckyThrow private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Game.Genre>> {
 
     companion object {
         fun create() = LuckyThrow(uid = generateWheelItemUid())
@@ -24,8 +25,15 @@ class LuckyThrow private constructor(override val uid: String) : WheelItem.Pendi
         с выпавшим жанром, то эта клетка автоматически засчитывается пройденной и стример двигается дальше.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Genre(name = "Жанр"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Game.Genre> {
+        return Parameters.One(rawArguments.getStringParameter().let { Json.decodeFromString(it) })
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val genre = arguments.getStringParameter().let { Json.decodeFromString<Game.Genre>(it) }
+        val genre = getParameters(arguments, globalState).parameter1
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),

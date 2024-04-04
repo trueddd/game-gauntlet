@@ -8,7 +8,8 @@ import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
-class UnrealBoost private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class UnrealBoost private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Boolean>> {
 
     companion object {
         fun create() = UnrealBoost(uid = generateWheelItemUid())
@@ -24,8 +25,15 @@ class UnrealBoost private constructor(override val uid: String) : WheelItem.Pend
         Если стример испугался, то он может спокойно реролльнуть колесо без штрафа.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Bool(name = "Получилось простримить 24 часа?"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Boolean> {
+        return Parameters.One(rawArguments.getBooleanParameter()!!)
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val isSuccessful = arguments.getBooleanParameter()
+        val isSuccessful = getParameters(arguments, globalState).parameter1
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),
@@ -49,6 +57,7 @@ class UnrealBoost private constructor(override val uid: String) : WheelItem.Pend
         companion object {
             fun create() = Buff(uid = generateWheelItemUid(), modifier = 3, chargesLeft = 5)
         }
+
         override val id = Id.UnrealBoost
         override val name = "Нереальный буст"
         override val description = """

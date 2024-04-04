@@ -3,13 +3,16 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.items.DiceBattle.Buff
+import com.github.trueddd.items.DiceBattle.Debuff
 import com.github.trueddd.utils.d6Range
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
-class DiceBattle private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class DiceBattle private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.Three<Participant, Int, Int>> {
 
     companion object {
         fun create() = DiceBattle(uid = generateWheelItemUid())
@@ -26,11 +29,30 @@ class DiceBattle private constructor(override val uid: String) : WheelItem.Pendi
         получает количество минус очков своего кубика. При выпавших одинаковых числах, кубики бросаются еще раз.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(
+            ParameterType.Player("Соперник"),
+            ParameterType.Int("Мой кубик"),
+            ParameterType.Int("Кубик соперника"),
+        )
+
+    override fun getParameters(
+        rawArguments: List<String>,
+        currentState: GlobalState
+    ): Parameters.Three<Participant, Int, Int> {
+        return Parameters.Three(
+            rawArguments.getParticipantParameter(index = 0, currentState)!!,
+            rawArguments.getIntParameter(index = 1),
+            rawArguments.getIntParameter(index = 2),
+        )
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val opponent = arguments.getParticipantParameter(index = 0, globalState)
-        val myDice = arguments.getIntParameter(index = 1).takeIf { it in d6Range }
+        val parameters = getParameters(arguments, globalState)
+        val opponent = parameters.parameter1
+        val myDice = parameters.parameter2.takeIf { it in d6Range }
             ?: throw IllegalArgumentException("Player dice value was corrupted or not specified")
-        val opponentDice = arguments.getIntParameter(index = 2).takeIf { it in d6Range }
+        val opponentDice = parameters.parameter3.takeIf { it in d6Range }
             ?: throw IllegalArgumentException("Opponent dice value was corrupted or not specified")
         if (myDice == opponentDice) {
             throw IllegalArgumentException("Dice values must differ")

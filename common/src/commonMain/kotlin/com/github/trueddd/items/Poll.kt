@@ -9,7 +9,8 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Poll private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class Poll private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.Two<Int, Participant?>> {
 
     companion object {
         fun create() = Poll(uid = generateWheelItemUid())
@@ -27,9 +28,26 @@ class Poll private constructor(override val uid: String) : WheelItem.PendingEven
         то среди всех).
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(
+            ParameterType.Item(name = "Выпавший пункт", itemSetType = ItemSetType.Common),
+            ParameterType.Player(name = "Получатель"),
+        )
+
+    override fun getParameters(
+        rawArguments: List<String>,
+        currentState: GlobalState
+    ): Parameters.Two<Int, Participant?> {
+        return Parameters.Two(
+            rawArguments.getIntParameter(index = 0),
+            rawArguments.getParticipantParameter(index = 1, currentState, optional = true)
+        )
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val itemId = arguments.getIntParameter(index = 0)
-        val receiver = arguments.getParticipantParameter(index = 1, globalState)
+        val parameters = getParameters(arguments, globalState)
+        val itemId = parameters.parameter1
+        val receiver = parameters.parameter2 ?: usedBy
         val factory = getItemFactoriesSet().firstOrNull { it.itemId.value == itemId }
             ?: throw IllegalArgumentException("No factory found for itemId $itemId")
         val action = ItemReceive(receiver, factory.create())

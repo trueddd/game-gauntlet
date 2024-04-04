@@ -7,7 +7,8 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class CompanySoul private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class CompanySoul private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.Two<Participant, Boolean>> {
 
     companion object {
         fun create() = CompanySoul(uid = generateWheelItemUid())
@@ -25,9 +26,26 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
         -1 к следующему броску кубика стримеру, не выдержевшему напора острых шуток.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(
+            ParameterType.Player(name = "Слушатель"),
+            ParameterType.Bool(name = "Шутка удалась")
+        )
+
+    override fun getParameters(
+        rawArguments: List<String>,
+        currentState: GlobalState
+    ): Parameters.Two<Participant, Boolean> {
+        return Parameters.Two(
+            rawArguments.getParticipantParameter(index = 0, currentState)!!,
+            rawArguments.getBooleanParameter(index = 1)!!
+        )
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val listener = arguments.getParticipantParameter(index = 0, globalState)
-        val jokeSucceeded = arguments.getBooleanParameter(index = 1)
+        val parameters = getParameters(arguments, globalState)
+        val listener = parameters.parameter1
+        val jokeSucceeded = parameters.parameter2
         return globalState.updatePlayers { participant, playerState ->
             when (participant.name) {
                 usedBy.name -> playerState.copy(

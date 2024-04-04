@@ -46,6 +46,7 @@ import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.widget.AsyncImage
 import com.github.trueddd.util.localized
 import com.github.trueddd.util.typeLocalized
+import com.github.trueddd.utils.getItemFactoriesSet
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
@@ -207,6 +208,7 @@ private fun Profile(
     actions: List<Action>,
     modifier: Modifier = Modifier,
 ) {
+    var dialogItem by remember { mutableStateOf<WheelItem?>(null) }
     val lazyListState = rememberLazyListState()
     val leftSidePanelTopPadding by remember {
         derivedStateOf {
@@ -270,6 +272,7 @@ private fun Profile(
                         globalState.stateOf(selectedPlayer).wheelItems.forEach { item ->
                             WheelItemView(item) {
                                 println("Used ${item.name}")
+                                dialogItem = item
                             }
                         }
                     }
@@ -450,6 +453,24 @@ private fun Profile(
                         .padding(horizontal = 32.dp)
                 )
             }
+        }
+        var allItems by remember { mutableStateOf(emptyList<WheelItem>()) }
+        LaunchedEffect(Unit) {
+            allItems = get<AppClient>().getItems()
+        }
+        if (dialogItem != null && currentPlayer != null) {
+            WheelItemUseDialog(
+                item = dialogItem!!,
+                globalState = globalState,
+                player = currentPlayer,
+                items = allItems,
+                onItemUse = { item, parameters ->
+                    // todo: use item with parameters
+                    println("using ${dialogItem?.name}")
+                    dialogItem = null
+                },
+                onDialogDismiss = { dialogItem = null }
+            )
         }
     }
 }

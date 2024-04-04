@@ -7,7 +7,8 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class NotDumb private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class NotDumb private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Int>> {
 
     companion object {
         fun create() = NotDumb(uid = generateWheelItemUid())
@@ -27,17 +28,26 @@ class NotDumb private constructor(override val uid: String) : WheelItem.PendingE
         Если один и тот же вопрос выпадает повторно, стример должен его реролльнуть.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Int(name = "Количество правильных ответов"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Int> {
+        return Parameters.One(rawArguments.getIntParameter())
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val value = arguments.getIntParameter().let { value ->
-            when (value) {
-                0, 1, 2 -> -3
-                3 -> -2
-                4 -> -1
-                5 -> 1
-                6 -> 2
-                7 -> 3
-                else -> throw IllegalArgumentException("Result should be in range from 0 to 7, but was $value")
-            }
+        val rightAnswers = getParameters(arguments, globalState).parameter1
+        require(rightAnswers in 0..7) {
+            "Result should be in range from 0 to 7, but was $rightAnswers"
+        }
+        val value = when (rightAnswers) {
+            0, 1, 2 -> -3
+            3 -> -2
+            4 -> -1
+            5 -> 1
+            6 -> 2
+            7 -> 3
+            else -> return globalState
         }
         val modifier = if (value >= 0) {
             Buff.create(value)

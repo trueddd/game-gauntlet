@@ -8,7 +8,8 @@ import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
-class UnbelievableDemocracy private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class UnbelievableDemocracy private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Boolean>> {
 
     companion object {
         fun create() = UnbelievableDemocracy(uid = generateWheelItemUid())
@@ -22,8 +23,15 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
         Чат решает плюс очко или минус очко к следующему броску кубика для всех участников.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Bool(name = "Чат выбрал Плюс очко?"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Boolean> {
+        return Parameters.One(rawArguments.getBooleanParameter()!!)
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val pollSucceeded = arguments.getBooleanParameter()
+        val pollSucceeded = getParameters(arguments, globalState).parameter1
         return globalState.updatePlayers { participant, playerState ->
             playerState.copy(
                 pendingEvents = if (participant == usedBy) {
