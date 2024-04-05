@@ -4,9 +4,11 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.Teleport}")
 class Teleport private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Boolean?>> {
 
@@ -14,7 +16,7 @@ class Teleport private constructor(override val uid: String) : WheelItem.Pending
         fun create() = Teleport(uid = generateWheelItemUid())
     }
 
-    override val id = Id.Teleport
+    override val id = Id(Teleport)
 
     override val name = "Телепорт"
 
@@ -62,7 +64,7 @@ class Teleport private constructor(override val uid: String) : WheelItem.Pending
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.Teleport
+        override val itemId = Id(Teleport)
         override fun create() = Companion.create()
     }
 }

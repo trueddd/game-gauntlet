@@ -7,12 +7,12 @@ import com.github.trueddd.data.globalState
 import com.github.trueddd.utils.DefaultTimeZone
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
+import com.github.trueddd.utils.serialization
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.io.File
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -38,10 +38,13 @@ open class LocalEventHistoryHolder(
         Log.info(TAG, "Saving Global state")
         val eventsToSave = getActions()
         val timeRange = "${globalState.startDate}:${globalState.endDate}"
-        val mapLayout = Json.encodeToString(GameGenreDistribution.serializer(), globalState.gameGenreDistribution)
+        val mapLayout = serialization.encodeToString(
+            GameGenreDistribution.serializer(),
+            globalState.gameGenreDistribution
+        )
         val events = eventsToSave
             .asReversed()
-            .joinToString("\n") { Json.encodeToString(it) }
+            .joinToString("\n") { serialization.encodeToString(it) }
         val text = buildString {
             appendLine(timeRange)
             appendLine(mapLayout)
@@ -67,12 +70,12 @@ open class LocalEventHistoryHolder(
                 ?.let { (start, end) -> start.toLong() to end.toLong() }
                 ?: throw IllegalArgumentException("Error while parsing game time range")
             val mapLayout = fileContent.getOrNull(1)
-                ?.let { Json.decodeFromString(GameGenreDistribution.serializer(), it) }
+                ?.let { serialization.decodeFromString(GameGenreDistribution.serializer(), it) }
                 ?: throw IllegalArgumentException("Error while parsing map layout")
             val events = fileContent
                 .drop(2)
                 .filter { it.isNotBlank() }
-                .map { Json.decodeFromString(Action.serializer(), it) }
+                .map { serialization.decodeFromString(Action.serializer(), it) }
             val initialState = globalState(
                 genreDistribution = mapLayout,
                 startDateTime = Instant.fromEpochMilliseconds(start).toLocalDateTime(DefaultTimeZone),

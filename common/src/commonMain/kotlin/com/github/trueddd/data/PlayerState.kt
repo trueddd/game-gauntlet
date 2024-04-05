@@ -2,6 +2,7 @@ package com.github.trueddd.data
 
 import com.github.trueddd.items.DiceRollModifier
 import com.github.trueddd.items.WheelItem
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -16,12 +17,19 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class PlayerState(
+    @SerialName("sc")
     val stepsCount: Int = 0,
+    @SerialName("ba")
     val boardMoveAvailable: Boolean = true,
+    @SerialName("po")
     val position: Int = GlobalState.START_POSITION,
+    @SerialName("in")
     val inventory: List<WheelItem.InventoryItem> = emptyList(),
+    @SerialName("ef")
     val effects: List<WheelItem.Effect> = emptyList(),
+    @SerialName("gh")
     val gameHistory: List<GameHistoryEntry> = emptyList(),
+    @SerialName("pe")
     val pendingEvents: List<WheelItem.PendingEvent> = emptyList(),
 ) {
 

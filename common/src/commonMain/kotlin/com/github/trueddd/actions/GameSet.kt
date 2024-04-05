@@ -8,11 +8,15 @@ import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("a${Action.Key.GameSet}")
 data class GameSet(
+    @SerialName("sb")
     val setBy: Participant,
+    @SerialName("gi")
     val gameId: Game.Id,
 ) : Action(Key.GameSet) {
 

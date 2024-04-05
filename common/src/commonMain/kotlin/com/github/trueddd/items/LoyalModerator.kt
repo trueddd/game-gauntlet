@@ -4,9 +4,11 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.LoyalModerator}")
 class LoyalModerator private constructor(override val uid: String) : WheelItem.InventoryItem(),
     Parametrized<Parameters.One<String>> {
 
@@ -14,7 +16,7 @@ class LoyalModerator private constructor(override val uid: String) : WheelItem.I
         fun create() = LoyalModerator(uid = generateWheelItemUid())
     }
 
-    override val id = Id.LoyalModerator
+    override val id = Id(LoyalModerator)
 
     override val name = "Верный модер"
 
@@ -48,7 +50,7 @@ class LoyalModerator private constructor(override val uid: String) : WheelItem.I
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.LoyalModerator
+        override val itemId = Id(LoyalModerator)
         override fun create() = Companion.create()
     }
 }

@@ -4,10 +4,12 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
+@SerialName("${WheelItem.UnrecognizedDisk}")
 class UnrecognizedDisk private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Boolean>> {
 
@@ -15,7 +17,7 @@ class UnrecognizedDisk private constructor(override val uid: String) : WheelItem
         fun create() = UnrecognizedDisk(uid = generateWheelItemUid())
     }
 
-    override val id = Id.UnrecognizedDisk
+    override val id = Id(UnrecognizedDisk)
 
     override val name = "Неопознанная дискета"
 
@@ -43,7 +45,7 @@ class UnrecognizedDisk private constructor(override val uid: String) : WheelItem
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.UnrecognizedDisk
+        override val itemId = Id(UnrecognizedDisk)
         override fun create() = Companion.create()
     }
 
@@ -56,7 +58,7 @@ class UnrecognizedDisk private constructor(override val uid: String) : WheelItem
             fun create() = Buff(uid = generateWheelItemUid())
         }
 
-        override val id = Id.UnrecognizedDisk
+        override val id = Id(UnrecognizedDisk)
         override val name = "Неопознанная дискета"
         override val description = "+${modifier.absoluteValue} к следующему броску кубика для перехода по секторам."
     }

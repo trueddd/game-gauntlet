@@ -6,11 +6,15 @@ import com.github.trueddd.data.Participant
 import com.github.trueddd.items.*
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("a${Action.Key.ItemReceive}")
 data class ItemReceive(
+    @SerialName("rb")
     val receivedBy: Participant,
+    @SerialName("wi")
     val item: WheelItem,
 ) : Action(Key.ItemReceive) {
 

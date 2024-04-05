@@ -116,9 +116,10 @@ class AppClient(
             launch {
                 for (frame in session.incoming) {
                     val textFrame = frame as? Frame.Text ?: continue
+                    val content = textFrame.readText()
+                    println("New action received: $content")
                     val data = Response.parse(textFrame.readText()) ?: continue
                     if (data is Response.UserAction) {
-                        println("New action received: ${data.action}")
                         this@callbackFlow.send(listOf(data.action))
                     }
                 }

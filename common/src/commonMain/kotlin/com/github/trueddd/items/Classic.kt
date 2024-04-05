@@ -4,9 +4,11 @@ import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.Classic}")
 class Classic private constructor(override val uid: String) : WheelItem.Event() {
 
     companion object {
@@ -14,7 +16,7 @@ class Classic private constructor(override val uid: String) : WheelItem.Event() 
         val TargetGameIds = listOf(Game.Id(5)) // TODO: replace with actual games
     }
 
-    override val id = Id.Classic
+    override val id = Id(Classic)
 
     override val name = "Классика"
 
@@ -37,7 +39,7 @@ class Classic private constructor(override val uid: String) : WheelItem.Event() 
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.Classic
+        override val itemId = Id(Classic)
         override fun create() = Companion.create()
     }
 
@@ -49,7 +51,7 @@ class Classic private constructor(override val uid: String) : WheelItem.Event() 
         companion object {
             fun create() = Buff(uid = generateWheelItemUid())
         }
-        override val id = Id.Classic
+        override val id = Id(Classic)
         override val name = "Классика"
         override val description = "+1 к следующему броску кубика"
     }

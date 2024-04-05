@@ -4,16 +4,18 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.isEven
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.WillOfChance}")
 class WillOfChance private constructor(override val uid: String) : WheelItem.Event() {
 
     companion object {
         fun create() = WillOfChance(uid = generateWheelItemUid())
     }
 
-    override val id = Id.WillOfChance
+    override val id = Id(WillOfChance)
 
     override val name = "Воля случая"
 
@@ -35,7 +37,7 @@ class WillOfChance private constructor(override val uid: String) : WheelItem.Eve
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.WillOfChance
+        override val itemId = Id(WillOfChance)
         override fun create() = Companion.create()
     }
 
@@ -49,7 +51,7 @@ class WillOfChance private constructor(override val uid: String) : WheelItem.Eve
             fun create() = Debuff(uid = generateWheelItemUid())
         }
 
-        override val id = Id.WillOfBadChance
+        override val id = Id(WillOfBadChance)
 
         override val name = "Воля случая. Дебафф"
 
@@ -66,7 +68,7 @@ class WillOfChance private constructor(override val uid: String) : WheelItem.Eve
             fun create() = Buff(uid = generateWheelItemUid())
         }
 
-        override val id = Id.WillOfGoodChance
+        override val id = Id(WillOfGoodChance)
 
         override val name = "Воля случая. Бафф"
 

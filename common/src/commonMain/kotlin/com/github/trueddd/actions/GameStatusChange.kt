@@ -8,12 +8,16 @@ import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 // TODO: split this action to more specific ones or include game drop logics here?
 @Serializable
+@SerialName("a${Action.Key.GameStatusChange}")
 data class GameStatusChange(
+    @SerialName("p")
     val participant: Participant,
+    @SerialName("s")
     val gameNewStatus: Game.Status,
 ) : Action(Key.GameStatusChange) {
 

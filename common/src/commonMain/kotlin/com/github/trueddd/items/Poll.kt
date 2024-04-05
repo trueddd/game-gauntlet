@@ -6,9 +6,11 @@ import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.github.trueddd.utils.getItemFactoriesSet
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.Poll}")
 class Poll private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.Two<Int, Participant?>> {
 
@@ -16,7 +18,7 @@ class Poll private constructor(override val uid: String) : WheelItem.PendingEven
         fun create() = Poll(uid = generateWheelItemUid())
     }
 
-    override val id = Id.Poll
+    override val id = Id(Poll)
 
     override val name = "Голосование"
 
@@ -57,7 +59,7 @@ class Poll private constructor(override val uid: String) : WheelItem.PendingEven
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.Poll
+        override val itemId = Id(Poll)
         override fun create() = Companion.create()
     }
 }

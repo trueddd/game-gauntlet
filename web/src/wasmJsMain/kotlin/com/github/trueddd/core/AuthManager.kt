@@ -4,6 +4,7 @@ import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.Participant
 import com.github.trueddd.util.authRedirectUri
 import com.github.trueddd.util.twitchClientId
+import com.github.trueddd.utils.serialization
 import io.ktor.http.*
 import kotlinx.browser.window
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 class AuthManager(
     private val appClient: AppClient,
@@ -29,12 +29,12 @@ class AuthManager(
 
     init {
         val user = window.localStorage.getItem(USER_KEY)
-            ?.let { Json.decodeFromString<Participant>(it) }
+            ?.let { serialization.decodeFromString<Participant>(it) }
         _userState = MutableStateFlow(user)
     }
 
     private fun writeUser(authResponse: AuthResponse) {
-        window.localStorage.setItem(USER_KEY, Json.encodeToString(authResponse.user))
+        window.localStorage.setItem(USER_KEY, serialization.encodeToString(authResponse.user))
         window.localStorage.setItem(TOKEN_KEY, authResponse.token)
     }
 

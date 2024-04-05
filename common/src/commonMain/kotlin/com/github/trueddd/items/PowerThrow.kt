@@ -1,9 +1,11 @@
 package com.github.trueddd.items
 
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.PowerThrow}")
 class PowerThrow private constructor(
     override val uid: String,
     override val chargesLeft: Int
@@ -14,7 +16,7 @@ class PowerThrow private constructor(
         fun create(chargesLeft: Int) = PowerThrow(uid = generateWheelItemUid(), chargesLeft)
     }
 
-    override val id = Id.PowerThrow
+    override val id = Id(PowerThrow)
 
     override val name = "Мощный бросок"
 
@@ -38,7 +40,7 @@ class PowerThrow private constructor(
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.PowerThrow
+        override val itemId = Id(PowerThrow)
         override fun create() = Companion.create()
     }
 }

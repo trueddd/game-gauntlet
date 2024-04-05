@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @Single
 class EventManagerImpl(
     private val actionHandlerRegistry: ActionHandlerRegistry,
-    private val stateHolder: StateHolderImpl,
+    private val stateHolder: StateHolder,
 ) : EventManager, CoroutineScope {
 
     companion object {

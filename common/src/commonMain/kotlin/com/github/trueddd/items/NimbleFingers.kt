@@ -4,9 +4,11 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.NimbleFingers}")
 class NimbleFingers private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<String>> {
 
@@ -14,7 +16,7 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
         fun create() = NimbleFingers(uid = generateWheelItemUid())
     }
 
-    override val id = Id.NimbleFingers
+    override val id = Id(NimbleFingers)
 
     override val name = "Ловкие пальцы"
 
@@ -65,7 +67,7 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.NimbleFingers
+        override val itemId = Id(NimbleFingers)
         override fun create() = Companion.create()
     }
 }

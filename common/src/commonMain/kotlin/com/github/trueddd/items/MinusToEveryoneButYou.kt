@@ -3,16 +3,18 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.MinusToEveryoneButYou}")
 class MinusToEveryoneButYou private constructor(override val uid: String) : WheelItem.Event() {
 
     companion object {
         fun create() = MinusToEveryoneButYou(uid = generateWheelItemUid())
     }
 
-    override val id = Id.MinusToEveryoneButYou
+    override val id = Id(MinusToEveryoneButYou)
 
     override val name = "Минус всем, плюс тебе"
 
@@ -24,16 +26,16 @@ class MinusToEveryoneButYou private constructor(override val uid: String) : Whee
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
         return globalState.updatePlayers { player, state ->
             if (player.name == rolledBy.name) {
-                state.copy(effects = state.effects + PlusOneBuff.create())
+                state.copy(effects = state.effects + com.github.trueddd.items.PlusOneBuff.create())
             } else {
-                state.copy(effects = state.effects + MinusOneDebuff.create())
+                state.copy(effects = state.effects + com.github.trueddd.items.MinusOneDebuff.create())
             }
         }
     }
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.MinusToEveryoneButYou
+        override val itemId = Id(MinusToEveryoneButYou)
         override fun create() = Companion.create()
     }
 }

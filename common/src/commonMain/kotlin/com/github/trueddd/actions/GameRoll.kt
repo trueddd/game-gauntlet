@@ -11,11 +11,15 @@ import com.github.trueddd.items.YourStream
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("a${Action.Key.GameRoll}")
 data class GameRoll(
+    @SerialName("rb")
     val participant: Participant,
+    @SerialName("gi")
     val gameId: Game.Id,
 ) : Action(Key.GameRoll) {
 

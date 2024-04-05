@@ -5,16 +5,12 @@ import com.github.trueddd.data.ActionsTable
 import com.github.trueddd.data.GameGenreDistribution
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.globalState
-import com.github.trueddd.utils.DefaultTimeZone
-import com.github.trueddd.utils.Environment
-import com.github.trueddd.utils.Log
-import com.github.trueddd.utils.StateModificationException
+import com.github.trueddd.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -46,13 +42,13 @@ class DatabaseEventHistoryHolder(
         Log.info(TAG, "Saving Global state")
         val timeRange = "${globalState.startDate}:${globalState.endDate}"
         val eventsToSave = getActions()
-        val mapLayout = Json.encodeToString(
+        val mapLayout = serialization.encodeToString(
             GameGenreDistribution.serializer(),
             globalState.gameGenreDistribution
         )
         val events = eventsToSave
             .asReversed()
-            .joinToString("\n") { Json.encodeToString(it) }
+            .joinToString("\n") { serialization.encodeToString(it) }
         val text = buildString {
             appendLine(timeRange)
             appendLine(mapLayout)
@@ -87,7 +83,7 @@ class DatabaseEventHistoryHolder(
             }
         val genreDistributionRegex = Regex("^\"\\d+\"$")
         val mapLayout = records.firstOrNull { it.matches(genreDistributionRegex) }
-            ?.let { Json.decodeFromString(GameGenreDistribution.serializer(), it) }
+            ?.let { serialization.decodeFromString(GameGenreDistribution.serializer(), it) }
             ?: run {
                 mutex.unlock()
                 throw IllegalStateException("Distribution must be read, but actions list is empty")
@@ -96,7 +92,7 @@ class DatabaseEventHistoryHolder(
             .filter { it.isNotBlank() }
             .filter { it.first() == '{' && it.last() == '}' }
         val events = withContext(Dispatchers.Default) {
-            eventsContent.map { Json.decodeFromString(Action.serializer(), it) }
+            eventsContent.map { serialization.decodeFromString(Action.serializer(), it) }
         }
         val initialState = globalState(
             genreDistribution = mapLayout,

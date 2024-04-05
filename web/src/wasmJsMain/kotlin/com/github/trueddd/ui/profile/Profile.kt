@@ -109,7 +109,7 @@ fun ProfileScreen(
         },
         modifier = modifier
     ) {
-        if (actions.isNotEmpty() && globalState != null && selected != null) {
+        if (globalState != null && selected != null) {
             Profile(
                 selectedPlayer = selected!!,
                 currentPlayer = currentParticipant,

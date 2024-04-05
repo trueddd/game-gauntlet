@@ -4,10 +4,12 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
+@SerialName("${WheelItem.UnrealBoost}")
 class UnrealBoost private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Boolean>> {
 
@@ -15,7 +17,7 @@ class UnrealBoost private constructor(override val uid: String) : WheelItem.Pend
         fun create() = UnrealBoost(uid = generateWheelItemUid())
     }
 
-    override val id = Id.UnrealBoost
+    override val id = Id(UnrealBoost)
 
     override val name = "Нереальный буст"
 
@@ -44,7 +46,7 @@ class UnrealBoost private constructor(override val uid: String) : WheelItem.Pend
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.UnrealBoost
+        override val itemId = Id(UnrealBoost)
         override fun create() = Companion.create()
     }
 
@@ -58,7 +60,7 @@ class UnrealBoost private constructor(override val uid: String) : WheelItem.Pend
             fun create() = Buff(uid = generateWheelItemUid(), modifier = 3, chargesLeft = 5)
         }
 
-        override val id = Id.UnrealBoost
+        override val id = Id(UnrealBoost)
         override val name = "Нереальный буст"
         override val description = """
             Ты легенда. +${modifier.absoluteValue} к броску кубика на ход.

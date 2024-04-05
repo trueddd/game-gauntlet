@@ -3,6 +3,7 @@ package com.github.trueddd.core
 import com.github.trueddd.data.TwitchResponse
 import com.github.trueddd.data.TwitchUser
 import com.github.trueddd.utils.Environment
+import com.github.trueddd.utils.serialization
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
@@ -12,20 +13,14 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Single
 
 @Single
 class HttpClient {
 
-    private val json = Json {
-        prettyPrint = true
-        ignoreUnknownKeys = true
-    }
-
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
-            json(json)
+            json(serialization)
         }
     }
 

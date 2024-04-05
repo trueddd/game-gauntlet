@@ -7,10 +7,12 @@ import com.github.trueddd.items.DiceBattle.Buff
 import com.github.trueddd.items.DiceBattle.Debuff
 import com.github.trueddd.utils.d6Range
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
+@SerialName("${WheelItem.DiceBattle}")
 class DiceBattle private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.Three<Participant, Int, Int>> {
 
@@ -18,7 +20,7 @@ class DiceBattle private constructor(override val uid: String) : WheelItem.Pendi
         fun create() = DiceBattle(uid = generateWheelItemUid())
     }
 
-    override val id = Id.DiceBattle
+    override val id = Id(DiceBattle)
 
     override val name = "Писькомерянье"
 
@@ -75,7 +77,7 @@ class DiceBattle private constructor(override val uid: String) : WheelItem.Pendi
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.DiceBattle
+        override val itemId = Id(DiceBattle)
         override fun create() = Companion.create()
     }
 
@@ -87,7 +89,7 @@ class DiceBattle private constructor(override val uid: String) : WheelItem.Pendi
         companion object {
             fun create(diceValue: Int) = Buff(uid = generateWheelItemUid(), modifier = diceValue)
         }
-        override val id = Id.DiceBattle
+        override val id = Id(DiceBattle)
         override val name = "Писькомерянье"
         override val description = "+${modifier.absoluteValue} к броску кубика на ход"
     }
@@ -100,7 +102,7 @@ class DiceBattle private constructor(override val uid: String) : WheelItem.Pendi
         companion object {
             fun create(diceValue: Int) = Debuff(uid = generateWheelItemUid(), modifier = diceValue)
         }
-        override val id = Id.DiceBattle
+        override val id = Id(DiceBattle)
         override val name = "Писькомерянье"
         override val description = "-${modifier.absoluteValue} к броску кубика на ход"
     }

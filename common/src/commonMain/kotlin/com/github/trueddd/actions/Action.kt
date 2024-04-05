@@ -3,6 +3,7 @@ package com.github.trueddd.actions
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.Timer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -12,7 +13,9 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 sealed class Action(
+    @SerialName("id")
     open val id: Int,
+    @SerialName("ia")
     val issuedAt: Long = Timer.currentTimeMillis(),
 ) {
 

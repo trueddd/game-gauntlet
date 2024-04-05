@@ -2,7 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.data.Game
 import com.github.trueddd.utils.Log
-import kotlinx.serialization.json.Json
+import com.github.trueddd.utils.serialization
 import org.koin.core.annotation.Single
 
 @Single
@@ -14,7 +14,7 @@ class GamesProviderImpl : GamesProvider {
 
     private fun decodeGenreOrNull(input: String): Game.Genre? {
         return try {
-            Json.decodeFromString<Game.Genre>("\"$input\"")
+            serialization.decodeFromString<Game.Genre>("\"$input\"")
         } catch (e: Exception) {
             null
         }

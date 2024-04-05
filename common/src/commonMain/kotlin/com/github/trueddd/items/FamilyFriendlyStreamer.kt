@@ -4,16 +4,18 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.FamilyFriendlyStreamer}")
 class FamilyFriendlyStreamer private constructor(override val uid: String) : WheelItem.PendingEvent() {
 
     companion object {
         fun create() = FamilyFriendlyStreamer(uid = generateWheelItemUid())
     }
 
-    override val id = Id.FamilyFriendlyStreamer
+    override val id = Id(FamilyFriendlyStreamer)
 
     override val name = "Стример для всей семьи"
 
@@ -34,7 +36,7 @@ class FamilyFriendlyStreamer private constructor(override val uid: String) : Whe
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.FamilyFriendlyStreamer
+        override val itemId = Id(FamilyFriendlyStreamer)
         override fun create() = Companion.create()
     }
 
@@ -48,7 +50,7 @@ class FamilyFriendlyStreamer private constructor(override val uid: String) : Whe
             fun create() = Debuff(uid = generateWheelItemUid())
         }
 
-        override val id = Id.FamilyFriendlyStreamer
+        override val id = Id(FamilyFriendlyStreamer)
 
         override val name = "Стример не для всей семьи"
 

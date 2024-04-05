@@ -8,12 +8,17 @@ import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("a${Action.Key.ItemUse}")
 data class ItemUse(
+    @SerialName("ub")
     val usedBy: Participant,
+    @SerialName("iu")
     val itemUid: String,
+    @SerialName("ar")
     val arguments: List<String> = emptyList(),
 ) : Action(Key.ItemUse) {
 

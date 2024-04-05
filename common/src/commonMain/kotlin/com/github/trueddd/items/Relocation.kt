@@ -5,9 +5,11 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.Relocation}")
 class Relocation private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Game.Genre>> {
 
@@ -15,7 +17,7 @@ class Relocation private constructor(override val uid: String) : WheelItem.Pendi
         fun create() = Relocation(uid = generateWheelItemUid())
     }
 
-    override val id = Id.Relocation
+    override val id = Id(Relocation)
 
     override val name = "Релокейшен"
 
@@ -43,7 +45,7 @@ class Relocation private constructor(override val uid: String) : WheelItem.Pendi
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.Relocation
+        override val itemId = Id(Relocation)
         override fun create() = Companion.create()
     }
 }

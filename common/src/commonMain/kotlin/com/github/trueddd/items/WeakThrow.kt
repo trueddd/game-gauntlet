@@ -1,9 +1,11 @@
 package com.github.trueddd.items
 
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.WeakThrow}")
 class WeakThrow private constructor(
     override val uid: String,
     override val chargesLeft: Int
@@ -13,7 +15,7 @@ class WeakThrow private constructor(
         fun create() = WeakThrow(uid = generateWheelItemUid(), chargesLeft = 1)
     }
 
-    override val id = Id.WeakThrow
+    override val id = Id(WeakThrow)
 
     override val name = "Слабый бросок"
 
@@ -37,7 +39,7 @@ class WeakThrow private constructor(
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.WeakThrow
+        override val itemId = Id(WeakThrow)
         override fun create() = Companion.create()
     }
 }

@@ -7,11 +7,15 @@ import com.github.trueddd.items.*
 import com.github.trueddd.utils.*
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("a${Action.Key.BoardMove}")
 data class BoardMove(
+    @SerialName("rb")
     val rolledBy: Participant,
+    @SerialName("dv")
     val diceValue: Int,
 ) : Action(Key.BoardMove) {
 

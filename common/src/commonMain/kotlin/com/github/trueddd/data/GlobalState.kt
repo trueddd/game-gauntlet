@@ -1,16 +1,24 @@
 package com.github.trueddd.data
 
 import com.github.trueddd.items.BoardTrap
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class GlobalState(
+    @SerialName("sd")
     val startDate: Long,
+    @SerialName("ed")
     val endDate: Long,
+    @SerialName("pl")
     val players: Map<Participant, PlayerState>,
+    @SerialName("bl")
     val boardLength: Int,
+    @SerialName("wi")
     val winner: Participant? = null,
+    @SerialName("gd")
     val gameGenreDistribution: GameGenreDistribution,
+    @SerialName("bt")
     val boardTraps: Map<Int, BoardTrap> = mapOf(),
 ) {
 

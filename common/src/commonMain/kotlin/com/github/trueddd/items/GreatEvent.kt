@@ -4,10 +4,12 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
+@SerialName("${WheelItem.GreatEvent}")
 class GreatEvent private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Int>> {
 
@@ -15,7 +17,7 @@ class GreatEvent private constructor(override val uid: String) : WheelItem.Pendi
         fun create() = GreatEvent(uid = generateWheelItemUid())
     }
 
-    override val id = Id.GreatEvent
+    override val id = Id(GreatEvent)
 
     override val name = "Крутой ивент"
 
@@ -43,7 +45,7 @@ class GreatEvent private constructor(override val uid: String) : WheelItem.Pendi
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.GreatEvent
+        override val itemId = Id(GreatEvent)
         override fun create() = Companion.create()
     }
 
@@ -55,7 +57,7 @@ class GreatEvent private constructor(override val uid: String) : WheelItem.Pendi
         companion object {
             fun create(modifier: Int) = Buff(uid = generateWheelItemUid(), modifier = modifier)
         }
-        override val id = Id.GreatEvent
+        override val id = Id(GreatEvent)
         override val name = "Крутой ивент"
         override val description = """
             +${modifier.absoluteValue} к броску кубика на ход. Спасибо всем, кто был онлайн.

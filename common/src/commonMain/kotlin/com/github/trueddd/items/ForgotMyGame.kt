@@ -5,9 +5,11 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.ForgotMyGame}")
 class ForgotMyGame private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Boolean>> {
 
@@ -15,7 +17,7 @@ class ForgotMyGame private constructor(override val uid: String) : WheelItem.Pen
         fun create() = ForgotMyGame(uid = generateWheelItemUid())
     }
 
-    override val id = Id.ForgotMyGame
+    override val id = Id(ForgotMyGame)
 
     override val name = "\"Я забыл, во что играл...\""
 
@@ -44,7 +46,7 @@ class ForgotMyGame private constructor(override val uid: String) : WheelItem.Pen
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.ForgotMyGame
+        override val itemId = Id(ForgotMyGame)
         override fun create() = Companion.create()
     }
 }

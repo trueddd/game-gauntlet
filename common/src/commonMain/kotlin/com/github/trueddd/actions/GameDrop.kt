@@ -11,11 +11,15 @@ import com.github.trueddd.utils.StateModificationException
 import com.github.trueddd.utils.rollDice
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("a${Action.Key.GameDrop}")
 data class GameDrop(
+    @SerialName("rb")
     val rolledBy: Participant,
+    @SerialName("dv")
     val diceValue: Int,
 ) : Action(Key.GameDrop) {
 
