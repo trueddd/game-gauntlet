@@ -26,7 +26,7 @@ class NimbleFingersItemTest : EventGateTest() {
         val plasticine = Plasticine.create()
         handleAction(ItemReceive(user2, plasticine))
         handleAction(ItemReceive(user1, nimbleFingers))
-        handleAction(ItemUse(user1, nimbleFingers, user2.name, plasticine.uid))
+        handleAction(ItemUse(user1, nimbleFingers, plasticine.uid))
         assertEquals(expected = 0, pendingEventsOf(user1).size)
         assertEquals(expected = 0, inventoryOf(user2).size)
         assertEquals(expected = 1, inventoryOf(user1).size)
