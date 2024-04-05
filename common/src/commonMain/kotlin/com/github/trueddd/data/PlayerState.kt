@@ -50,6 +50,9 @@ data class PlayerState(
     val modifiersSum: Int
         get() = effects.filterIsInstance<DiceRollModifier>().sumOf { it.modifier }
 
+    val wheelItems: List<WheelItem>
+        get() = inventory + effects + pendingEvents
+
     fun updatedHistoryWithLast(block: (GameHistoryEntry) -> GameHistoryEntry): List<GameHistoryEntry> {
         return gameHistory.mapIndexed { index, entry -> if (index == gameHistory.size - 1) block(entry) else entry }
     }

@@ -23,7 +23,7 @@ class StateRecoverabilityTest : EventGateTest() {
             "${user3.name}:${Action.Key.BoardMove}",
         )
         actionsSequence.forEach {
-            eventGate.parseAndHandleSuspend(it)
+            eventGate.parseAndHandle(it)
         }
         eventGate.historyHolder.save(eventGate.stateHolder.current)
         eventGate.eventManager.stopHandling()

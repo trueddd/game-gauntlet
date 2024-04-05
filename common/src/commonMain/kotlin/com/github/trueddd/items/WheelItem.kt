@@ -29,11 +29,11 @@ sealed class WheelItem : Rollable {
     }
 
     object Colors {
-        const val EVENT = 0xFF06B6D4
-        const val PENDING_EVENT = 0xFF14B8A6
-        const val INVENTORY_ITEM = 0xFFF59E0B
-        const val BUFF = 0xFF22C55E
-        const val DEBUFF = 0xFFEF4444
+        const val EVENT = 0xFF5BC4DA
+        const val PENDING_EVENT = 0xFF7554D0
+        const val INVENTORY_ITEM = 0xFFE4B932
+        const val BUFF = 0xFF2D765C
+        const val DEBUFF = 0xFFCC476C
     }
 
     @JvmInline

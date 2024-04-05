@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.trueddd.core.AppClient
+import com.github.trueddd.core.ServerRouter
 import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.ui.widget.AsyncImage
@@ -51,6 +52,7 @@ fun Rules(
     modifier: Modifier = Modifier,
 ) {
     val appClient = remember { get<AppClient>() }
+    val router = remember { get<ServerRouter>() }
     var searchText by remember { mutableStateOf("") }
     var selectedTypes by remember { mutableStateOf(emptyList<WheelItemView>()) }
     var items by remember { mutableStateOf(emptyList<WheelItem>()) }
@@ -129,7 +131,7 @@ fun Rules(
             items(visibleItems) { item ->
                 Row {
                     AsyncImage(
-                        model = appClient.router.wheelItemIconUrl(item.iconId),
+                        model = router.wheelItemIconUrl(item.iconId),
                         modifier = Modifier
                             .size(48.dp)
                             .background(Color.White)

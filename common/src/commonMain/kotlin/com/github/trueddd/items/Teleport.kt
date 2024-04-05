@@ -7,7 +7,8 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Teleport private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class Teleport private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Boolean?>> {
 
     companion object {
         fun create() = Teleport(uid = generateWheelItemUid())
@@ -24,7 +25,15 @@ class Teleport private constructor(override val uid: String) : WheelItem.Pending
         Если сосед только один, телепортируешься к нему, если соседей нет вовсе - УВЫ.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Bool(name = "Выпал Орёл?"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Boolean?> {
+        return Parameters.One(rawArguments.getBooleanParameter(optional = true))
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+        val coin = getParameters(arguments, globalState).parameter1
         val userPosition = globalState.positionOf(usedBy)
         val neighborBack = globalState.players.values
             .filter { it.position < userPosition && it.position in GlobalState.PLAYABLE_BOARD_RANGE }
@@ -36,7 +45,7 @@ class Teleport private constructor(override val uid: String) : WheelItem.Pending
             neighborBack == null && neighborForth != null -> neighborForth
             neighborBack != null && neighborForth == null -> neighborBack
             neighborBack == null && neighborForth == null -> userPosition
-            neighborBack != null && neighborForth != null -> when (arguments.getBooleanParameter(0)) {
+            neighborBack != null && neighborForth != null -> when (coin!!) {
                 true -> neighborForth
                 false -> neighborBack
             }

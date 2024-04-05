@@ -8,7 +8,8 @@ import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
-class GreatEvent private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class GreatEvent private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Int>> {
 
     companion object {
         fun create() = GreatEvent(uid = generateWheelItemUid())
@@ -22,9 +23,16 @@ class GreatEvent private constructor(override val uid: String) : WheelItem.Pendi
         К следующему броску кубика прибавь значение в зависимости от количества стримящих в данный момент участников.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Int(name = "Количество стримящих"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Int> {
+        return Parameters.One(rawArguments.getIntParameter())
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val online = arguments.getIntParameter()
-            .also { require(it in 0 .. globalState.players.size) }
+        val online = getParameters(arguments, globalState).parameter1
+        require(online in 0 .. globalState.players.size)
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),

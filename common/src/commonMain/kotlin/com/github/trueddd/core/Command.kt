@@ -45,6 +45,14 @@ sealed class Command(val value: String) {
                 append(":")
                 append(itemId.value)
             }.let { Action(it) }
+            fun itemUse(player: Participant, item: WheelItem, arguments: List<String>) = buildString {
+                append(player.name)
+                append(":")
+                append(com.github.trueddd.actions.Action.Key.ItemUse)
+                append(":")
+                append(item.uid)
+                arguments.forEach { append(":$it") }
+            }.let { Action(it) }
         }
     }
 

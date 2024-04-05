@@ -7,7 +7,8 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class LoyalModerator private constructor(override val uid: String) : WheelItem.InventoryItem() {
+class LoyalModerator private constructor(override val uid: String) : WheelItem.InventoryItem(),
+    Parametrized<Parameters.One<String>> {
 
     companion object {
         fun create() = LoyalModerator(uid = generateWheelItemUid())
@@ -22,9 +23,19 @@ class LoyalModerator private constructor(override val uid: String) : WheelItem.I
         Не имеет временных ограничений и может быть использовано в любой момент.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.MyItem(
+            name = "Снимаемый дебафф",
+            predicate = { it is Effect.Debuff && it !is EasterCakeBang }
+        ))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<String> {
+        return Parameters.One(rawArguments.getStringParameter())
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState.updatePlayer(usedBy) { playerState ->
-            val targetDebuffId = arguments.getStringParameter()
+            val targetDebuffId = getParameters(arguments, globalState).parameter1
             if (playerState.effects.firstOrNull { it.uid == targetDebuffId } is EasterCakeBang) {
                 throw IllegalArgumentException("This debuff cannot be dispelled")
             }

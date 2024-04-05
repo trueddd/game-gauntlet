@@ -22,6 +22,7 @@ import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.theme.DarkColors
 import com.github.trueddd.ui.*
+import com.github.trueddd.ui.profile.ProfileScreen
 import com.github.trueddd.ui.rules.Rules
 import com.github.trueddd.ui.wheels.Wheels
 import kotlinx.coroutines.delay
@@ -119,8 +120,9 @@ private fun App(
                     )
                 }
                 is Destination.Profile -> {
-                    Profile(
-                        participant = user,
+                    ProfileScreen(
+                        currentParticipant = user,
+                        globalState = globalState,
                         modifier = Modifier
                     )
                 }

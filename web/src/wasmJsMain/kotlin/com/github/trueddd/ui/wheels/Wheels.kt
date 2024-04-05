@@ -113,6 +113,7 @@ fun Wheels(
                     onClick = {
                         (wheelState.rolledItem as? WheelItem)?.let {
                             appClient.sendCommand(Command.Action.itemReceive(participant, it.id))
+                            wheelState = wheelState.copy(rolledItem = null)
                         }
                     },
                     modifier = Modifier

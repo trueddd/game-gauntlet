@@ -8,7 +8,8 @@ import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
-class MongoliaDoesNotExist private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class MongoliaDoesNotExist private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Boolean>> {
 
     companion object {
         fun create() = MongoliaDoesNotExist(uid = generateWheelItemUid())
@@ -26,8 +27,15 @@ class MongoliaDoesNotExist private constructor(override val uid: String) : Wheel
         Если стримеру уже было доказано, что Монголия существует, то он рероллит этот пункт.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Bool(name = "Монголия существует?"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Boolean> {
+        return Parameters.One(rawArguments.getBooleanParameter()!!)
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val isSuccessful = arguments.getBooleanParameter()
+        val isSuccessful = getParameters(arguments, globalState).parameter1
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),
@@ -50,6 +58,7 @@ class MongoliaDoesNotExist private constructor(override val uid: String) : Wheel
         companion object {
             fun create() = Buff(uid = generateWheelItemUid(), modifier = 2)
         }
+
         override val id = Id.MongoliaDoesNotExist
         override val name = "Монголия существует"
         override val description = """
@@ -65,6 +74,7 @@ class MongoliaDoesNotExist private constructor(override val uid: String) : Wheel
         companion object {
             fun create() = Debuff(uid = generateWheelItemUid(), modifier = -2)
         }
+
         override val id = Id.MongoliaDoesNotExist
         override val name = "Монголии не существует"
         override val description = """

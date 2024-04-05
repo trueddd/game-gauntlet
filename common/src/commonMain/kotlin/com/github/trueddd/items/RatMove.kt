@@ -7,7 +7,8 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class RatMove private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class RatMove private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Participant?>> {
 
     companion object {
         fun create() = RatMove(uid = generateWheelItemUid())
@@ -23,15 +24,26 @@ class RatMove private constructor(override val uid: String) : WheelItem.PendingE
         то пункт рероллится.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Player(name = "Стример"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Participant?> {
+        return Parameters.One(rawArguments.getParticipantParameter(index = 0, currentState, optional = true))
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val targetUser = arguments.getParticipantParameter(index = 0, globalState)
+        val targetUser = getParameters(arguments, globalState).parameter1 ?: usedBy
         return globalState.updatePlayers { participant, playerState ->
             when (participant.name) {
                 usedBy.name -> playerState.copy(pendingEvents = playerState.pendingEvents.without(uid))
-                targetUser.name -> playerState.copy(
-                    inventory = emptyList(),
-                    effects = playerState.effects.filterIsInstance<EasterCakeBang>(),
-                )
+                targetUser.name -> if (targetUser != usedBy) {
+                    playerState.copy(
+                        inventory = emptyList(),
+                        effects = playerState.effects.filterIsInstance<EasterCakeBang>(),
+                    )
+                } else {
+                    playerState
+                }
                 else -> playerState
             }
         }

@@ -17,6 +17,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.github.trueddd.items.WheelItem
+import com.github.trueddd.ui.res.StringResources
 
 @Stable
 sealed class WheelItemView(
@@ -29,11 +30,11 @@ sealed class WheelItemView(
         val All = listOf(Buff, Debuff, Event, PendingEvent, Inventory)
     }
 
-    data object Buff : WheelItemView("Баффы", Color(WheelItem.Colors.BUFF))
-    data object Debuff : WheelItemView("Дебаффы", Color(WheelItem.Colors.DEBUFF))
-    data object Event : WheelItemView("События", Color(WheelItem.Colors.EVENT))
-    data object PendingEvent : WheelItemView("Интерактивные события", Color(WheelItem.Colors.PENDING_EVENT))
-    data object Inventory : WheelItemView("Предметы", Color(WheelItem.Colors.INVENTORY_ITEM))
+    data object Buff : WheelItemView(StringResources.WheelItem.Buff, Color(WheelItem.Colors.BUFF))
+    data object Debuff : WheelItemView(StringResources.WheelItem.Debuff, Color(WheelItem.Colors.DEBUFF))
+    data object Event : WheelItemView(StringResources.WheelItem.Event, Color(WheelItem.Colors.EVENT))
+    data object PendingEvent : WheelItemView(StringResources.WheelItem.PendingEvent, Color(WheelItem.Colors.PENDING_EVENT))
+    data object Inventory : WheelItemView(StringResources.WheelItem.InventoryItem, Color(WheelItem.Colors.INVENTORY_ITEM))
 }
 
 @Composable

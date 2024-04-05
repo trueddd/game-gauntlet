@@ -77,21 +77,24 @@ class DatabaseEventHistoryHolder(
             mutex.unlock()
             return globalState()
         }
-        val (start, end) = records.getOrNull(0)
+        val eventDatesRegex = Regex("^\\d+:\\d+$")
+        val (start, end) = records.firstOrNull { it.matches(eventDatesRegex) }
             ?.split(":")
             ?.let { (start, end) -> start.toLong() to end.toLong() }
             ?: run {
                 mutex.unlock()
                 throw IllegalArgumentException("Error while parsing game time range")
             }
-        val mapLayout = records.getOrNull(1)
+        val genreDistributionRegex = Regex("^\"\\d+\"$")
+        val mapLayout = records.firstOrNull { it.matches(genreDistributionRegex) }
             ?.let { Json.decodeFromString(GameGenreDistribution.serializer(), it) }
             ?: run {
                 mutex.unlock()
                 throw IllegalStateException("Distribution must be read, but actions list is empty")
             }
-        val eventsContent = records.drop(2)
+        val eventsContent = records
             .filter { it.isNotBlank() }
+            .filter { it.first() == '{' && it.last() == '}' }
         val events = withContext(Dispatchers.Default) {
             eventsContent.map { Json.decodeFromString(Action.serializer(), it) }
         }

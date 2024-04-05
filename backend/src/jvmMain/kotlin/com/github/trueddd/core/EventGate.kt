@@ -15,9 +15,6 @@ interface EventGate {
 
     suspend fun parseAndHandle(input: String): Boolean
 
-    @TestOnly
-    suspend fun parseAndHandleSuspend(input: String): Boolean
-
     suspend fun start()
 
     @TestOnly

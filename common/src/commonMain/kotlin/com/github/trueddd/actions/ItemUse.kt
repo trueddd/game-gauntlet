@@ -3,8 +3,7 @@ package com.github.trueddd.actions
 import com.github.trueddd.core.ItemRoller
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
-import com.github.trueddd.items.Plasticine
-import com.github.trueddd.items.WheelItem
+import com.github.trueddd.items.*
 import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator

@@ -8,7 +8,8 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Relocation private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class Relocation private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Game.Genre>> {
 
     companion object {
         fun create() = Relocation(uid = generateWheelItemUid())
@@ -22,11 +23,16 @@ class Relocation private constructor(override val uid: String) : WheelItem.Pendi
         Стример роллит список жанров и переходит на ближайший сектор с выпавшим жанром.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Genre(name = "Жанр"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Game.Genre> {
+        return Parameters.One(rawArguments.getIntParameter().let { Game.Genre.entries[it] })
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val genre = arguments.getIntParameter()
-            .let { Game.Genre.entries.getOrNull(it) }
-            ?.also { require(it != Game.Genre.Special) }
-            ?: throw IllegalArgumentException("Index of genre must be specified")
+        val genre = getParameters(arguments, globalState).parameter1
+        require(genre != Game.Genre.Special)
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),

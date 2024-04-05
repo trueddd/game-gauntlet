@@ -30,9 +30,8 @@ import org.w3c.dom.url.URL
 
 class AppClient(
     private val httpClient: HttpClient,
+    private val router: ServerRouter,
 ) : CoroutineScope {
-
-    val router = ServerRouter()
 
     private var runnerJob: Job? = null
 
@@ -130,7 +129,7 @@ class AppClient(
         }
     }
 
-    private suspend fun loadActions(): List<Action> {
+    suspend fun loadActions(): List<Action> {
         return withContext(coroutineContext) {
             try {
                 httpClient.get(router.http(Router.ACTIONS)) {

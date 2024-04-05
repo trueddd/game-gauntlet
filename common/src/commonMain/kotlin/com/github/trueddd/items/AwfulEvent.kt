@@ -9,7 +9,8 @@ import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
-class AwfulEvent private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class AwfulEvent private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Int>> {
 
     companion object {
         fun create() = AwfulEvent(uid = generateWheelItemUid())
@@ -23,9 +24,16 @@ class AwfulEvent private constructor(override val uid: String) : WheelItem.Pendi
         Отними от следующего броска кубика значение в зависимости от количества стримящих в данный момент участников.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Int(name = "Количество стримящих участников"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Int> {
+        return Parameters.One(rawArguments.getIntParameter())
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val online = arguments.getIntParameter(index = 0)
-            .also { require(it in 0 .. globalState.players.size) }
+        val online = getParameters(arguments, globalState).parameter1
+        require(online in 0..globalState.players.size)
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),
@@ -48,6 +56,7 @@ class AwfulEvent private constructor(override val uid: String) : WheelItem.Pendi
         companion object {
             fun create(modifier: Int) = Debuff(uid = generateWheelItemUid(), modifier = -modifier)
         }
+
         override val id = Id.AwfulEvent
         override val name = "Плохой ивент"
         override val description = """

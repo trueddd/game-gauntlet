@@ -7,7 +7,8 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class NimbleFingers private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class NimbleFingers private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<String>> {
 
     companion object {
         fun create() = NimbleFingers(uid = generateWheelItemUid())
@@ -23,10 +24,26 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
         то данный пункт сбрасывается.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(
+            ParameterType.ForeignItem(name = "Предмет", predicate = { it is InventoryItem }),
+        )
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<String> {
+        return Parameters.One(rawArguments.getStringParameter())
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val targetUser = arguments.getParticipantParameter(index = 0, globalState)
-        val targetItem = arguments.getStringParameter(index = 1)
-            .let { id -> globalState.inventoryOf(targetUser).firstOrNull { it.uid == id } }
+        val parameters = getParameters(arguments, globalState)
+        val targetItemId = parameters.parameter1
+        val targetUser = globalState.players.firstNotNullOfOrNull { (player, state) ->
+            if (state.inventory.any { it.uid == targetItemId }) {
+                player
+            } else {
+                null
+            }
+        } ?: throw IllegalArgumentException("Not found target user")
+        val targetItem = globalState.inventoryOf(targetUser).firstOrNull { it.uid == parameters.parameter1 }
             ?: throw IllegalArgumentException("ID of target item must be specified")
         return globalState.updatePlayers { participant, state ->
             when (participant) {

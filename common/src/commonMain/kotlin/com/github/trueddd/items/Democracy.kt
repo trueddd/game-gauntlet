@@ -3,12 +3,15 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.items.Democracy.Buff
+import com.github.trueddd.items.Democracy.Debuff
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
-class Democracy private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class Democracy private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Boolean>> {
 
     companion object {
         fun create() = Democracy(uid = generateWheelItemUid())
@@ -22,8 +25,15 @@ class Democracy private constructor(override val uid: String) : WheelItem.Pendin
         Чат решает плюс очко или минус очко к следующему броску кубика.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Bool(name = "Чат выбрал плюс?"))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Boolean> {
+        return Parameters.One(rawArguments.getBooleanParameter()!!)
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val pollSucceeded = arguments.getBooleanParameter()
+        val pollSucceeded = getParameters(arguments, globalState).parameter1
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),

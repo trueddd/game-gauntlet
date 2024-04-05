@@ -8,7 +8,8 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class WannaSwap private constructor(override val uid: String) : WheelItem.PendingEvent() {
+class WannaSwap private constructor(override val uid: String) : WheelItem.PendingEvent(),
+    Parametrized<Parameters.One<Participant>> {
 
     companion object {
         fun create() = WannaSwap(uid = generateWheelItemUid())
@@ -25,11 +26,29 @@ class WannaSwap private constructor(override val uid: String) : WheelItem.Pendin
         начинается с начала.
     """.trimIndent()
 
+    override val parametersScheme: List<ParameterType>
+        get() = listOf(ParameterType.Player(
+            name = "Другой игрок",
+            description = "Укажи себя, если обмен не требуется"
+        ))
+
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Participant> {
+        return Parameters.One(rawArguments.getParticipantParameter(index = 0, currentState)!!)
+    }
+
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
-        val swapPlayer = arguments.getParticipantParameter(index = 0, globalState)
-        val userGame = globalState[usedBy.name]!!.currentActiveGame
+        val swapPlayer = getParameters(arguments, globalState).parameter1
+        if (swapPlayer == usedBy) {
+            return globalState.updatePlayers { participant, playerState ->
+                when (participant) {
+                    usedBy -> playerState.copy(pendingEvents = playerState.pendingEvents.without(uid))
+                    else -> playerState
+                }
+            }
+        }
+        val userGame = globalState.stateOf(usedBy).currentActiveGame
             ?: throw IllegalStateException("The game of user must be in active state")
-        val gameToSwap = globalState[swapPlayer.name]!!.currentActiveGame
+        val gameToSwap = globalState.stateOf(swapPlayer).currentActiveGame
             ?: throw IllegalStateException("The game of another player must be in active state")
         return globalState.updatePlayers { participant, playerState ->
             when (participant.name) {
