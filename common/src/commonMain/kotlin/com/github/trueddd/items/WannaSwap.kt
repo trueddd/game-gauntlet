@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class WannaSwap private constructor(override val uid: String) : WheelItem.PendingEvent(),
-    Parametrized<Parameters.One<Participant?>> {
+    Parametrized<Parameters.One<Participant>> {
 
     companion object {
         fun create() = WannaSwap(uid = generateWheelItemUid())
@@ -27,20 +27,25 @@ class WannaSwap private constructor(override val uid: String) : WheelItem.Pendin
     """.trimIndent()
 
     override val parametersScheme: List<ParameterType>
-        get() = listOf(ParameterType.Player(name = "Другой игрок", optional = true))
+        get() = listOf(ParameterType.Player(
+            name = "Другой игрок",
+            description = "Укажи себя, если обмен не требуется"
+        ))
 
-    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Participant?> {
-        return Parameters.One(rawArguments.getParticipantParameter(index = 0, currentState, optional = true))
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Participant> {
+        return Parameters.One(rawArguments.getParticipantParameter(index = 0, currentState)!!)
     }
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         val swapPlayer = getParameters(arguments, globalState).parameter1
-            ?: return globalState.updatePlayers { participant, playerState ->
+        if (swapPlayer == usedBy) {
+            return globalState.updatePlayers { participant, playerState ->
                 when (participant) {
                     usedBy -> playerState.copy(pendingEvents = playerState.pendingEvents.without(uid))
                     else -> playerState
                 }
             }
+        }
         val userGame = globalState.stateOf(usedBy).currentActiveGame
             ?: throw IllegalStateException("The game of user must be in active state")
         val gameToSwap = globalState.stateOf(swapPlayer).currentActiveGame

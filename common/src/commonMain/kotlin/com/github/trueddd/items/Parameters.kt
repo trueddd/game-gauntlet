@@ -23,29 +23,30 @@ interface Parametrized<P : Parameters> {
     fun getParameters(rawArguments: List<String>, currentState: GlobalState): P
 }
 
-enum class ItemSetType {
-    Personal,
-    Foreign,
-    Common
-}
-
 sealed class ParameterType {
 
     abstract val name: String
-    open val optional: Boolean
-        get() = false
+    open val description: String?
+        get() = null
 
     class Bool(override val name: String) : ParameterType()
     class Int(override val name: String) : ParameterType()
     class Player(
         override val name: String,
         val predicate: (Participant) -> Boolean = { true },
-        override val optional: Boolean = false
+        override val description: String? = null
+    ) : ParameterType()
+    class MyItem(
+        override val name: String,
+        val predicate: ((WheelItem) -> Boolean) = { true },
+    ) : ParameterType()
+    class ForeignItem(
+        override val name: String,
+        val predicate: ((WheelItem) -> Boolean) = { true }
     ) : ParameterType()
     class Item(
         override val name: String,
-        val predicate: ((WheelItem) -> Boolean) = { true },
-        val itemSetType: ItemSetType
+        val predicate: ((WheelItem) -> Boolean) = { true }
     ) : ParameterType()
     class Genre(override val name: String) : ParameterType()
 }

@@ -30,7 +30,7 @@ class Poll private constructor(override val uid: String) : WheelItem.PendingEven
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(
-            ParameterType.Item(name = "Выпавший пункт", itemSetType = ItemSetType.Common),
+            ParameterType.Item(name = "Выпавший пункт"),
             ParameterType.Player(name = "Получатель"),
         )
 

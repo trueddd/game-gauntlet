@@ -24,10 +24,9 @@ class LoyalModerator private constructor(override val uid: String) : WheelItem.I
     """.trimIndent()
 
     override val parametersScheme: List<ParameterType>
-        get() = listOf(ParameterType.Item(
+        get() = listOf(ParameterType.MyItem(
             name = "Снимаемый дебафф",
-            predicate = { it is Effect.Debuff },
-            itemSetType = ItemSetType.Personal
+            predicate = { it is Effect.Debuff && it !is EasterCakeBang }
         ))
 
     override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<String> {

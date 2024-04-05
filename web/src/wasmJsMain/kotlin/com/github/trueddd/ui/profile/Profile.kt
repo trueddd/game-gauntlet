@@ -12,8 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,6 +34,7 @@ import androidx.compose.ui.zIndex
 import com.github.trueddd.actions.Action
 import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.AuthManager
+import com.github.trueddd.core.Command
 import com.github.trueddd.core.ServerRouter
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
@@ -46,7 +45,7 @@ import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.widget.AsyncImage
 import com.github.trueddd.util.localized
 import com.github.trueddd.util.typeLocalized
-import com.github.trueddd.utils.getItemFactoriesSet
+import com.github.trueddd.utils.Log
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
@@ -57,6 +56,8 @@ private object ProfileContentType {
     const val DATE = "date"
     const val TABLE = "table"
 }
+
+private const val TAG = "ProfileScreen"
 
 private val leftSideBarWidth = 320.dp
 private val leftSideBarPadding = 32.dp
@@ -208,6 +209,7 @@ private fun Profile(
     actions: List<Action>,
     modifier: Modifier = Modifier,
 ) {
+    val appClient = remember { get<AppClient>() }
     var dialogItem by remember { mutableStateOf<WheelItem?>(null) }
     val lazyListState = rememberLazyListState()
     val leftSidePanelTopPadding by remember {
@@ -271,7 +273,7 @@ private fun Profile(
                     ) {
                         globalState.stateOf(selectedPlayer).wheelItems.forEach { item ->
                             WheelItemView(item) {
-                                println("Used ${item.name}")
+                                Log.info(TAG, "Called dialog for ${item.name}")
                                 dialogItem = item
                             }
                         }
@@ -416,7 +418,7 @@ private fun Profile(
                 .width(leftSideBarWidth)
                 .fillMaxHeight()
         ) {
-            Box( // todo: avatar
+            Box(
                 modifier = Modifier
                     .size(120.dp)
                     .background(MaterialTheme.colorScheme.surface, CircleShape)
@@ -457,6 +459,7 @@ private fun Profile(
         var allItems by remember { mutableStateOf(emptyList<WheelItem>()) }
         LaunchedEffect(Unit) {
             allItems = get<AppClient>().getItems()
+                .sortedBy { it.name }
         }
         if (dialogItem != null && currentPlayer != null) {
             WheelItemUseDialog(
@@ -465,8 +468,8 @@ private fun Profile(
                 player = currentPlayer,
                 items = allItems,
                 onItemUse = { item, parameters ->
-                    // todo: use item with parameters
-                    println("using ${dialogItem?.name}")
+                    Log.info(TAG, "using ${item.name} with parameters $parameters")
+                    appClient.sendCommand(Command.Action.itemUse(currentPlayer, item, parameters))
                     dialogItem = null
                 },
                 onDialogDismiss = { dialogItem = null }

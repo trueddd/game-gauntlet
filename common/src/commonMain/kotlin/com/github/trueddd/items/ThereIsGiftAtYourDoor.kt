@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class ThereIsGiftAtYourDoor private constructor(override val uid: String) : WheelItem.PendingEvent(),
-    Parametrized<Parameters.One<Participant?>> {
+    Parametrized<Parameters.One<Participant>> {
 
     companion object {
         fun create() = ThereIsGiftAtYourDoor(uid = generateWheelItemUid())
@@ -25,10 +25,10 @@ class ThereIsGiftAtYourDoor private constructor(override val uid: String) : Whee
     """.trimIndent()
 
     override val parametersScheme: List<ParameterType>
-        get() = listOf(ParameterType.Player(name = "Участник", optional = true))
+        get() = listOf(ParameterType.Player(name = "Кто получает дебафф?"))
 
-    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Participant?> {
-        return Parameters.One(rawArguments.getParticipantParameter(index = 0, currentState, optional = true))
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Participant> {
+        return Parameters.One(rawArguments.getParticipantParameter(index = 0, currentState)!!)
     }
 
     override suspend fun use(
@@ -36,7 +36,7 @@ class ThereIsGiftAtYourDoor private constructor(override val uid: String) : Whee
         globalState: GlobalState,
         arguments: List<String>
     ): GlobalState {
-        return when (val target = getParameters(arguments, globalState).parameter1 ?: usedBy) {
+        return when (val target = getParameters(arguments, globalState).parameter1) {
             usedBy -> globalState.updatePlayer(usedBy) { playerState ->
                 playerState.copy(
                     effects = playerState.effects + StayAfterGame.create(),

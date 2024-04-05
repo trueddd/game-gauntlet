@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class NimbleFingers private constructor(override val uid: String) : WheelItem.PendingEvent(),
-    Parametrized<Parameters.Two<Participant, String>> {
+    Parametrized<Parameters.One<String>> {
 
     companion object {
         fun create() = NimbleFingers(uid = generateWheelItemUid())
@@ -26,24 +26,24 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(
-            ParameterType.Player(name = "Игрок"),
-            ParameterType.Item(name = "target item ID", itemSetType = ItemSetType.Foreign),
+            ParameterType.ForeignItem(name = "Предмет", predicate = { it is InventoryItem }),
         )
 
-    override fun getParameters(
-        rawArguments: List<String>,
-        currentState: GlobalState
-    ): Parameters.Two<Participant, String> {
-        return Parameters.Two(
-            rawArguments.getParticipantParameter(index = 0, currentState)!!,
-            rawArguments.getStringParameter(index = 1),
-        )
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<String> {
+        return Parameters.One(rawArguments.getStringParameter())
     }
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         val parameters = getParameters(arguments, globalState)
-        val targetUser = parameters.parameter1
-        val targetItem = globalState.inventoryOf(targetUser).firstOrNull { it.uid == parameters.parameter2 }
+        val targetItemId = parameters.parameter1
+        val targetUser = globalState.players.firstNotNullOfOrNull { (player, state) ->
+            if (state.inventory.any { it.uid == targetItemId }) {
+                player
+            } else {
+                null
+            }
+        } ?: throw IllegalArgumentException("Not found target user")
+        val targetItem = globalState.inventoryOf(targetUser).firstOrNull { it.uid == parameters.parameter1 }
             ?: throw IllegalArgumentException("ID of target item must be specified")
         return globalState.updatePlayers { participant, state ->
             when (participant) {
