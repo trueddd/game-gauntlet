@@ -20,7 +20,7 @@ class ClassicItemTest : EventGateTest() {
     fun `ensure no buff`() = runTest {
         val user = requireRandomParticipant()
         handleAction(ItemReceive(user, Classic.create()))
-        eventGate.stateHolder.current.players.forEach { (_, state) ->
+        eventGate.stateHolder.current.stateSnapshot.playersState.forEach { (_, state) ->
             assertEquals(expected = 0, state.modifiersSum)
         }
     }
@@ -31,7 +31,7 @@ class ClassicItemTest : EventGateTest() {
         handleAction(BoardMove(user, diceValue = 3))
         handleAction(GameRoll(user, Game.Id(5)))
         handleAction(ItemReceive(user, Classic.create()))
-        eventGate.stateHolder.current.players.forEach { (_, state) ->
+        eventGate.stateHolder.current.stateSnapshot.playersState.forEach { (_, state) ->
             assertEquals(expected = 1, state.modifiersSum)
             assertIs<WheelItem.Effect.Buff>(state.effects.first())
         }

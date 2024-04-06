@@ -14,8 +14,8 @@ class EarthquakeItemTest : EventGateTest() {
     fun `quake 1`() = runTest {
         val user = requireRandomParticipant()
         handleAction(ItemReceive(user, Earthquake.create()))
-        eventGate.stateHolder.current.players.values.forEach {
-            assertEquals(expected = 1, it.position)
+        eventGate.stateHolder.current.stateSnapshot.playersState.forEach { (_, playerState) ->
+            assertEquals(expected = 1, playerState.position)
         }
     }
 

@@ -11,7 +11,7 @@ class GameWinnerTest : EventGateTest() {
     fun `basic winner test`() = runTest {
         val player = requireRandomParticipant()
         makeMovesUntilFinish(player)
-        assertEquals(player, eventGate.stateHolder.current.winner)
+        assertEquals(player.name, eventGate.stateHolder.current.stateSnapshot.winner)
     }
 
     @Test
@@ -19,6 +19,6 @@ class GameWinnerTest : EventGateTest() {
         val (player1, player2) = requireParticipants()
         makeMovesUntilFinish(player1)
         makeMovesUntilFinish(player2)
-        assertEquals(player1, eventGate.stateHolder.current.winner)
+        assertEquals(player1.name, eventGate.stateHolder.current.stateSnapshot.winner)
     }
 }

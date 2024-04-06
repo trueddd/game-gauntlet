@@ -27,7 +27,8 @@ class Shitter private constructor(override val uid: String) : WheelItem.Event() 
     """.trimIndent()
 
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
-        val everyoneEqualized = globalState.players.values.map { it.position }.distinct().let { it.size == 1 }
+        val everyoneEqualized = globalState.stateSnapshot.playersState.values
+            .map { it.position }.distinct().let { it.size == 1 }
         if (everyoneEqualized) {
             return globalState
         }

@@ -20,7 +20,7 @@ class IWouldBeatItItemTest : EventGateTest() {
         handleAction(ItemReceive(user1, IWouldBeatIt.create()))
         handleAction(BoardMove(user1, diceValue = 3))
         handleAction(GameRoll(user1, Game.Id(1)))
-        assertEquals(expected = 1, stateOf(user1).gameHistory.size)
+        assertEquals(expected = 1, gamesOf(user1).size)
         assertTrue(eventGate.stateHolder.current.getDroppedGames().isEmpty())
     }
 
@@ -57,6 +57,6 @@ class IWouldBeatItItemTest : EventGateTest() {
         handleAction(ItemReceive(user1, IWouldBeatIt.create()))
         assertTrue(eventGate.stateHolder.current.getDroppedGames().isNotEmpty())
         handleAction(GameRoll(user1, Game.Id(4)))
-        assertEquals(expected = 1, stateOf(user1).gameHistory.size)
+        assertEquals(expected = 1, gamesOf(user1).size)
     }
 }

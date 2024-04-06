@@ -38,46 +38,41 @@ data class GameStatusChange(
     class Handler : Action.Handler<GameStatusChange> {
 
         override suspend fun handle(action: GameStatusChange, currentState: GlobalState): GlobalState {
-            return currentState.updatePlayer(action.participant) { state ->
-                val currentGame = state.currentActiveGame
-                    ?: throw StateModificationException(action, "No game entries")
-                val nextGame = state.gameHistory.firstOrNull { it.status == Game.Status.Next }
-                val newGameHistory = state.gameHistory.map { entry ->
-                    when (entry.game) {
-                        currentGame.game -> entry.copy(status = action.gameNewStatus)
-                        nextGame?.game -> entry.copy(status = Game.Status.InProgress)
-                        else -> entry
+            val currentGame = currentState.stateOf(action.participant).currentActiveGame
+                ?: throw StateModificationException(action, "No game entries")
+            val nextGame = currentState.gameHistory[action.participant.name]
+                ?.firstOrNull { it.status == Game.Status.Next }
+            val newPendingEvents = currentState.pendingEventsOf(action.participant).mapNotNull { pendingEvent ->
+                when (pendingEvent) {
+                    is FamilyFriendlyStreamer -> pendingEvent.takeIf {
+                        action.gameNewStatus != Game.Status.Finished
                     }
+                    else -> pendingEvent
                 }
-                val newPendingEvents = state.pendingEvents.mapNotNull { pendingEvent ->
-                    return@mapNotNull when (pendingEvent) {
-                        is FamilyFriendlyStreamer -> pendingEvent.takeIf { action.gameNewStatus != Game.Status.Finished }
-                        else -> pendingEvent
+            }
+            val newEffects = currentState.effectsOf(action.participant).mapNotNull { effect ->
+                when (effect) {
+                    is Gamer -> when {
+                        !action.gameNewStatus.allowsNextStep -> effect
+                        !effect.isActive -> effect.setActive(true)
+                        else -> effect.charge()
                     }
-                }
-                val newEffects = state.effects.mapNotNull { effect ->
-                    return@mapNotNull when (effect) {
-                        is Gamer -> when {
-                            !action.gameNewStatus.allowsNextStep -> effect
-                            !effect.isActive -> effect.setActive(true)
-                            else -> effect.charge()
-                        }
-                        is Viewer -> when {
-                            !action.gameNewStatus.allowsNextStep -> effect
-                            !effect.isActive -> effect.setActive(true)
-                            else -> effect.charge()
-                        }
-                        is EasterCakeBang -> when {
-                            action.gameNewStatus == Game.Status.Finished -> null
-                            else -> effect
-                        }
-                        is ClimbingRope.Buff -> null
-                        is ThereIsGiftAtYourDoor.StayAfterGame -> null
+                    is Viewer -> when {
+                        !action.gameNewStatus.allowsNextStep -> effect
+                        !effect.isActive -> effect.setActive(true)
+                        else -> effect.charge()
+                    }
+                    is EasterCakeBang -> when {
+                        action.gameNewStatus == Game.Status.Finished -> null
                         else -> effect
                     }
+                    is ClimbingRope.Buff -> null
+                    is ThereIsGiftAtYourDoor.StayAfterGame -> null
+                    else -> effect
                 }
+            }
+            return currentState.updatePlayer(action.participant) { state ->
                 state.copy(
-                    gameHistory = newGameHistory,
                     boardMoveAvailable = when {
                         state.effects.any { it is ThereIsGiftAtYourDoor.StayAfterGame } -> false
                         action.gameNewStatus.allowsNextStep -> true
@@ -86,7 +81,15 @@ data class GameStatusChange(
                     effects = newEffects,
                     pendingEvents = newPendingEvents,
                 )
-            }
+            }.updateGameHistory(action.participant) { history ->
+                history.map { entry ->
+                    when (entry.game) {
+                        currentGame.game -> entry.copy(status = action.gameNewStatus)
+                        nextGame?.game -> entry.copy(status = Game.Status.InProgress)
+                        else -> entry
+                    }
+                }
+            }.updateCurrentGame(action.participant)
         }
     }
 }

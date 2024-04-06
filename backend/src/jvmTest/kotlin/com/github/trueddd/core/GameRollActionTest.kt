@@ -36,7 +36,7 @@ class GameRollActionTest : EventGateTest() {
         val currentGame = stateOf(participant).currentGame
         handleAction(GameRoll(participant, Game.Id(1)))
         assertEquals(currentGame, stateOf(participant).currentGame)
-        assertEquals(Game.Id(0), stateOf(participant).gameHistory.firstOrNull()?.game?.id)
+        assertEquals(Game.Id(0), gamesOf(participant).firstOrNull()?.game?.id)
     }
 
     @Test
@@ -48,8 +48,8 @@ class GameRollActionTest : EventGateTest() {
         handleAction(GameStatusChange(participant, Game.Status.Finished))
         handleAction(BoardMove(participant, diceValue = 3))
         handleAction(GameRoll(participant, Game.Id(2)))
-        assertEquals(firstGame?.game?.id, stateOf(participant).gameHistory.firstOrNull()?.game?.id)
-        assertEquals(Game.Status.Finished, stateOf(participant).gameHistory.firstOrNull()?.status)
+        assertEquals(firstGame?.game?.id, gamesOf(participant).firstOrNull()?.game?.id)
+        assertEquals(Game.Status.Finished, gamesOf(participant).firstOrNull()?.status)
         assertEquals(Game.Status.InProgress, stateOf(participant).currentGame?.status)
     }
 }

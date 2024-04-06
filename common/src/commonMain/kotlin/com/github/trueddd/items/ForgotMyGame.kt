@@ -32,15 +32,20 @@ class ForgotMyGame private constructor(override val uid: String) : WheelItem.Pen
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         val shouldReroll = getParameters(arguments, globalState).parameter1
-        return globalState.updatePlayer(usedBy) { playerState ->
-            playerState.copy(
-                pendingEvents = playerState.pendingEvents.without(uid),
-                gameHistory = if (shouldReroll) {
-                    playerState.updatedHistoryWithLast { it.copy(status = Game.Status.Rerolled) }
-                } else {
-                    playerState.gameHistory
-                },
-            )
+        return if (shouldReroll) {
+            globalState.updatePlayer(usedBy) { playerState ->
+                playerState.copy(
+                    pendingEvents = playerState.pendingEvents.without(uid),
+                    currentGame = playerState.currentGame?.copy(status = Game.Status.Rerolled)
+                )
+            }.updateGameHistory(usedBy) {
+                val lastGame = it.lastOrNull() ?: return@updateGameHistory it
+                it.take(it.size - 1) + lastGame.copy(status = Game.Status.Rerolled)
+            }
+        } else {
+            globalState.updatePlayer(usedBy) { playerState ->
+                playerState.copy(pendingEvents = playerState.pendingEvents.without(uid))
+            }
         }
     }
 

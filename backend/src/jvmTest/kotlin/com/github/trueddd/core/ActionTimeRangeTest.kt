@@ -43,9 +43,14 @@ class ActionTimeRangeTest : EventGateTest() {
 
     @Test
     fun `handle action in proper time range`() = runTest {
-        eventGate.startNoLoad(globalState())
+        eventGate.startNoLoad(globalState(
+            startDateTime = (Clock.System.now() - 1.hours).toLocalDateTime(DefaultTimeZone),
+        ))
+        println(eventGate.stateHolder.current.startDate)
+        println(eventGate.stateHolder.current.endDate)
         val user = requireRandomParticipant()
-        handleAction(BoardMove(user, diceValue = 4))
+        handleAction(BoardMove(user, diceValue = 4).also { println(it.toString()) })
+        println(stateOf(user).toString())
         assertEquals(expected = 4, positionOf(user))
     }
 }

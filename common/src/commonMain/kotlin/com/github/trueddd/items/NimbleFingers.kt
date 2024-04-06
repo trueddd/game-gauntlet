@@ -38,9 +38,9 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         val parameters = getParameters(arguments, globalState)
         val targetItemId = parameters.parameter1
-        val targetUser = globalState.players.firstNotNullOfOrNull { (player, state) ->
+        val targetUser = globalState.stateSnapshot.playersState.firstNotNullOfOrNull { (player, state) ->
             if (state.inventory.any { it.uid == targetItemId }) {
-                player
+                globalState.players.firstOrNull { it.name == player }
             } else {
                 null
             }
@@ -62,7 +62,9 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
     }
 
     fun canUse(user: Participant, globalState: GlobalState): Boolean {
-        return globalState.players.any { (player, state) -> player != user && state.inventory.isNotEmpty() }
+        return globalState.stateSnapshot.playersState.any { (player, state) ->
+            player != user.name && state.inventory.isNotEmpty()
+        }
     }
 
     @ItemFactory

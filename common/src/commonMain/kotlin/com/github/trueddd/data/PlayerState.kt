@@ -12,7 +12,6 @@ import kotlinx.serialization.Serializable
  * 0 means the starting point of the board, player cannot reenter this spot.
  * @property inventory current set of inventory item of player available for them to use.
  * @property effects current set of effects that are applied to player.
- * @property gameHistory whole history of games (including current one) that have been played or rerolled by player.
  * @property pendingEvents current set of events that have been received be player and now awaiting to be used.
  */
 @Serializable
@@ -27,13 +26,21 @@ data class PlayerState(
     val inventory: List<WheelItem.InventoryItem> = emptyList(),
     @SerialName("ef")
     val effects: List<WheelItem.Effect> = emptyList(),
-    @SerialName("gh")
-    val gameHistory: List<GameHistoryEntry> = emptyList(),
+    @SerialName("cg")
+    val currentGame: GameHistoryEntry? = null,
     @SerialName("pe")
     val pendingEvents: List<WheelItem.PendingEvent> = emptyList(),
 ) {
 
     companion object {
+        fun default() = PlayerState(
+            stepsCount = 0,
+            boardMoveAvailable = true,
+            position = GlobalState.START_POSITION,
+            inventory = emptyList(),
+            effects = emptyList(),
+            pendingEvents = emptyList(),
+        )
         fun calculateStintIndex(position: Int): Int {
             return when {
                 position == GlobalState.START_POSITION -> 0
@@ -42,9 +49,6 @@ data class PlayerState(
             }
         }
     }
-
-    val currentGame: GameHistoryEntry?
-        get() = gameHistory.lastOrNull { it.status != Game.Status.Next }
 
     val currentActiveGame: GameHistoryEntry?
         get() = currentGame?.takeIf { it.status == Game.Status.InProgress }
@@ -60,10 +64,6 @@ data class PlayerState(
 
     val wheelItems: List<WheelItem>
         get() = inventory + effects + pendingEvents
-
-    fun updatedHistoryWithLast(block: (GameHistoryEntry) -> GameHistoryEntry): List<GameHistoryEntry> {
-        return gameHistory.mapIndexed { index, entry -> if (index == gameHistory.size - 1) block(entry) else entry }
-    }
 }
 
 inline fun <reified T : WheelItem.Effect> List<WheelItem.Effect>.without(): List<WheelItem.Effect> {

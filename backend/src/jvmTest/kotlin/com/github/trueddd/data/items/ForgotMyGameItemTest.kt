@@ -30,8 +30,8 @@ class ForgotMyGameItemTest : EventGateTest() {
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("1")))
         assertEquals(expected = 0, pendingEventsOf(user).size)
-        assertEquals(expected = 1, stateOf(user).gameHistory.count { it.status == Game.Status.Rerolled })
-        assertEquals(expected = 0, stateOf(user).gameHistory.count { it.status == Game.Status.InProgress })
+        assertEquals(expected = 1, gamesOf(user).count { it.status == Game.Status.Rerolled })
+        assertEquals(expected = 0, gamesOf(user).count { it.status == Game.Status.InProgress })
         assertFalse(stateOf(user).boardMoveAvailable)
     }
 
@@ -44,8 +44,8 @@ class ForgotMyGameItemTest : EventGateTest() {
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("0")))
         assertEquals(expected = 0, pendingEventsOf(user).size)
-        assertEquals(expected = 0, stateOf(user).gameHistory.count { it.status == Game.Status.Rerolled })
-        assertEquals(expected = 1, stateOf(user).gameHistory.count { it.status == Game.Status.InProgress })
+        assertEquals(expected = 0, gamesOf(user).count { it.status == Game.Status.Rerolled })
+        assertEquals(expected = 1, gamesOf(user).count { it.status == Game.Status.InProgress })
         assertFalse(stateOf(user).boardMoveAvailable)
     }
 }

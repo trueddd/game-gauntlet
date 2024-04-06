@@ -82,10 +82,10 @@ fun StateTable(
                     Text(text = "Pending events")
                 }
             }
-            globalState.players.forEach { (player, state) ->
+            globalState.stateSnapshot.playersState.forEach { (player, state) ->
                 Row {
                     TableCell {
-                        Text(text = player.displayName)
+                        Text(text = player)
                     }
                     TableCell {
                         Text(text = "${state.position}")

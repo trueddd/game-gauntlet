@@ -78,13 +78,13 @@ fun ActionsBoard(
                     expanded = userExpanded,
                     onDismissRequest = { userExpanded = false },
                 ) {
-                    globalState.players.keys.map { it.displayName }.forEach {
+                    globalState.players.map { it.displayName }.forEach {
                         DropdownMenuItem(
                             text = {
                                 Text(it)
                             },
                             onClick = {
-                                user = globalState.players.firstNotNullOfOrNull { (key, _) ->
+                                user = globalState.players.firstNotNullOfOrNull { key ->
                                     if (key.displayName == it) key else null
                                 }
                                 userExpanded = false

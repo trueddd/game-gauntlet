@@ -46,8 +46,8 @@ data class ItemUse(
     ) : Action.Handler<ItemUse> {
 
         override suspend fun handle(action: ItemUse, currentState: GlobalState): GlobalState {
-            val item = currentState.players[action.usedBy]?.inventory?.firstOrNull { it.uid == action.itemUid }
-                ?: currentState.players[action.usedBy]?.pendingEvents?.firstOrNull { it.uid == action.itemUid }
+            val item = currentState.inventoryOf(action.usedBy).firstOrNull { it.uid == action.itemUid }
+                ?: currentState.pendingEventsOf(action.usedBy).firstOrNull { it.uid == action.itemUid }
                 ?: return currentState
             return when (item) {
                 is Plasticine -> item.transform(

@@ -1,9 +1,6 @@
 package com.github.trueddd.core
 
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
-import com.github.trueddd.data.PlayerState
-import com.github.trueddd.data.globalState
+import com.github.trueddd.data.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -21,13 +18,13 @@ class StateHolderImpl : StateHolder {
     override fun update(block: GlobalState.() -> GlobalState) = _globalStateFlow.update(block)
 
     override val participants: Set<Participant>
-        get() = current.players.keys
+        get() = current.players.toSet()
 
     override fun get(name: String): Participant? {
-        return current.players.keys.firstOrNull { it.name == name }
+        return current.players.firstOrNull { it.name == name }
     }
 
     override fun get(participant: Participant): PlayerState {
-        return current.players[participant]!!
+        return current.stateSnapshot.playersState[participant.name]!!
     }
 }

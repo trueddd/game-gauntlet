@@ -74,7 +74,9 @@ fun ProfileScreen(
     LaunchedEffect(Unit) {
         actions = appClient.loadActions()
     }
-    var selected by remember { mutableStateOf(currentParticipant ?: globalState?.players?.keys?.firstOrNull()) }
+    var selected by remember { mutableStateOf(
+        currentParticipant ?: globalState?.players?.firstOrNull()
+    ) }
     PermanentNavigationDrawer(
         drawerContent = {
             Column(
@@ -84,7 +86,7 @@ fun ProfileScreen(
                     .width(leftSideBarWidth)
                     .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(topEnd = 32.dp, bottomEnd = 32.dp))
             ) {
-                globalState?.players?.keys?.forEach {
+                globalState?.players?.forEach {
                     NavigationDrawerItem(
                         label = { Text(it.displayName) },
                         selected = selected == it,

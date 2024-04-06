@@ -65,7 +65,7 @@ data class ItemReceive(
                 }
                 is BabySupport -> {
                     currentState.updatePlayer(action.receivedBy) { state ->
-                        if (currentState.players.minOf { it.value.position } == state.position) {
+                        if (currentState.stateSnapshot.playersState.minOf { it.value.position } == state.position) {
                             state.copy(effects = state.effects + action.item)
                         } else {
                             state

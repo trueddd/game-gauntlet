@@ -38,7 +38,7 @@ data class GameDrop(
     class Handler : Action.Handler<GameDrop> {
 
         override suspend fun handle(action: GameDrop, currentState: GlobalState): GlobalState {
-            val currentGame = currentState[action.rolledBy.name]?.currentGame
+            val currentGame = currentState.stateOf(action.rolledBy).currentGame
                 ?: throw StateModificationException(action, "No game to drop")
             if (currentGame.status.isComplete) {
                 throw StateModificationException(action, "Current game is already complete")
@@ -46,6 +46,10 @@ data class GameDrop(
             if (currentState.effectsOf(action.rolledBy).any { it is EasterCakeBang }) {
                 throw StateModificationException(action, "Cannot drop the game due to player's debuff")
             }
+            val newGameHistory = currentState.gamesOf(action.rolledBy).lastOrNull()
+                ?.copy(status = Game.Status.Dropped)
+                ?.let { currentState.gamesOf(action.rolledBy).dropLast(1) + it }
+                ?: currentState.gamesOf(action.rolledBy)
             return currentState.updatePlayer(action.rolledBy) { playerState ->
                 val moveValue = when {
                     playerState.effects.any { it is SamuraiLunge.Buff } -> action.diceValue
@@ -53,19 +57,15 @@ data class GameDrop(
                     else -> -action.diceValue
                 }
                 val finalPosition = (playerState.position + moveValue).coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
-                val newGameHistory = playerState.gameHistory.lastOrNull()
-                    ?.copy(status = Game.Status.Dropped)
-                    ?.let { playerState.gameHistory.dropLast(1) + it }
-                    ?: playerState.gameHistory
                 playerState.copy(
                     position = finalPosition,
                     effects = playerState.effects
                         .without<SamuraiLunge.Buff>()
                         .without<ClimbingRope.Buff>(),
-                    gameHistory = newGameHistory,
+                    currentGame = playerState.currentGame?.copy(status = Game.Status.Dropped),
                     boardMoveAvailable = false,
                 )
-            }
+            }.updateGameHistory(action.rolledBy) { newGameHistory }
         }
     }
 }

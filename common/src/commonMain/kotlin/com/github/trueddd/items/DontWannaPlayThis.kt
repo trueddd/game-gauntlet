@@ -21,20 +21,22 @@ class DontWannaPlayThis private constructor(override val uid: String) : WheelIte
     override val name = "\"Я не хочу играть в это\""
 
     override val description = """
-        Выбери стримера и сбрось его инвентарь, баффы и дебаффы. 
-        Теперь ты главная крыса ивента. Нельзя сбросить пустой инвентарь, нельзя сбросить свой инвентарь, 
-        если у всех стримеров пустой инвентарь, то пункт рероллится.
+        Позволяет реролльнуть игру. Имеет 1 заряд.
     """.trimIndent()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+        if (globalState.stateOf(usedBy).currentGame?.status != Game.Status.InProgress) {
+            throw IllegalStateException("Can't reroll game that is not in progress")
+        }
         return globalState.updatePlayer(usedBy) { playerState ->
-            val currentGame = playerState.currentActiveGame!!
             playerState.copy(
                 inventory = playerState.inventory.without(uid),
-                gameHistory = playerState.gameHistory.map {
-                    if (it.game == currentGame.game) it.copy(status = Game.Status.Rerolled) else it
-                },
+                currentGame = playerState.currentGame?.copy(status = Game.Status.Rerolled),
             )
+        }.updateGameHistory(usedBy) { history ->
+            val gameToReroll = history.lastOrNull { it.status == Game.Status.InProgress }
+                ?: return@updateGameHistory history
+            history.dropLast(1) + gameToReroll
         }
     }
 

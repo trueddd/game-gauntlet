@@ -43,15 +43,19 @@ fun Map(globalState: GlobalState) {
                 add(MapCellState(
                     index = 0,
                     genre = null,
-                    players = globalState.players.filterValues { it.position == 0 }.keys.toList(),
-                    traps = globalState.boardTraps.filterKeys { it == 0 }.values.toList()
+                    players = globalState.stateSnapshot.playersState
+                        .filterValues { it.position == 0 }.keys
+                        .let { names -> globalState.players.filter { it.name in names } },
+                    traps = globalState.stateSnapshot.boardTraps.filterKeys { it == 0 }.values.toList()
                 ))
                 globalState.gameGenreDistribution.genres.forEachIndexed { index, genre ->
                     add(MapCellState(
                         index = index + 1,
                         genre = genre,
-                        players = globalState.players.filterValues { it.position == index + 1 }.keys.toList(),
-                        traps = globalState.boardTraps.filterKeys { it == index + 1 }.values.toList()
+                        players = globalState.stateSnapshot.playersState
+                            .filterValues { it.position == index + 1 }.keys
+                            .let { names -> globalState.players.filter { it.name in names } },
+                        traps = globalState.stateSnapshot.boardTraps.filterKeys { it == index + 1 }.values.toList()
                     ))
                 }
             }

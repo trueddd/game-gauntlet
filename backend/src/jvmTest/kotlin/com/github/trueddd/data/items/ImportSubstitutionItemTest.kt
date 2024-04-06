@@ -15,7 +15,7 @@ class ImportSubstitutionItemTest : EventGateTest() {
         val user = requireRandomParticipant()
         handleAction(ItemReceive(user, ImportSubstitution.create()))
         makeMovesUntilFinish(user)
-        assertEquals(user, eventGate.stateHolder.current.winner)
+        assertEquals(user.name, eventGate.stateHolder.current.stateSnapshot.winner)
         assertIs<ImportSubstitution>(effectsOf(user).first())
     }
 }

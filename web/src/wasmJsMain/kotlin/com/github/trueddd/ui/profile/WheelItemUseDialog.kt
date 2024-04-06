@@ -156,7 +156,7 @@ private fun PlayerParameter(
 ) {
     var value by remember { mutableStateOf<Participant?>(null) }
     var expanded by remember { mutableStateOf(false) }
-    val values = remember { globalState.players.keys.filter(parameter.predicate).map { it.displayName } }
+    val values = remember { globalState.players.filter(parameter.predicate).map { it.displayName } }
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
@@ -180,7 +180,7 @@ private fun PlayerParameter(
                 DropdownMenuItem(
                     text = { Text(it) },
                     onClick = {
-                        value = globalState.players.firstNotNullOfOrNull { (key, _) ->
+                        value = globalState.players.firstNotNullOfOrNull { key->
                             if (key.displayName == it) key else null
                         }
                         value?.let(onParameterUpdated)
@@ -213,7 +213,7 @@ private fun ForeignItemParameter(
     }
     Column {
         val players = remember {
-            globalState.players.keys.filter{ it != player }
+            globalState.players.filter{ it != player }
         }
         ExposedDropdownMenuBox(
             expanded = playerExpanded,

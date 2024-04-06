@@ -30,8 +30,7 @@ private fun Participant.averageMoveDice(actions: List<Action>): String {
 }
 
 private fun Participant.gamesWithStatus(status: Game.Status, globalState: GlobalState): String {
-    return globalState.stateOf(this)
-        .gameHistory
+    return globalState.gamesOf(this)
         .count { it.status == status }
         .toString()
 }

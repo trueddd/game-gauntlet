@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
 class BananaSkin private constructor(override val uid: String) : WheelItem.InventoryItem() {
 
     companion object {
+        const val STEPS_BACK = 2
         fun create() = BananaSkin(uid = generateWheelItemUid())
     }
 
@@ -29,8 +30,12 @@ class BananaSkin private constructor(override val uid: String) : WheelItem.Inven
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(inventory = playerState.inventory.without(uid))
         }.let { state ->
-            val trapEntry = globalState.players[usedBy]!!.position to Trap()
-            state.copy(boardTraps = state.boardTraps + trapEntry)
+            val trapEntry = globalState.stateOf(usedBy).position to Trap()
+            state.copy(
+                stateSnapshot = state.stateSnapshot.copy(
+                    boardTraps = state.stateSnapshot.boardTraps + trapEntry
+                )
+            )
         }
     }
 

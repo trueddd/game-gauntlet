@@ -41,28 +41,48 @@ data class GameSet(
                 ?: throw StateModificationException(action, "Game with Id (${action.gameId}) was not found")
             return when {
                 currentState.effectsOf(action.setBy).any { it is DontCare } -> {
+                    val entry = GameHistoryEntry(
+                        game = game,
+                        status = if (currentState.stateOf(action.setBy).hasCurrentActive) {
+                            Game.Status.Next
+                        } else {
+                            Game.Status.InProgress
+                        }
+                    )
                     currentState.updatePlayer(action.setBy) { playerState ->
-                        val entry = GameHistoryEntry(
-                            game = game,
-                            status = if (playerState.hasCurrentActive) Game.Status.Next else Game.Status.InProgress
-                        )
                         playerState.copy(
                             effects = playerState.effects.without<DontCare>(),
-                            gameHistory = playerState.gameHistory + entry,
+                            currentGame = if (playerState.hasCurrentActive) playerState.currentGame else entry,
                         )
-                    }
+                    }.copy(gameHistory = currentState.gameHistory.mapValues { (player, history) ->
+                        if (player == action.setBy.name) {
+                            history + entry
+                        } else {
+                            history
+                        }
+                    })
                 }
                 currentState.effectsOf(action.setBy).any { it is DontUnderstand } -> {
+                    val entry = GameHistoryEntry(
+                        game = game,
+                        status = if (currentState.stateOf(action.setBy).hasCurrentActive) {
+                            Game.Status.Next
+                        } else {
+                            Game.Status.InProgress
+                        }
+                    )
                     currentState.updatePlayer(action.setBy) { playerState ->
-                        val entry = GameHistoryEntry(
-                            game = game,
-                            status = if (playerState.hasCurrentActive) Game.Status.Next else Game.Status.InProgress
-                        )
                         playerState.copy(
                             effects = playerState.effects.without<DontUnderstand>(),
-                            gameHistory = playerState.gameHistory + entry,
+                            currentGame = if (playerState.hasCurrentActive) playerState.currentGame else entry,
                         )
-                    }
+                    }.copy(gameHistory = currentState.gameHistory.mapValues { (player, history) ->
+                        if (player == action.setBy.name) {
+                            history + entry
+                        } else {
+                            history
+                        }
+                    })
                 }
                 else -> throw StateModificationException(
                     action,
