@@ -36,6 +36,9 @@ data class GlobalState(
     val boardLength: Int
         get() = STINT_SIZE * STINT_COUNT
 
+    val gameConfig: GameConfig
+        get() = GameConfig(players, gameGenreDistribution, startDate, endDate)
+
     fun stateOf(participant: Participant) = stateSnapshot.playersState[participant.name]!!
     fun effectsOf(participant: Participant) = stateOf(participant).effects
     fun pendingEventsOf(participant: Participant) = stateOf(participant).pendingEvents
@@ -103,4 +106,6 @@ data class GlobalState(
             }
         ))
     }
+
+    fun defaultPlayersHistory() = players.associate { it.name to PlayerTurnsHistory(emptyList()) }
 }

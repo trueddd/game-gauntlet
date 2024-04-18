@@ -44,6 +44,7 @@ class EventGateImpl(
         Log.info(TAG, "Stopping and clearing...")
         eventManager.stopHandling()
         stateHolder.update { globalState() }
+        stateHolder.updateHistory { stateHolder.current.defaultPlayersHistory() }
         historyHolder.drop()
     }
 
@@ -51,6 +52,7 @@ class EventGateImpl(
         Log.info(TAG, "Resetting in-memory state...")
         eventManager.stopHandling()
         stateHolder.update { globalState() }
+        stateHolder.updateHistory { stateHolder.current.defaultPlayersHistory() }
         historyHolder.drop()
         eventManager.startHandling()
     }

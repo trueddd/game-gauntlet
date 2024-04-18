@@ -23,8 +23,9 @@ class AwfulEvent private constructor(override val uid: String) : WheelItem.Pendi
     override val name = "Плохой ивент"
 
     override val description = """
-        Отними от следующего броска кубика значение в зависимости от количества стримящих в данный момент участников.
-    """.trimIndent()
+        |Отними от следующего броска кубика значение в зависимости от количества 
+        |стримящих в данный момент участников.
+    """.trimMargin()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Int(name = "Количество стримящих участников"))

@@ -46,6 +46,7 @@ class EventManagerImpl(
 
     override fun startHandling(initState: GlobalState) {
         stateHolder.update { initState }
+        stateHolder.updateHistory { initState.defaultPlayersHistory() }
         startEventHandling()
     }
 
@@ -75,8 +76,17 @@ class EventManagerImpl(
             )
         eventHandlingMonitor.lock()
         return try {
-            val result = handler.handle(action, stateHolder.current)
+            val oldState = stateHolder.current
+            val result = handler.handle(action, oldState)
             stateHolder.update { result }
+            stateHolder.updateHistory {
+                PlayersHistoryCalculator.calculate(
+                    currentHistory = stateHolder.currentPlayersHistory,
+                    action = action,
+                    oldState = oldState,
+                    newState = stateHolder.current
+                )
+            }
             EventManager.HandledAction(action.id, action.issuedAt)
         } catch (error: Exception) {
             EventManager.HandledAction(action.id, action.issuedAt, error)

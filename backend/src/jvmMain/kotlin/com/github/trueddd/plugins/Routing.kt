@@ -31,19 +31,17 @@ fun Application.configureRouting() {
             cacheControl { listOf(CacheControl.MaxAge(maxAgeSeconds = 3600)) }
         }
 
+        // Called once user opens web app
+        get(Router.CONFIG) {
+            cache()
+            call.respond(eventGate.stateHolder.current.gameConfig)
+        }
+
+        // Wheel scope
         authenticate {
-            get(Router.ACTIONS) {
-                call.respond(eventGate.historyHolder.getActions())
-            }
             get(Router.Wheels.GAMES) {
                 cache()
                 val items = gamesProvider.listAll()
-                call.respond(items)
-            }
-            get(Router.Wheels.PLAYERS) {
-                cache()
-                val user = call.userLogin!!
-                val items = eventGate.stateHolder.participants.filter { it.name != user }
                 call.respond(items)
             }
             get(Router.Wheels.ROLL_ITEMS) {
@@ -56,6 +54,14 @@ fun Application.configureRouting() {
                 val user = call.userLogin!!
                 call.respond(eventGate.stateHolder.participants.filter { it.name != user }.random())
             }
+        }
+
+        // Profile scope
+        get(Router.TURNS) {
+            if (call.userLogin == null) {
+                cache()
+            }
+            call.respond(eventGate.stateHolder.currentPlayersHistory)
         }
 
         post(Router.LOAD_GAME) {

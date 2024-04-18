@@ -199,8 +199,7 @@ class AppClient(
     suspend fun getGames(): List<Game> =
         getJsonData(router.http(Router.Wheels.GAMES), sendBearerToken = true) ?: emptyList()
 
-    suspend fun getPlayers(): List<Participant> =
-        getJsonData(router.http(Router.Wheels.PLAYERS), sendBearerToken = true) ?: emptyList()
+    fun getPlayers(): List<Participant> = TODO("Replace with GameConfig call")
 
     suspend fun rollItem(): WheelItem? =
         getJsonData(router.http(Router.Wheels.ROLL_ITEMS), sendBearerToken = true)

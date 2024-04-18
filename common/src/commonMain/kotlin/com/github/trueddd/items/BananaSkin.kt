@@ -21,10 +21,10 @@ class BananaSkin private constructor(override val uid: String) : WheelItem.Inven
     override val name = "Банановая кожура"
 
     override val description = """
-        После прохождения игры на текущем секторе стример может пометить этот сектор, где он только что стоял. 
-        Стример, наступивший на этот сектор, автоматически отступит на два сектора назад, а кожура пропадёт. 
-        Данный эффект работает и на стримера, который использовал этот предмет.
-    """.trimIndent()
+        |После прохождения игры на текущем секторе стример может пометить этот сектор, где он только что стоял. 
+        |Стример, наступивший на этот сектор, автоматически отступит на два сектора назад, а кожура пропадёт. 
+        |Данный эффект работает и на стримера, который использовал этот предмет.
+    """.trimMargin()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState.updatePlayer(usedBy) { playerState ->

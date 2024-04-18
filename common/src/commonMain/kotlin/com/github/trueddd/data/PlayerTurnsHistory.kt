@@ -22,7 +22,7 @@ data class Turn(
     @SerialName("mr")
     val moveRange: IntRange?,
     @SerialName("ge")
-    val game: GameHistoryEntry,
+    val game: GameHistoryEntry?,
 ) {
 
     companion object IntRangeSerializer : KSerializer<IntRange> {

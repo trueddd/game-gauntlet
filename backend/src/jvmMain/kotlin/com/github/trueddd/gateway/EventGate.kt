@@ -39,6 +39,7 @@ fun Routing.setupEventGate() {
             close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, Response.ErrorCode.AuthError))
             return@webSocket
         }
+        // TODO: replace with StateSnapshot
         eventGate.stateHolder.globalStateFlow
             .onStart { Log.info(TAG, "Starting $user`s session ${this@webSocket}") }
             .map { Response.State(it) }
