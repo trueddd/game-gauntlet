@@ -39,9 +39,10 @@ fun Routing.setupEventGate() {
             close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, Response.ErrorCode.AuthError))
             return@webSocket
         }
-        // TODO: replace with StateSnapshot
         eventGate.stateHolder.globalStateFlow
             .onStart { Log.info(TAG, "Starting $user`s session ${this@webSocket}") }
+            .map { it.stateSnapshot }
+            .distinctUntilChanged()
             .map { Response.State(it) }
             .onEach { outgoing.sendResponse(it) }
             .onCompletion { Log.info(TAG, "Ending $user`s session ${this@webSocket}") }
@@ -62,7 +63,7 @@ fun Routing.setupEventGate() {
                     is Command.Restore -> {
                         eventGate.eventManager.stopHandling()
                         val restored = eventGate.historyHolder.load()
-                        eventGate.eventManager.startHandling(initState = restored)
+                        eventGate.eventManager.startHandling(restored.globalState, restored.playersHistory)
                     }
                     is Command.Action -> eventGate.parseAndHandle(command.payload)
                     is Command.Reset -> eventGate.resetState()

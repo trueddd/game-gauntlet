@@ -31,13 +31,13 @@ class EventGateImpl(
     }
 
     override fun startNoLoad(initialState: GlobalState) {
-        eventManager.startHandling(initialState)
+        eventManager.startHandling(initialState, initialState.defaultPlayersHistory())
     }
 
     override suspend fun start() {
         Log.info(TAG, "Starting...")
-        val savedHistory = historyHolder.load()
-        eventManager.startHandling(savedHistory)
+        val loadedGameState = historyHolder.load()
+        eventManager.startHandling(loadedGameState.globalState, loadedGameState.playersHistory)
     }
 
     override fun stop() {

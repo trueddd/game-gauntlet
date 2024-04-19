@@ -1,12 +1,8 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
-import com.github.trueddd.data.AuthResponse
-import com.github.trueddd.data.Game
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.*
 import com.github.trueddd.data.request.DownloadGameRequestBody
-import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.util.toBlob
 import io.ktor.client.*
@@ -21,10 +17,9 @@ import io.ktor.websocket.*
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.url.URL
 
@@ -33,80 +28,12 @@ class AppClient(
     private val router: ServerRouter,
 ) : CoroutineScope {
 
-    private var runnerJob: Job? = null
-
-    private val _globalState = MutableStateFlow<GlobalState?>(null)
-    val globalState: StateFlow<GlobalState?>
-        get() = _globalState.asStateFlow()
-
-    private val _connectionState = MutableStateFlow<SocketState>(SocketState.Disconnected())
-    val connectionState: StateFlow<SocketState>
-        get() = _connectionState.asStateFlow()
-
-    private val actionsChannel = Channel<String>(onBufferOverflow = BufferOverflow.DROP_OLDEST)
-
     override val coroutineContext by lazy {
         Dispatchers.Default + SupervisorJob()
     }
 
-    fun sendCommand(command: Command) {
-        launch {
-            println("sending `${command.value}`")
-            actionsChannel.send(command.value)
-        }
-    }
-
     private fun savedJwtToken(): String? {
         return window.localStorage.getItem(AuthManager.TOKEN_KEY)
-    }
-
-    fun start() {
-        if (runnerJob?.isActive == true) {
-            println("Client is already running")
-            return
-        }
-        runnerJob = launch {
-            _connectionState.value = SocketState.Connecting
-            httpClient.webSocket(router.ws(Router.STATE)) {
-                val token = savedJwtToken() ?: run {
-                    close()
-                    return@webSocket
-                }
-                outgoing.send(Frame.Text(token))
-                _connectionState.value = SocketState.Connected
-                launch {
-                    for (action in actionsChannel) {
-                        outgoing.send(Frame.Text(action))
-                    }
-                }
-                for (frame in incoming) {
-                    val textFrame = frame as? Frame.Text ?: continue
-                    val data = Response.parse(textFrame.readText().also { println(it) }) ?: continue
-                    when (data) {
-                        is Response.UserAction -> continue
-                        is Response.Error -> println("Error occurred: ${data.exception.message}")
-                        is Response.Info -> println("Message from server: ${data.message}")
-                        is Response.State -> _globalState.emit(data.globalState)
-                    }
-                }
-                if (runnerJob?.isActive == true) {
-                    val reason = closeReason.await()?.message ?: "Unknown reason"
-                    if (reason == Response.ErrorCode.AuthError || reason == Response.ErrorCode.TokenExpired) {
-                        get<AuthManager>().logout()
-                    }
-                    runnerJob?.cancel(reason)
-                }
-            }
-        }
-        runnerJob?.invokeOnCompletion { throwable ->
-            val error = throwable?.let { Error(it) }
-            _connectionState.value = SocketState.Disconnected(error)
-        }
-    }
-
-    fun stop() {
-        runnerJob?.cancel()
-        runnerJob = null
     }
 
     fun getActionsFlow(): Flow<List<Action>> {
@@ -130,7 +57,7 @@ class AppClient(
         }
     }
 
-    suspend fun loadActions(): List<Action> {
+    private suspend fun loadActions(): List<Action> {
         return withContext(coroutineContext) {
             try {
                 httpClient.get(router.http(Router.ACTIONS)) {
@@ -193,13 +120,51 @@ class AppClient(
         }
     }
 
+    suspend fun getGameConfig(): Result<GameConfig> {
+        return withContext(coroutineContext) {
+            try {
+                httpClient.get(router.http(Router.CONFIG)) {
+                    contentType(ContentType.Application.Json)
+                }.body<GameConfig>().let { Result.success(it) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun getStateSnapshot(): Result<StateSnapshot> {
+        return withContext(coroutineContext) {
+            try {
+                httpClient.get(router.http(Router.SNAPSHOT)) {
+                    contentType(ContentType.Application.Json)
+                }.body<StateSnapshot>().let { Result.success(it) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun getPlayersHistory(): Result<PlayersHistory> {
+        return withContext(coroutineContext) {
+            try {
+                httpClient.get(router.http(Router.TURNS)) {
+                    contentType(ContentType.Application.Json)
+                    savedJwtToken()?.let { bearerAuth(it) }
+                }.body<PlayersHistory>().let { Result.success(it) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.failure(e)
+            }
+        }
+    }
+
     suspend fun getItems(): List<WheelItem> =
         getJsonData(router.http(Router.Wheels.ITEMS)) ?: emptyList()
 
     suspend fun getGames(): List<Game> =
         getJsonData(router.http(Router.Wheels.GAMES), sendBearerToken = true) ?: emptyList()
-
-    fun getPlayers(): List<Participant> = TODO("Replace with GameConfig call")
 
     suspend fun rollItem(): WheelItem? =
         getJsonData(router.http(Router.Wheels.ROLL_ITEMS), sendBearerToken = true)

@@ -19,18 +19,20 @@ sealed class Destination(
         fun all() = listOf(Rules, Map, Dashboard, Wheels, Games, Profile)
     }
 
-    open val isPrivate = false
+    open val requireAuth = false
 
     data object Rules : Destination("Правила", Icons.AutoMirrored.Rounded.List, Icons.AutoMirrored.Outlined.List)
     data object Map : Destination("Карта", Icons.Rounded.LocationOn, Icons.Outlined.LocationOn)
     data object Dashboard : Destination("Панель управления", Icons.Rounded.Menu, Icons.Outlined.Menu) {
-        override val isPrivate = true
+        override val requireAuth = true
     }
 
     data object Games : Destination("Загрузка игр", Icons.Rounded.Search, Icons.Outlined.Search) {
-        override val isPrivate = true
+        override val requireAuth = true
     }
 
     data object Profile : Destination("Профиль", Icons.Rounded.AccountCircle, Icons.Outlined.AccountCircle)
-    data object Wheels : Destination("Колеса", Icons.Rounded.Refresh, Icons.Outlined.Refresh)
+    data object Wheels : Destination("Колеса", Icons.Rounded.Refresh, Icons.Outlined.Refresh) {
+        override val requireAuth = true
+    }
 }

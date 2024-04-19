@@ -110,4 +110,24 @@ class PlayerTurnsTest {
         assertEquals(expected = 0..4, actual = playersHistory[player1.name]!!.turns.first().moveRange)
         assertEquals(expected = Game.Status.InProgress, actual = playersHistory[player1.name]!!.turns.first().game?.status)
     }
+
+    @Test
+    fun `player turns calculation - 5`() = runTest {
+        val eventGate = provideEventGate()
+        val (player1) = eventGate.stateHolder.participants.toList()
+        eventGate.eventManager.startHandling()
+        // player 1
+        eventGate.eventManager.consumeAction(BoardMove(player1, diceValue = 4))
+        eventGate.eventManager.consumeAction(GameRoll(player1, Game.Id(1)))
+        eventGate.eventManager.consumeAction(GameStatusChange(player1, gameNewStatus = Game.Status.Finished))
+        eventGate.eventManager.consumeAction(BoardMove(player1, diceValue = 2))
+        //
+        val playersHistory = eventGate.stateHolder.currentPlayersHistory
+        // compare player 1
+        assertEquals(expected = 2, actual = playersHistory[player1.name]!!.turns.size)
+        assertEquals(expected = 0..4, actual = playersHistory[player1.name]!!.turns.first().moveRange)
+        assertEquals(expected = 4..6, actual = playersHistory[player1.name]!!.turns.last().moveRange)
+        assertEquals(expected = Game.Status.Finished, actual = playersHistory[player1.name]!!.turns.first().game?.status)
+        assertEquals(expected = null, actual = playersHistory[player1.name]!!.turns.last().game?.status)
+    }
 }

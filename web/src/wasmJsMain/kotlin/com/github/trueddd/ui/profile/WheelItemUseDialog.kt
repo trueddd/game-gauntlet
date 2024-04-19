@@ -7,9 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.github.trueddd.data.Game
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.*
 import com.github.trueddd.items.*
 import com.github.trueddd.util.isDevEnvironment
 
@@ -23,7 +21,8 @@ private fun Map<String, String>.updateParametersMap(
 @Composable
 fun WheelItemUseDialog(
     item: WheelItem,
-    globalState: GlobalState,
+    gameConfig: GameConfig,
+    stateSnapshot: StateSnapshot,
     player: Participant,
     items: List<WheelItem>,
     onItemUse: (WheelItem, List<String>) -> Unit,
@@ -81,13 +80,13 @@ fun WheelItemUseDialog(
                             is ParameterType.Int -> IntParameter(parameter) {
                                 parameters = parameters.updateParametersMap(parameter, it.toString())
                             }
-                            is ParameterType.Player -> PlayerParameter(parameter, globalState) {
+                            is ParameterType.Player -> PlayerParameter(parameter, gameConfig) {
                                 parameters = parameters.updateParametersMap(parameter, it.name)
                             }
-                            is ParameterType.ForeignItem -> ForeignItemParameter(parameter, globalState, player) {
+                            is ParameterType.ForeignItem -> ForeignItemParameter(parameter, stateSnapshot, gameConfig, player) {
                                 parameters = parameters.updateParametersMap(parameter, it.uid)
                             }
-                            is ParameterType.MyItem -> MyItemParameter(parameter, globalState, player) {
+                            is ParameterType.MyItem -> MyItemParameter(parameter, stateSnapshot, player) {
                                 parameters = parameters.updateParametersMap(parameter, it.uid)
                             }
                             is ParameterType.Item -> ItemParameter(parameter, items) {
@@ -151,12 +150,12 @@ private fun IntParameter(
 @Composable
 private fun PlayerParameter(
     parameter: ParameterType.Player,
-    globalState: GlobalState,
+    gameConfig: GameConfig,
     onParameterUpdated: (Participant) -> Unit
 ) {
     var value by remember { mutableStateOf<Participant?>(null) }
     var expanded by remember { mutableStateOf(false) }
-    val values = remember { globalState.players.filter(parameter.predicate).map { it.displayName } }
+    val values = remember { gameConfig.players.filter(parameter.predicate).map { it.displayName } }
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
@@ -180,7 +179,7 @@ private fun PlayerParameter(
                 DropdownMenuItem(
                     text = { Text(it) },
                     onClick = {
-                        value = globalState.players.firstNotNullOfOrNull { key->
+                        value = gameConfig.players.firstNotNullOfOrNull { key->
                             if (key.displayName == it) key else null
                         }
                         value?.let(onParameterUpdated)
@@ -196,7 +195,8 @@ private fun PlayerParameter(
 @Composable
 private fun ForeignItemParameter(
     parameter: ParameterType.ForeignItem,
-    globalState: GlobalState,
+    stateSnapshot: StateSnapshot,
+    gameConfig: GameConfig,
     player: Participant,
     onParameterUpdated: (WheelItem) -> Unit
 ) {
@@ -204,16 +204,16 @@ private fun ForeignItemParameter(
     var itemExpanded by remember { mutableStateOf(false) }
     var playerExpanded by remember { mutableStateOf(false) }
     var selectedPlayer by remember { mutableStateOf<Participant?>(null) }
-    val values = remember(selectedPlayer, globalState) {
+    val values = remember(selectedPlayer, stateSnapshot) {
         if (selectedPlayer != null) {
-            globalState.stateOf(selectedPlayer!!).wheelItems.filter(parameter.predicate)
+            stateSnapshot.playersState[selectedPlayer!!.name]?.wheelItems?.filter(parameter.predicate) ?: emptyList()
         } else {
             emptyList()
         }
     }
     Column {
         val players = remember {
-            globalState.players.filter{ it != player }
+            gameConfig.players.filter{ it != player }
         }
         ExposedDropdownMenuBox(
             expanded = playerExpanded,
@@ -289,14 +289,14 @@ private fun ForeignItemParameter(
 @Composable
 private fun MyItemParameter(
     parameter: ParameterType.MyItem,
-    globalState: GlobalState,
+    stateSnapshot: StateSnapshot,
     player: Participant,
     onParameterUpdated: (WheelItem) -> Unit
 ) {
     var value by remember { mutableStateOf<WheelItem?>(null) }
     var itemExpanded by remember { mutableStateOf(false) }
-    val values = remember(globalState.stateOf(player)) {
-        globalState.stateOf(player).wheelItems.filter(parameter.predicate)
+    val values = remember(stateSnapshot.playersState[player.name]) {
+        stateSnapshot.playersState[player.name]!!.wheelItems.filter(parameter.predicate)
     }
     ExposedDropdownMenuBox(
         expanded = itemExpanded,

@@ -1,9 +1,6 @@
 package com.github.trueddd.di
 
-import com.github.trueddd.core.AppClient
-import com.github.trueddd.core.AppStorage
-import com.github.trueddd.core.AuthManager
-import com.github.trueddd.core.ServerRouter
+import com.github.trueddd.core.*
 import com.github.trueddd.utils.serialization
 import io.ktor.client.*
 import io.ktor.client.engine.js.*
@@ -12,6 +9,7 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import org.koin.dsl.binds
 import org.koin.dsl.module
 
 val module = module {
@@ -41,4 +39,7 @@ val module = module {
     single { AuthManager(appClient = get()) }
 
     single { AppStorage() }
+
+    single { GameStateProviderImpl(httpClient = get(), router = get(), authManager = get(), appClient = get()) }
+        .binds(arrayOf(GameStateProvider::class, CommandSender::class))
 }

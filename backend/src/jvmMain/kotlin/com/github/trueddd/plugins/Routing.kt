@@ -37,8 +37,16 @@ fun Application.configureRouting() {
             call.respond(eventGate.stateHolder.current.gameConfig)
         }
 
+        get(Router.SNAPSHOT) {
+            cache()
+            call.respond(eventGate.stateHolder.current.stateSnapshot)
+        }
+
         // Wheel scope
         authenticate {
+            get(Router.ACTIONS) {
+                call.respond(eventGate.historyHolder.getActions())
+            }
             get(Router.Wheels.GAMES) {
                 cache()
                 val items = gamesProvider.listAll()

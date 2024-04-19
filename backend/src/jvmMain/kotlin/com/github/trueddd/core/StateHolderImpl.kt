@@ -35,7 +35,7 @@ class StateHolderImpl : StateHolder {
     }
 
     private val _playersTurnsStateFlow: MutableStateFlow<PlayersHistory> = MutableStateFlow(
-        value = current.players.associate { it.name to PlayerTurnsHistory(emptyList()) }
+        value = current.defaultPlayersHistory()
     )
 
     override val playersTurnsStateFlow: StateFlow<PlayersHistory>

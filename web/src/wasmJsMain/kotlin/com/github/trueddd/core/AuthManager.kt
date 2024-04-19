@@ -38,6 +38,10 @@ class AuthManager(
         window.localStorage.setItem(TOKEN_KEY, authResponse.token)
     }
 
+    fun savedJwtToken(): String? {
+        return window.localStorage.getItem(TOKEN_KEY)
+    }
+
     fun receiveHashParameters(): Map<String, String> {
         val hash = window.location.hash.removePrefix("#")
         val arguments = hash.takeUnless { it.isEmpty() }

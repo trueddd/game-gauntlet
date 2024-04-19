@@ -1,10 +1,7 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
-import com.github.trueddd.data.ActionsTable
-import com.github.trueddd.data.GameGenreDistribution
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.globalState
+import com.github.trueddd.data.*
 import com.github.trueddd.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -63,7 +60,7 @@ class DatabaseEventHistoryHolder(
         Log.info(TAG, "Global state saved; ${result.size} lines saved")
     }
 
-    override suspend fun load(): GlobalState {
+    override suspend fun load(): LoadedGameState {
         mutex.lock()
         val records = suspendedTransactionAsync(Dispatchers.IO, database) {
             ActionsTable.selectAll().map { it[ActionsTable.value] }
@@ -71,7 +68,8 @@ class DatabaseEventHistoryHolder(
         Log.info(TAG, "Records found: ${records.size}")
         if (records.isEmpty()) {
             mutex.unlock()
-            return globalState()
+            val state = globalState()
+            return LoadedGameState(state, state.defaultPlayersHistory())
         }
         val eventDatesRegex = Regex("^\\d+:\\d+$")
         val (start, end) = records.firstOrNull { it.matches(eventDatesRegex) }
@@ -99,17 +97,27 @@ class DatabaseEventHistoryHolder(
             startDateTime = Instant.fromEpochMilliseconds(start).toLocalDateTime(DefaultTimeZone),
             activePeriod = (end - start).toDuration(DurationUnit.MILLISECONDS),
         )
-        return events.fold(initialState) { state, action ->
+        var playersHistory = initialState.defaultPlayersHistory()
+        val globalState = events.fold(initialState) { state, action ->
             val handler = actionHandlerRegistry.handlerOf(action) ?: return@fold state
             latestEvents.push(action)
             try {
-                handler.handle(action, state)
+                val newState = handler.handle(action, state)
+                playersHistory = PlayersHistoryCalculator.calculate(
+                    currentHistory = playersHistory,
+                    action = action,
+                    oldState = state,
+                    newState = newState
+                )
+                newState
             } catch (error: StateModificationException) {
                 Log.error(TAG, "Error caught while restoring state at action: $action")
                 Log.error(TAG, "Current state: $state")
                 error.printStackTrace()
                 state
             }
-        }.also { mutex.unlock() }
+        }
+        mutex.unlock()
+        return LoadedGameState(globalState, playersHistory)
     }
 }

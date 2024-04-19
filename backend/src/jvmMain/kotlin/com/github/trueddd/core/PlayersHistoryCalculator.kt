@@ -1,10 +1,7 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.actions.*
-import com.github.trueddd.data.Game
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.PlayerTurnsHistory
-import com.github.trueddd.data.Turn
+import com.github.trueddd.data.*
 
 object PlayersHistoryCalculator {
 

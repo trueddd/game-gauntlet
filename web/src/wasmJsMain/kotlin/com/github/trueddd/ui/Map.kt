@@ -15,9 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.trueddd.data.Game
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.*
 import com.github.trueddd.items.BoardTrap
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.util.localized
@@ -32,31 +30,40 @@ data class MapCellState(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun Map(globalState: GlobalState) {
+fun Map(
+    gameConfig: GameConfig,
+    stateSnapshot: StateSnapshot?
+) {
     Column(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
     ) {
-        val mapState = remember(globalState) {
+        val mapState = remember(stateSnapshot, gameConfig) {
             buildList {
-                add(MapCellState(
-                    index = 0,
-                    genre = null,
-                    players = globalState.stateSnapshot.playersState
-                        .filterValues { it.position == 0 }.keys
-                        .let { names -> globalState.players.filter { it.name in names } },
-                    traps = globalState.stateSnapshot.boardTraps.filterKeys { it == 0 }.values.toList()
-                ))
-                globalState.gameGenreDistribution.genres.forEachIndexed { index, genre ->
-                    add(MapCellState(
-                        index = index + 1,
-                        genre = genre,
-                        players = globalState.stateSnapshot.playersState
-                            .filterValues { it.position == index + 1 }.keys
-                            .let { names -> globalState.players.filter { it.name in names } },
-                        traps = globalState.stateSnapshot.boardTraps.filterKeys { it == index + 1 }.values.toList()
-                    ))
+                add(
+                    MapCellState(
+                        index = 0,
+                        genre = null,
+                        players = stateSnapshot?.playersState
+                            ?.filterValues { it.position == 0 }?.keys
+                            ?.let { names -> gameConfig.players.filter { it.name in names } }
+                            ?: emptyList(),
+                        traps = stateSnapshot?.boardTraps?.filterKeys { it == 0 }?.values?.toList() ?: emptyList()
+                    )
+                )
+                gameConfig.gameGenreDistribution.genres.forEachIndexed { index, genre ->
+                    add(
+                        MapCellState(
+                            index = index + 1,
+                            genre = genre,
+                            players = stateSnapshot?.playersState
+                                ?.filterValues { it.position == index + 1 }?.keys
+                                ?.let { names -> gameConfig.players.filter { it.name in names } }
+                                ?: emptyList(),
+                            traps = stateSnapshot?.boardTraps?.filterKeys { it == index + 1 }?.values?.toList() ?: emptyList()
+                        )
+                    )
                 }
             }
         }

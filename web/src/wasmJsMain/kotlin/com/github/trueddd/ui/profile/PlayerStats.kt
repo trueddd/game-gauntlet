@@ -10,16 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.github.trueddd.actions.Action
-import com.github.trueddd.actions.BoardMove
 import com.github.trueddd.data.Game
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerTurnsHistory
 
-private fun Participant.averageMoveDice(actions: List<Action>): String {
-    val average = actions.filterIsInstance<BoardMove>()
-        .filter { it.rolledBy == this }
-        .map { it.diceValue }
+// TODO: calculate stats on backend?
+private fun PlayerTurnsHistory.averageMoveDice(): String {
+    val average = turns
+        .mapNotNull { turn -> turn.moveRange?.let { it.last - it.first } }
         .average()
     return if (average.isNaN()) {
         "-"
@@ -29,18 +26,14 @@ private fun Participant.averageMoveDice(actions: List<Action>): String {
     }
 }
 
-private fun Participant.gamesWithStatus(status: Game.Status, globalState: GlobalState): String {
-    return globalState.gamesOf(this)
-        .count { it.status == status }
-        .toString()
+private fun PlayerTurnsHistory.gamesWithStatus(status: Game.Status): String {
+    return turns.count { it.game?.status == status }.toString()
 }
 
 @Composable
 fun Stats(
     expanded: Boolean,
-    player: Participant,
-    globalState: GlobalState,
-    actions: List<Action>,
+    turnsHistory: PlayerTurnsHistory,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -49,22 +42,22 @@ fun Stats(
     ) {
         StatsItem(
             title = "Средний показатель кубика",
-            value = player.averageMoveDice(actions),
+            value = turnsHistory.averageMoveDice(),
             expanded = expanded
         )
         StatsItem(
             title = "Пройденных игр",
-            value = player.gamesWithStatus(Game.Status.Finished, globalState),
+            value = turnsHistory.gamesWithStatus(Game.Status.Finished),
             expanded = expanded
         )
         StatsItem(
             title = "Количество рероллов",
-            value = player.gamesWithStatus(Game.Status.Rerolled, globalState),
+            value = turnsHistory.gamesWithStatus(Game.Status.Rerolled),
             expanded = expanded
         )
         StatsItem(
             title = "Количество дропов",
-            value = player.gamesWithStatus(Game.Status.Dropped, globalState),
+            value = turnsHistory.gamesWithStatus(Game.Status.Dropped),
             expanded = expanded
         )
     }

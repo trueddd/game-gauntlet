@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import com.github.trueddd.data.Game
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.ui.res.StringResources
+import kotlinx.datetime.LocalDate
 
 @Stable
 val WheelItem.typeLocalized: String
@@ -35,4 +36,23 @@ val Game.Status.localized: String
         Game.Status.Dropped -> StringResources.GameStatus.Dropped
         Game.Status.Rerolled -> StringResources.GameStatus.Rerolled
         Game.Status.Next -> StringResources.GameStatus.Next
+    }
+
+@Stable
+fun LocalDate.format(): String {
+    return buildString {
+        append(dayOfMonth.toString().padStart(2, '0'))
+        append('.')
+        append(monthNumber.toString().padStart(2, '0'))
+        append('.')
+        append(year)
+    }
+}
+
+@Stable
+val RelativeDate.localized: String
+    get() = when (this) {
+        is RelativeDate.Today -> StringResources.RelativeDate.Today
+        is RelativeDate.Yesterday -> StringResources.RelativeDate.Yesterday
+        is RelativeDate.Other -> date.format()
     }

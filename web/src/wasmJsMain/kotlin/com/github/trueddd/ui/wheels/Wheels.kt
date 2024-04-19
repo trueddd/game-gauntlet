@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.sp
 import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.AppStorage
 import com.github.trueddd.core.Command
+import com.github.trueddd.core.CommandSender
+import com.github.trueddd.data.GameConfig
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.Rollable
 import com.github.trueddd.di.get
@@ -34,6 +36,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun Wheels(
     participant: Participant,
+    gameConfig: GameConfig,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -41,6 +44,7 @@ fun Wheels(
         modifier = modifier
     ) {
         val scope = rememberCoroutineScope()
+        val commandSender = remember { get<CommandSender>() }
         val appClient = remember { get<AppClient>() }
         val appStorage = remember { get<AppStorage>() }
         var wheelState by remember {
@@ -55,7 +59,7 @@ fun Wheels(
             val items = when (wheelState.type) {
                 WheelType.Items -> appClient.getItems()
                 WheelType.Games -> appClient.getGames()
-                WheelType.Players -> appClient.getPlayers()
+                WheelType.Players -> gameConfig.players
             }
             wheelState = appStorage.getSavedWheelState(items, wheelState.type)
         }
@@ -112,7 +116,7 @@ fun Wheels(
                     shape = RoundedCornerShape(50),
                     onClick = {
                         (wheelState.rolledItem as? WheelItem)?.let {
-                            appClient.sendCommand(Command.Action.itemReceive(participant, it.id))
+                            commandSender.sendCommand(Command.Action.itemReceive(participant, it.id))
                             wheelState = wheelState.copy(rolledItem = null)
                         }
                     },

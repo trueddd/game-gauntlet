@@ -7,6 +7,8 @@ object Router {
     const val ICONS = "/icons"
     /** Resource for receiving game state and sending actions **/
     const val STATE = "/state"
+    /** Resource for receiving game state (unauthorized) **/
+    const val SNAPSHOT = "/state/snapshot"
     /** Resource for receiving users' actions **/
     const val ACTIONS = "/actions"
     /** Resource for receiving users' turns (profile tab) **/

@@ -31,23 +31,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.github.trueddd.actions.Action
-import com.github.trueddd.core.AppClient
-import com.github.trueddd.core.AuthManager
-import com.github.trueddd.core.Command
-import com.github.trueddd.core.ServerRouter
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.core.*
+import com.github.trueddd.data.*
 import com.github.trueddd.di.get
 import com.github.trueddd.items.Usable
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.widget.AsyncImage
+import com.github.trueddd.util.RelativeDate
 import com.github.trueddd.util.localized
 import com.github.trueddd.util.typeLocalized
+import com.github.trueddd.utils.DefaultTimeZone
 import com.github.trueddd.utils.Log
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toLocalDateTime
 
 private object ProfileContentType {
     const val BACKGROUND = "background"
@@ -65,18 +63,17 @@ private val leftSideBarPadding = 32.dp
 @Composable
 fun ProfileScreen(
     currentParticipant: Participant?,
-    globalState: GlobalState?,
+    gameConfig: GameConfig,
+    stateSnapshot: StateSnapshot?,
     modifier: Modifier = Modifier,
 ) {
-    val appClient = remember { get<AppClient>() }
+    val gameStateProvider = remember { get<GameStateProvider>() }
     val authManager = remember { get<AuthManager>() }
-    var actions by remember { mutableStateOf(emptyList<Action>()) }
+    var turnsHistory by remember { mutableStateOf<PlayersHistory?>(null) }
     LaunchedEffect(Unit) {
-        actions = appClient.loadActions()
+        gameStateProvider.playersHistoryFlow().collect { turnsHistory = it }
     }
-    var selected by remember { mutableStateOf(
-        currentParticipant ?: globalState?.players?.firstOrNull()
-    ) }
+    var selected by remember { mutableStateOf(currentParticipant ?: gameConfig.players.firstOrNull()) }
     PermanentNavigationDrawer(
         drawerContent = {
             Column(
@@ -86,7 +83,7 @@ fun ProfileScreen(
                     .width(leftSideBarWidth)
                     .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(topEnd = 32.dp, bottomEnd = 32.dp))
             ) {
-                globalState?.players?.forEach {
+                gameConfig.players.forEach {
                     NavigationDrawerItem(
                         label = { Text(it.displayName) },
                         selected = selected == it,
@@ -111,25 +108,15 @@ fun ProfileScreen(
         },
         modifier = modifier
     ) {
-        if (globalState != null && selected != null) {
+        if (stateSnapshot != null && selected != null) {
             Profile(
                 selectedPlayer = selected!!,
                 currentPlayer = currentParticipant,
-                globalState = globalState,
-                actions = actions,
+                gameConfig = gameConfig,
+                stateSnapshot = stateSnapshot,
+                turnsHistory = turnsHistory?.get(selected!!.name) ?: PlayerTurnsHistory(emptyList()),
             )
         }
-    }
-}
-
-@Stable
-private fun LocalDate.format(): String {
-    return buildString {
-        append(dayOfMonth.toString().padStart(2, '0'))
-        append('.')
-        append(monthNumber.toString().padStart(2, '0'))
-        append('.')
-        append(year)
     }
 }
 
@@ -207,11 +194,12 @@ private fun WheelItemView(
 private fun Profile(
     selectedPlayer: Participant,
     currentPlayer: Participant?,
-    globalState: GlobalState,
-    actions: List<Action>,
+    gameConfig: GameConfig,
+    stateSnapshot: StateSnapshot,
+    turnsHistory: PlayerTurnsHistory,
     modifier: Modifier = Modifier,
 ) {
-    val appClient = remember { get<AppClient>() }
+    val commandSender = remember { get<CommandSender>() }
     var dialogItem by remember { mutableStateOf<WheelItem?>(null) }
     val lazyListState = rememberLazyListState()
     val leftSidePanelTopPadding by remember {
@@ -221,9 +209,13 @@ private fun Profile(
                 ?.offset
         }
     }
-    val turnsGroupedByDate = remember(selectedPlayer) {
-        PlayerTurn.turnsFrom(selectedPlayer, globalState, actions)
-            .groupBy { it.moveDateTime.date }
+    val turnsGroupedByDate = remember(turnsHistory) {
+        turnsHistory.turns
+            .sortedByDescending { it.moveDate }
+            .groupBy { turn ->
+                Instant.fromEpochMilliseconds(turn.moveDate).toLocalDateTime(DefaultTimeZone)
+                    .let { RelativeDate.from(it) }
+            }
     }
     Box(
         modifier = modifier
@@ -261,9 +253,7 @@ private fun Profile(
                 ) {
                     Stats(
                         expanded = true,
-                        player = selectedPlayer,
-                        globalState = globalState,
-                        actions = actions,
+                        turnsHistory = turnsHistory,
                         modifier = Modifier
                             .weight(1f)
                     )
@@ -273,7 +263,7 @@ private fun Profile(
                         modifier = Modifier
                             .weight(2f)
                     ) {
-                        globalState.stateOf(selectedPlayer).wheelItems.forEach { item ->
+                        stateSnapshot.playersState[selectedPlayer.name]?.wheelItems?.forEach { item ->
                             WheelItemView(item) {
                                 Log.info(TAG, "Called dialog for ${item.name}")
                                 dialogItem = item
@@ -342,10 +332,10 @@ private fun Profile(
                     }
                 }
             }
-            turnsGroupedByDate.forEach { (date, turns) ->
+            turnsGroupedByDate.forEach { (relativeDate, turns) ->
                 item(contentType = ProfileContentType.DATE) {
                     Text(
-                        text = date.format(),
+                        text = relativeDate.localized,
                         color = Colors.White,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -372,28 +362,28 @@ private fun Profile(
                                     modifier = Modifier
                                         .weight(1f)
                                 ) {
-                                    Text(text = "${turn.start} » ${turn.end}")
+                                    Text(text = turn.moveRange?.let { "${it.first} » ${it.last}" } ?: "-")
                                 }
                                 Box(
                                     contentAlignment = Alignment.Center,
                                     modifier = Modifier
                                         .weight(1f)
                                 ) {
-                                    Text(text = turn.gameHistoryEntry?.game?.name ?: "-")
+                                    Text(text = turn.game?.game?.name ?: "-")
                                 }
                                 Box(
                                     contentAlignment = Alignment.Center,
                                     modifier = Modifier
                                         .weight(1f)
                                 ) {
-                                    Text(text = turn.gameHistoryEntry?.game?.genre?.localized ?: "-")
+                                    Text(text = turn.game?.game?.genre?.localized ?: "-")
                                 }
                                 Box(
                                     contentAlignment = Alignment.Center,
                                     modifier = Modifier
                                         .weight(1f)
                                 ) {
-                                    Text(text = turn.gameHistoryEntry?.status?.localized ?: "-")
+                                    Text(text = turn.game?.status?.localized ?: "-")
                                 }
                             }
                         }
@@ -449,9 +439,7 @@ private fun Profile(
             ) {
                 Stats(
                     expanded = false,
-                    player = selectedPlayer,
-                    globalState = globalState,
-                    actions = actions,
+                    turnsHistory = turnsHistory,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp)
@@ -466,12 +454,13 @@ private fun Profile(
         if (dialogItem != null && currentPlayer != null) {
             WheelItemUseDialog(
                 item = dialogItem!!,
-                globalState = globalState,
+                gameConfig = gameConfig,
+                stateSnapshot = stateSnapshot,
                 player = currentPlayer,
                 items = allItems,
                 onItemUse = { item, parameters ->
                     Log.info(TAG, "using ${item.name} with parameters $parameters")
-                    appClient.sendCommand(Command.Action.itemUse(currentPlayer, item, parameters))
+                    commandSender.sendCommand(Command.Action.itemUse(currentPlayer, item, parameters))
                     dialogItem = null
                 },
                 onDialogDismiss = { dialogItem = null }

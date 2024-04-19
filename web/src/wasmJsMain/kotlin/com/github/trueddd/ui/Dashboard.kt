@@ -7,18 +7,22 @@ import androidx.compose.ui.unit.dp
 import com.github.trueddd.actions.Action
 import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.Command
+import com.github.trueddd.core.CommandSender
 import com.github.trueddd.core.SocketState
-import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.GameConfig
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.StateSnapshot
 import com.github.trueddd.di.get
 
 @Composable
 fun Dashboard(
-    globalState: GlobalState,
+    gameConfig: GameConfig,
+    stateSnapshot: StateSnapshot,
     socketState: SocketState,
     participant: Participant?,
     modifier: Modifier = Modifier,
 ) {
+    val commandSender = remember { get<CommandSender>() }
     val appClient = remember { get<AppClient>() }
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -31,18 +35,18 @@ fun Dashboard(
                 .width(IntrinsicSize.Min)
         ) {
             ActionsBoard(
-                globalState = globalState,
+                gameConfig = gameConfig,
                 socketState = socketState,
-                sendAction = { appClient.sendCommand(Command.Action(it)) },
+                sendAction = { commandSender.sendCommand(Command.Action(it)) },
                 participant = participant,
                 modifier = Modifier
                     .fillMaxWidth()
             )
             GlobalStateManagement(
                 socketState = socketState,
-                onSaveRequested = { appClient.sendCommand(Command.Save) },
-                onRestoreRequested = { appClient.sendCommand(Command.Restore) },
-                onResetRequested = { appClient.sendCommand(Command.Reset) },
+                onSaveRequested = { commandSender.sendCommand(Command.Save) },
+                onRestoreRequested = { commandSender.sendCommand(Command.Restore) },
+                onResetRequested = { commandSender.sendCommand(Command.Reset) },
                 modifier = Modifier
             )
         }
@@ -59,7 +63,7 @@ fun Dashboard(
                     }
             }
             StateTable(
-                globalState = globalState,
+                stateSnapshot = stateSnapshot,
                 modifier = Modifier
             )
             ActionsLog(

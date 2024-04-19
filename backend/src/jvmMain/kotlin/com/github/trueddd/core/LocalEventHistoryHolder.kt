@@ -1,9 +1,7 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
-import com.github.trueddd.data.GameGenreDistribution
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.globalState
+import com.github.trueddd.data.*
 import com.github.trueddd.utils.DefaultTimeZone
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
@@ -60,7 +58,7 @@ open class LocalEventHistoryHolder(
         Log.info(TAG, "Global state saved")
     }
 
-    override suspend fun load(): GlobalState {
+    override suspend fun load(): LoadedGameState {
         val fileContent = withContext(Dispatchers.IO) {
             historyHolderFile.readLines()
         }
@@ -81,10 +79,18 @@ open class LocalEventHistoryHolder(
                 startDateTime = Instant.fromEpochMilliseconds(start).toLocalDateTime(DefaultTimeZone),
                 activePeriod = (end - start).toDuration(DurationUnit.MILLISECONDS),
             )
-            events.fold(initialState) { state, action ->
+            var playersHistory = initialState.defaultPlayersHistory()
+            val globalState = events.fold(initialState) { state, action ->
                 val handler = actionHandlerRegistry.handlerOf(action) ?: return@fold state
                 try {
-                    handler.handle(action, state)
+                    val newState = handler.handle(action, state)
+                    playersHistory = PlayersHistoryCalculator.calculate(
+                        currentHistory = playersHistory,
+                        action = action,
+                        oldState = state,
+                        newState = newState
+                    )
+                    newState
                 } catch (error: StateModificationException) {
                     Log.error(TAG, "Error caught while restoring state at action: $action")
                     Log.error(TAG, "Current state: $state")
@@ -92,6 +98,7 @@ open class LocalEventHistoryHolder(
                     state
                 }
             }
+            LoadedGameState(globalState, playersHistory)
         }
     }
 }

@@ -2,6 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.PlayersHistory
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.CoroutineScope
@@ -44,9 +45,9 @@ class EventManagerImpl(
         isEnabled.set(false)
     }
 
-    override fun startHandling(initState: GlobalState) {
+    override fun startHandling(initState: GlobalState, playersHistory: PlayersHistory) {
         stateHolder.update { initState }
-        stateHolder.updateHistory { initState.defaultPlayersHistory() }
+        stateHolder.updateHistory { playersHistory }
         startEventHandling()
     }
 

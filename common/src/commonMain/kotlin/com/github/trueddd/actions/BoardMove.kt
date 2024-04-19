@@ -1,5 +1,6 @@
 package com.github.trueddd.actions
 
+import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.PlayerState
@@ -83,6 +84,7 @@ data class BoardMove(
                             else -> null
                         }
                     },
+                    currentGame = currentState.gamesOf(action.rolledBy).lastOrNull { it.status == Game.Status.Next },
                 )
             }
             val winner = newState.stateSnapshot.playersState.entries

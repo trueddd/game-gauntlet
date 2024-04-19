@@ -14,7 +14,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.StateSnapshot
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.util.copyToClipBoard
 
@@ -53,7 +53,7 @@ private fun WheelItems(items: List<WheelItem>) {
 
 @Composable
 fun StateTable(
-    globalState: GlobalState,
+    stateSnapshot: StateSnapshot,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -82,7 +82,7 @@ fun StateTable(
                     Text(text = "Pending events")
                 }
             }
-            globalState.stateSnapshot.playersState.forEach { (player, state) ->
+            stateSnapshot.playersState.forEach { (player, state) ->
                 Row {
                     TableCell {
                         Text(text = player)

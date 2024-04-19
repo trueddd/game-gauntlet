@@ -1,6 +1,6 @@
 package com.github.trueddd.core
 
-import com.github.trueddd.data.PlayerTurnsHistory
+import com.github.trueddd.data.PlayersHistory
 import kotlinx.coroutines.flow.StateFlow
 
 interface PlayersHistoryProvider {
@@ -12,5 +12,3 @@ interface PlayersHistoryProvider {
 
     fun updateHistory(block: PlayersHistory.() -> PlayersHistory)
 }
-
-typealias PlayersHistory = Map<String, PlayerTurnsHistory>
