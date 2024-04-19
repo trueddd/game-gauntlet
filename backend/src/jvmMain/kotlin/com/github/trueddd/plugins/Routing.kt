@@ -3,7 +3,6 @@ package com.github.trueddd.plugins
 import com.github.trueddd.core.*
 import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.request.DownloadGameRequestBody
-import com.github.trueddd.di.getItemFactoriesSet
 import com.github.trueddd.utils.Environment
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -97,12 +96,6 @@ fun Application.configureRouting() {
             if (call.response.isSent) {
                 downloadedFile.delete()
             }
-        }
-
-        get(Router.Wheels.ITEMS) {
-            cache()
-            val items = getItemFactoriesSet().map { it.create() }
-            call.respond(items)
         }
 
         post(Router.USER) {

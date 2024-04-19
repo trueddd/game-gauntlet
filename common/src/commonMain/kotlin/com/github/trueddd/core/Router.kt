@@ -21,7 +21,6 @@ object Router {
     object Wheels {
         const val GAMES = "/games"
         const val ROLL_GAMES = "/games/roll"
-        const val ITEMS = "/items"
         const val ROLL_ITEMS = "/items/roll"
         const val ROLL_PLAYERS = "/players/roll"
     }

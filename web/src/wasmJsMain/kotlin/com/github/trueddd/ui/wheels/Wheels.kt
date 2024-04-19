@@ -30,6 +30,7 @@ import com.github.trueddd.data.Rollable
 import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.util.positionSpinAnimation
+import com.github.trueddd.utils.wheelItems
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,7 +58,7 @@ fun Wheels(
         }
         LaunchedEffect(wheelState.type) {
             val items = when (wheelState.type) {
-                WheelType.Items -> appClient.getItems()
+                WheelType.Items -> wheelItems
                 WheelType.Games -> appClient.getGames()
                 WheelType.Players -> gameConfig.players
             }

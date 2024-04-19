@@ -40,6 +40,10 @@ val module = module {
 
     single { AppStorage() }
 
-    single { GameStateProviderImpl(httpClient = get(), router = get(), authManager = get(), appClient = get()) }
-        .binds(arrayOf(GameStateProvider::class, CommandSender::class))
+    single { GameStateProviderImpl(
+        httpClient = get(),
+        router = get(),
+        authManager = get(),
+        appClient = get())
+    } binds arrayOf(GameStateProvider::class, CommandSender::class)
 }

@@ -43,6 +43,7 @@ import com.github.trueddd.util.localized
 import com.github.trueddd.util.typeLocalized
 import com.github.trueddd.utils.DefaultTimeZone
 import com.github.trueddd.utils.Log
+import com.github.trueddd.utils.wheelItems
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
@@ -448,8 +449,7 @@ private fun Profile(
         }
         var allItems by remember { mutableStateOf(emptyList<WheelItem>()) }
         LaunchedEffect(Unit) {
-            allItems = get<AppClient>().getItems()
-                .sortedBy { it.name }
+            allItems = wheelItems.sortedBy { it.name }
         }
         if (dialogItem != null && currentPlayer != null) {
             WheelItemUseDialog(

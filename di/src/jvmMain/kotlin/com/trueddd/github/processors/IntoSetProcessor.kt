@@ -6,13 +6,9 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.trueddd.github.annotations.ActionGenerator
-import com.trueddd.github.declarations.IntoSetClassDeclaration
 import com.trueddd.github.annotations.IntoSet
 import com.trueddd.github.annotations.ItemFactory
-import org.koin.core.annotation.ComponentScan
-import org.koin.core.annotation.Module
-import org.koin.core.annotation.Named
-import org.koin.core.annotation.Single
+import com.trueddd.github.declarations.IntoSetClassDeclaration
 
 class IntoSetProcessor(
     private val environment: SymbolProcessorEnvironment,
@@ -56,11 +52,6 @@ class IntoSetProcessor(
     }
 
     override fun processDeclarations(declarations: Iterable<IntoSetClassDeclaration>, fileSpec: FileSpec.Builder) {
-        val commonModuleSpec = TypeSpec.classBuilder("CommonModule")
-            .addAnnotation(Module::class)
-            .addAnnotation(ComponentScan::class)
-            .build()
-        fileSpec.addType(commonModuleSpec)
         declarations.toList()
             .groupBy { it.setName }
             .forEach { (type, declarations) ->
@@ -82,12 +73,6 @@ class IntoSetProcessor(
                         .addParameters(declarations.flatMap { it.dependenciesAsParameters }.distinct())
                         .returns(returnType)
                         .addStatement("return setOf(${items})")
-                        .addAnnotation(Single::class)
-                        .addAnnotation(
-                            AnnotationSpec.builder(Named::class)
-                                .addMember("value = %S", type)
-                                .build()
-                        )
                         .build()
                 )
             }

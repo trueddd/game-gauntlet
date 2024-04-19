@@ -160,9 +160,6 @@ class AppClient(
         }
     }
 
-    suspend fun getItems(): List<WheelItem> =
-        getJsonData(router.http(Router.Wheels.ITEMS)) ?: emptyList()
-
     suspend fun getGames(): List<Game> =
         getJsonData(router.http(Router.Wheels.GAMES), sendBearerToken = true) ?: emptyList()
 

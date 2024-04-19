@@ -13,7 +13,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,11 +30,11 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.ServerRouter
 import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.ui.widget.AsyncImage
+import com.github.trueddd.utils.wheelItems
 
 private fun WheelItem.contains(text: String): Boolean {
     return name.contains(text, ignoreCase = true) || description.contains(text, ignoreCase = true)
@@ -51,14 +54,12 @@ private fun WheelItem.isAnyOfTypes(types: List<WheelItemView>): Boolean {
 fun Rules(
     modifier: Modifier = Modifier,
 ) {
-    val appClient = remember { get<AppClient>() }
     val router = remember { get<ServerRouter>() }
     var searchText by remember { mutableStateOf("") }
     var selectedTypes by remember { mutableStateOf(emptyList<WheelItemView>()) }
-    var items by remember { mutableStateOf(emptyList<WheelItem>()) }
+    val items = remember { wheelItems }
     var visibleItems by remember { mutableStateOf(emptyList<WheelItem>()) }
     LaunchedEffect(Unit) {
-        items = appClient.getItems()
         visibleItems = items
             .filter { it.contains(searchText) }
             .filter { selectedTypes.isEmpty() || it.isAnyOfTypes(selectedTypes) }
