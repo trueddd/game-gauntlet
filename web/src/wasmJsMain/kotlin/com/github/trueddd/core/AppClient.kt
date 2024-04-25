@@ -57,19 +57,8 @@ class AppClient(
         }
     }
 
-    private suspend fun loadActions(): List<Action> {
-        return withContext(coroutineContext) {
-            try {
-                httpClient.get(router.http(Router.ACTIONS)) {
-                    bearerAuth(savedJwtToken()!!)
-                    contentType(ContentType.Application.Json)
-                }.body()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                emptyList()
-            }
-        }
-    }
+    private suspend fun loadActions(): List<Action> =
+        getJsonData(router.http(Router.ACTIONS), sendBearerToken = true) ?: emptyList()
 
     suspend fun loadImage(url: String): ByteArray? {
         return withContext(coroutineContext) {
@@ -120,45 +109,12 @@ class AppClient(
         }
     }
 
-    suspend fun getGameConfig(): Result<GameConfig> {
-        return withContext(coroutineContext) {
-            try {
-                httpClient.get(router.http(Router.CONFIG)) {
-                    contentType(ContentType.Application.Json)
-                }.body<GameConfig>().let { Result.success(it) }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Result.failure(e)
-            }
-        }
-    }
+    suspend fun getGameConfig(): GameConfig? = getJsonData(router.http(Router.CONFIG))
 
-    suspend fun getStateSnapshot(): Result<StateSnapshot> {
-        return withContext(coroutineContext) {
-            try {
-                httpClient.get(router.http(Router.SNAPSHOT)) {
-                    contentType(ContentType.Application.Json)
-                }.body<StateSnapshot>().let { Result.success(it) }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Result.failure(e)
-            }
-        }
-    }
+    suspend fun getStateSnapshot(): StateSnapshot? = getJsonData(router.http(Router.SNAPSHOT))
 
-    suspend fun getPlayersHistory(): Result<PlayersHistory> {
-        return withContext(coroutineContext) {
-            try {
-                httpClient.get(router.http(Router.TURNS)) {
-                    contentType(ContentType.Application.Json)
-                    savedJwtToken()?.let { bearerAuth(it) }
-                }.body<PlayersHistory>().let { Result.success(it) }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Result.failure(e)
-            }
-        }
-    }
+    suspend fun getPlayersHistory(): PlayersHistory? =
+        getJsonData(router.http(Router.TURNS), sendBearerToken = true)
 
     suspend fun getGames(): List<Game> =
         getJsonData(router.http(Router.Wheels.GAMES), sendBearerToken = true) ?: emptyList()
@@ -180,7 +136,7 @@ class AppClient(
             try {
                 httpClient.get(urlString) {
                     if (sendBearerToken) {
-                        bearerAuth(savedJwtToken()!!)
+                        savedJwtToken()?.let { bearerAuth(it) }
                     }
                     contentType(ContentType.Application.Json)
                 }.body<T>()

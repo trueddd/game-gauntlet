@@ -119,10 +119,12 @@ private fun MapCell(state: MapCellState) {
                     shape = RoundedCornerShape(8.dp)
                 )
         ) {
-            Text(
-                text = state.index.toString(),
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            if (state.index != 0) {
+                Text(
+                    text = state.index.toString(),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
             if (state.players.isNotEmpty()) {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(2.dp),

@@ -125,7 +125,7 @@ fun ProfileScreen(
 @Composable
 private fun WheelItemView(
     item: WheelItem,
-    onUse: () -> Unit = {}
+    onUse: (() -> Unit)? = null
 ) {
     val router = remember { get<ServerRouter>() }
     val tooltipState = rememberTooltipState(isPersistent = true)
@@ -148,7 +148,7 @@ private fun WheelItemView(
                     )
                 },
                 text = { Text(item.description) },
-                action = if (item is Usable) { {
+                action = if (item is Usable && onUse != null) { {
                     TextButton(
                         onClick = {
                             onUse()
@@ -265,10 +265,12 @@ private fun Profile(
                             .weight(2f)
                     ) {
                         stateSnapshot.playersState[selectedPlayer.name]?.wheelItems?.forEach { item ->
-                            WheelItemView(item) {
-                                Log.info(TAG, "Called dialog for ${item.name}")
-                                dialogItem = item
-                            }
+                            WheelItemView(
+                                item = item,
+                                onUse = if (selectedPlayer == currentPlayer) {
+                                    { dialogItem = item }
+                                } else null
+                            )
                         }
                     }
                 }

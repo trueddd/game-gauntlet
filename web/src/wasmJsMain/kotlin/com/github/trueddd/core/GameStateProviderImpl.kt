@@ -55,17 +55,17 @@ class GameStateProviderImpl(
         }
         connectionJob = launch {
             _connectionState.value = SocketState.Connecting
-            _gameConfig.value = appClient.getGameConfig().getOrNull() ?: run {
+            _gameConfig.value = appClient.getGameConfig() ?: run {
                 _connectionState.value = SocketState.Disconnected()
                 return@launch
             }
             if (authManager.userState.value == null) {
                 val result = appClient.getStateSnapshot()
-                if (result.isSuccess) {
+                if (result != null) {
                     _connectionState.value = SocketState.Connected
-                    _snapshotStateFlow.value = result.getOrNull()
+                    _snapshotStateFlow.value = result
                 } else {
-                    _connectionState.value = SocketState.Disconnected(result.exceptionOrNull())
+                    _connectionState.value = SocketState.Disconnected()
                     _snapshotStateFlow.value = null
                 }
                 return@launch
@@ -106,7 +106,7 @@ class GameStateProviderImpl(
     override fun playersHistoryFlow(): Flow<PlayersHistory?> {
         return flow {
             val history = appClient.getPlayersHistory()
-            emit(history.getOrNull())
+            emit(history)
         }
     }
 }
