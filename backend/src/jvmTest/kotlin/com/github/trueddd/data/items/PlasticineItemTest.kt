@@ -18,7 +18,7 @@ class PlasticineItemTest : EventGateTest() {
         val item = Plasticine.create()
         handleAction(ItemReceive(user, item))
         assertIs<Plasticine>(inventoryOf(user).first())
-        handleAction(ItemUse(user, item.uid, listOf(WheelItem.Id.ClimbingRope.asString())))
+        handleAction(ItemUse(user, item.uid, listOf(WheelItem.Id(WheelItem.ClimbingRope).asString())))
         assertIs<ClimbingRope>(inventoryOf(user).first())
     }
 }

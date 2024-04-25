@@ -4,10 +4,12 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
+@SerialName("${WheelItem.UnbelievableDemocracy}")
 class UnbelievableDemocracy private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Boolean>> {
 
@@ -15,7 +17,7 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
         fun create() = UnbelievableDemocracy(uid = generateWheelItemUid())
     }
 
-    override val id = Id.UnbelievableDemocracy
+    override val id = Id(UnbelievableDemocracy)
 
     override val name = "Невероятная демократия"
 
@@ -46,7 +48,7 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.UnbelievableDemocracy
+        override val itemId = Id(UnbelievableDemocracy)
         override fun create() = Companion.create()
     }
 
@@ -62,7 +64,7 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
                 causedByPollFrom = causedByPollFrom
             )
         }
-        override val id = Id.UnbelievableDemocracy
+        override val id = Id(UnbelievableDemocracy)
         override val name = "Невероятная демократия"
         override val description = """
             +${modifier.absoluteValue} к броску кубика на ход. Спасибо чату ${causedByPollFrom.name} за это.
@@ -81,7 +83,7 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
                 causedByPollFrom = causedByPollFrom
             )
         }
-        override val id = Id.UnbelievableDemocracy
+        override val id = Id(UnbelievableDemocracy)
         override val name = "Невероятная демократия"
         override val description = """
             -${modifier.absoluteValue} к броску кубика на ход. Спасибо чату ${causedByPollFrom.name} за это.

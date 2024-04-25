@@ -18,9 +18,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":annotations"))
-//                TODO: https://github.com/InsertKoinIO/koin-annotations/issues/120
-//                api(libs.koin.core)
-//                api(libs.koin.annotations)
                 implementation(libs.serialization)
                 implementation(libs.uuid)
                 api(libs.datetime)
@@ -37,7 +34,7 @@ kotlin {
             }
         }
         val wasmJsMain by getting {
-//            kotlin.srcDir("build/generated/ksp/wasmJs/wasmJsMain/kotlin")
+            kotlin.srcDir("build/generated/ksp/wasmJs/wasmJsMain/kotlin")
         }
     }
 }
@@ -45,5 +42,5 @@ kotlin {
 dependencies {
     add("kspJvm", project(":di"))
     add("kspJvm", libs.koin.ksp)
-//    add("kspWasmJs", project(":di"))
+    add("kspWasmJs", project(":di"))
 }

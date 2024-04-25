@@ -11,11 +11,15 @@ import com.github.trueddd.items.YourStream
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("a${Action.Key.GameRoll}")
 data class GameRoll(
+    @SerialName("rb")
     val participant: Participant,
+    @SerialName("gi")
     val gameId: Game.Id,
 ) : Action(Key.GameRoll) {
 
@@ -34,7 +38,7 @@ data class GameRoll(
     class Handler(private val gamesProvider: GamesProvider) : Action.Handler<GameRoll> {
 
         override suspend fun handle(action: GameRoll, currentState: GlobalState): GlobalState {
-            val currentGame = currentState[action.participant.name]?.gameHistory?.lastOrNull()
+            val currentGame = currentState.stateOf(action.participant).currentGame
             if (currentState.positionOf(action.participant) == 0) {
                 throw StateModificationException(action, "Cannot roll games on Start position")
             }
@@ -52,18 +56,18 @@ data class GameRoll(
                 && newGame.name.count { it.isLetterOrDigit() } > FewLetters.SYMBOLS_LIMIT) {
                 throw StateModificationException(action, "Cannot have this game while FewLetters debuff is applied")
             }
+            val newGameHistory = GameHistoryEntry(newGame, Game.Status.InProgress)
             return currentState.updatePlayer(action.participant) { state ->
-                val newGameHistory = state.gameHistory + GameHistoryEntry(newGame, Game.Status.InProgress)
                 val indexOfYourStreamBuff = state.effects.indexOfFirst { it is YourStream }
                 val indexOfFewLettersDebuff = state.effects.indexOfFirst { it is FewLetters }
                 val newEffects = state.effects.filterIndexed { index, _ ->
                     index != indexOfYourStreamBuff && index != indexOfFewLettersDebuff
                 }
                 state.copy(
-                    gameHistory = newGameHistory,
+                    currentGame = newGameHistory,
                     effects = newEffects
                 )
-            }
+            }.updateGameHistory(action.participant) { it + newGameHistory }
         }
     }
 }

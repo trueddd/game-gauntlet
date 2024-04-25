@@ -20,7 +20,7 @@ class PollItemTest : EventGateTest() {
         val user = requireRandomParticipant()
         val poll = Poll.create()
         handleAction(ItemReceive(user, poll))
-        val factory = getItemFactoriesSet().first { it.itemId == WheelItem.Id.ClimbingRope }
+        val factory = getItemFactoriesSet().first { it.itemId == WheelItem.Id(WheelItem.ClimbingRope) }
         handleAction(ItemUse(user, poll, factory.itemId.asString(), user.name))
         assertEquals(factory.itemId, inventoryOf(user).first().id)
         assertEquals(expected = 0, pendingEventsOf(user).size)
@@ -33,7 +33,7 @@ class PollItemTest : EventGateTest() {
         handleAction(ItemReceive(user1, poll))
         handleAction(ItemReceive(user2, PowerThrow.create()))
         handleAction(ItemReceive(user2, ClimbingRope.create()))
-        val factory = getItemFactoriesSet().first { it.itemId == WheelItem.Id.HoleyPockets }
+        val factory = getItemFactoriesSet().first { it.itemId == WheelItem.Id(WheelItem.HoleyPockets) }
         handleAction(ItemUse(user1, poll, factory.itemId.asString(), user2.name))
         assertEquals(expected = 0, pendingEventsOf(user1).size)
         assertTrue(inventoryOf(user2).isEmpty())

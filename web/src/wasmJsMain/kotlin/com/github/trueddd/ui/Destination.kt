@@ -1,36 +1,67 @@
 package com.github.trueddd.ui
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.List
-import androidx.compose.material.icons.automirrored.rounded.List
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material.icons.rounded.*
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.github.trueddd.ui.res.icons.map.Map
+import com.github.trueddd.ui.res.icons.rules.Rules
 
 @Stable
 sealed class Destination(
     val name: String,
     val icon: ImageVector,
     val disabledIcon: ImageVector,
+    val requireAuth: Boolean = false,
 ) {
 
     companion object {
         fun all() = listOf(Rules, Map, Dashboard, Wheels, Games, Profile)
     }
 
-    open val isPrivate = false
+    data object Rules : Destination(
+        "Правила",
+        Icons.Rounded.Rules,
+        Icons.Outlined.Rules
+    )
 
-    data object Rules : Destination("Правила", Icons.AutoMirrored.Rounded.List, Icons.AutoMirrored.Outlined.List)
-    data object Map : Destination("Карта", Icons.Rounded.LocationOn, Icons.Outlined.LocationOn)
-    data object Dashboard : Destination("Панель управления", Icons.Rounded.Menu, Icons.Outlined.Menu) {
-        override val isPrivate = true
-    }
+    data object Map : Destination(
+        "Карта",
+        Icons.Rounded.Map,
+        Icons.Outlined.Map
+    )
 
-    data object Games : Destination("Загрузка игр", Icons.Rounded.Search, Icons.Outlined.Search) {
-        override val isPrivate = true
-    }
+    data object Dashboard : Destination(
+        "Панель управления",
+        Icons.Rounded.Menu,
+        Icons.Outlined.Menu,
+        requireAuth = true
+    )
 
-    data object Profile : Destination("Профиль", Icons.Rounded.AccountCircle, Icons.Outlined.AccountCircle)
-    data object Wheels : Destination("Колеса", Icons.Rounded.Refresh, Icons.Outlined.Refresh)
+    data object Games : Destination(
+        "Загрузка игр",
+        Icons.Rounded.Search,
+        Icons.Outlined.Search,
+        requireAuth = true
+    )
+
+    data object Profile : Destination(
+        "Профиль",
+        Icons.Rounded.AccountCircle,
+        Icons.Outlined.AccountCircle
+    )
+
+    data object Wheels : Destination(
+        "Колеса",
+        Icons.Rounded.Refresh,
+        Icons.Outlined.Refresh,
+        requireAuth = true
+    )
 }

@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 data class Participant(
     override val name: String,
     val displayName: String = name,
-    val link: String = "https://twitch.tv/$name",
 ): Rollable {
 
     override val description: String

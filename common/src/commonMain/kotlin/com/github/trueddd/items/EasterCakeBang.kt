@@ -1,16 +1,18 @@
 package com.github.trueddd.items
 
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.EasterCakeBang}")
 class EasterCakeBang private constructor(override val uid: String) : WheelItem.Effect.Debuff() {
 
     companion object {
         fun create() = EasterCakeBang(uid = generateWheelItemUid())
     }
 
-    override val id = Id.EasterCakeBang
+    override val id = Id(EasterCakeBang)
 
     override val name = "Куличёвский тарабан"
 
@@ -24,7 +26,7 @@ class EasterCakeBang private constructor(override val uid: String) : WheelItem.E
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.EasterCakeBang
+        override val itemId = Id(EasterCakeBang)
         override fun create() = Companion.create()
     }
 }

@@ -2,6 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.PlayersHistory
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @Single
 class EventManagerImpl(
     private val actionHandlerRegistry: ActionHandlerRegistry,
-    private val stateHolder: StateHolderImpl,
+    private val stateHolder: StateHolder,
 ) : EventManager, CoroutineScope {
 
     companion object {
@@ -44,8 +45,9 @@ class EventManagerImpl(
         isEnabled.set(false)
     }
 
-    override fun startHandling(initState: GlobalState) {
+    override fun startHandling(initState: GlobalState, playersHistory: PlayersHistory) {
         stateHolder.update { initState }
+        stateHolder.updateHistory { playersHistory }
         startEventHandling()
     }
 
@@ -75,8 +77,17 @@ class EventManagerImpl(
             )
         eventHandlingMonitor.lock()
         return try {
-            val result = handler.handle(action, stateHolder.current)
+            val oldState = stateHolder.current
+            val result = handler.handle(action, oldState)
             stateHolder.update { result }
+            stateHolder.updateHistory {
+                PlayersHistoryCalculator.calculate(
+                    currentHistory = stateHolder.currentPlayersHistory,
+                    action = action,
+                    oldState = oldState,
+                    newState = stateHolder.current
+                )
+            }
             EventManager.HandledAction(action.id, action.issuedAt)
         } catch (error: Exception) {
             EventManager.HandledAction(action.id, action.issuedAt, error)

@@ -4,9 +4,11 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.NotDumb}")
 class NotDumb private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Int>> {
 
@@ -14,7 +16,7 @@ class NotDumb private constructor(override val uid: String) : WheelItem.PendingE
         fun create() = NotDumb(uid = generateWheelItemUid())
     }
 
-    override val id = Id.NotDumb
+    override val id = Id(NotDumb)
 
     override val name = "Стример не тупой"
 
@@ -64,7 +66,7 @@ class NotDumb private constructor(override val uid: String) : WheelItem.PendingE
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.NotDumb
+        override val itemId = Id(NotDumb)
         override fun create() = Companion.create()
     }
 
@@ -78,7 +80,7 @@ class NotDumb private constructor(override val uid: String) : WheelItem.PendingE
             fun create(modifier: Int) = Buff(uid = generateWheelItemUid(), modifier)
         }
 
-        override val id = Id.NotDumb
+        override val id = Id(NotDumb)
 
         override val name = "Стример не тупой"
 
@@ -95,7 +97,7 @@ class NotDumb private constructor(override val uid: String) : WheelItem.PendingE
             fun create(modifier: Int) = Debuff(uid = generateWheelItemUid(), modifier)
         }
 
-        override val id = Id.NotDumb
+        override val id = Id(NotDumb)
 
         override val name = "Стример не тупой (?)"
 

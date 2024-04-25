@@ -10,3 +10,7 @@ private tailrec fun <T> powerSet(left: Collection<T>, acc: List<List<T>>): List<
 }
 
 expect fun getItemFactoriesSet(): Set<WheelItem.Factory>
+
+val wheelItems: List<WheelItem> by lazy {
+    getItemFactoriesSet().map { it.create() }
+}

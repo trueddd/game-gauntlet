@@ -4,9 +4,11 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.ThereIsGiftAtYourDoor}")
 class ThereIsGiftAtYourDoor private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Participant>> {
 
@@ -14,7 +16,7 @@ class ThereIsGiftAtYourDoor private constructor(override val uid: String) : Whee
         fun create() = ThereIsGiftAtYourDoor(uid = generateWheelItemUid())
     }
 
-    override val id = Id.ThereIsGiftAtYourDoor
+    override val id = Id(ThereIsGiftAtYourDoor)
 
     override val name = "\"У вас под дверью насрано\""
 
@@ -60,7 +62,7 @@ class ThereIsGiftAtYourDoor private constructor(override val uid: String) : Whee
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.ThereIsGiftAtYourDoor
+        override val itemId = Id(ThereIsGiftAtYourDoor)
         override fun create() = Companion.create()
     }
 
@@ -71,7 +73,7 @@ class ThereIsGiftAtYourDoor private constructor(override val uid: String) : Whee
         companion object {
             fun create() = StayAfterGame(uid = generateWheelItemUid())
         }
-        override val id = Id.ThereIsGiftAtYourDoor
+        override val id = Id(ThereIsGiftAtYourDoor)
         override val name = "\"У вас под дверью насрано\""
         override val description = "Вам насрали под дверь. После прохождения игры вы остаётесь на текущей клетке."
     }
@@ -84,7 +86,7 @@ class ThereIsGiftAtYourDoor private constructor(override val uid: String) : Whee
         companion object {
             fun create() = Debuff(uid = generateWheelItemUid())
         }
-        override val id = Id.ThereIsGiftAtYourDoor
+        override val id = Id(ThereIsGiftAtYourDoor)
         override val name = "\"У вас под дверью насрано\""
         override val description = "-2 к следующему броску кубика для перехода по секторам. Серун..."
     }

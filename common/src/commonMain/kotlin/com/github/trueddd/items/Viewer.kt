@@ -1,9 +1,11 @@
 package com.github.trueddd.items
 
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.Viewer}")
 class Viewer private constructor(
     override val uid: String,
     override val chargesLeft: Int,
@@ -14,7 +16,7 @@ class Viewer private constructor(
         fun create() = Viewer(uid = generateWheelItemUid(), chargesLeft = 2, isActive = true)
     }
 
-    override val id = Id.Viewer
+    override val id = Id(Viewer)
 
     override val name = "Видосник"
 
@@ -35,7 +37,7 @@ class Viewer private constructor(
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.Viewer
+        override val itemId = Id(Viewer)
         override fun create() = Companion.create()
     }
 }

@@ -19,6 +19,6 @@ class DontUnderstandItemTest : EventGateTest() {
         assertTrue(effectsOf(user).isNotEmpty())
         handleAction(GameSet(user, Game.Id(3)))
         assertTrue(effectsOf(user).isEmpty())
-        assertEquals(expected = 1, stateOf(user).gameHistory.size)
+        assertEquals(expected = 1, gamesOf(user).size)
     }
 }

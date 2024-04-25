@@ -5,9 +5,11 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.ForgotMyGame}")
 class ForgotMyGame private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Boolean>> {
 
@@ -15,7 +17,7 @@ class ForgotMyGame private constructor(override val uid: String) : WheelItem.Pen
         fun create() = ForgotMyGame(uid = generateWheelItemUid())
     }
 
-    override val id = Id.ForgotMyGame
+    override val id = Id(ForgotMyGame)
 
     override val name = "\"Я забыл, во что играл...\""
 
@@ -30,21 +32,26 @@ class ForgotMyGame private constructor(override val uid: String) : WheelItem.Pen
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         val shouldReroll = getParameters(arguments, globalState).parameter1
-        return globalState.updatePlayer(usedBy) { playerState ->
-            playerState.copy(
-                pendingEvents = playerState.pendingEvents.without(uid),
-                gameHistory = if (shouldReroll) {
-                    playerState.updatedHistoryWithLast { it.copy(status = Game.Status.Rerolled) }
-                } else {
-                    playerState.gameHistory
-                },
-            )
+        return if (shouldReroll) {
+            globalState.updatePlayer(usedBy) { playerState ->
+                playerState.copy(
+                    pendingEvents = playerState.pendingEvents.without(uid),
+                    currentGame = playerState.currentGame?.copy(status = Game.Status.Rerolled)
+                )
+            }.updateGameHistory(usedBy) {
+                val lastGame = it.lastOrNull() ?: return@updateGameHistory it
+                it.take(it.size - 1) + lastGame.copy(status = Game.Status.Rerolled)
+            }
+        } else {
+            globalState.updatePlayer(usedBy) { playerState ->
+                playerState.copy(pendingEvents = playerState.pendingEvents.without(uid))
+            }
         }
     }
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.ForgotMyGame
+        override val itemId = Id(ForgotMyGame)
         override fun create() = Companion.create()
     }
 }

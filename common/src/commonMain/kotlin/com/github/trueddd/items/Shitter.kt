@@ -3,17 +3,19 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
+@SerialName("${WheelItem.Shitter}")
 class Shitter private constructor(override val uid: String) : WheelItem.Event() {
 
     companion object {
         fun create() = Shitter(uid = generateWheelItemUid())
     }
 
-    override val id = Id.Shitter
+    override val id = Id(Shitter)
 
     override val name = "Подсеруха"
 
@@ -25,7 +27,8 @@ class Shitter private constructor(override val uid: String) : WheelItem.Event() 
     """.trimIndent()
 
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
-        val everyoneEqualized = globalState.players.values.map { it.position }.distinct().let { it.size == 1 }
+        val everyoneEqualized = globalState.stateSnapshot.playersState.values
+            .map { it.position }.distinct().let { it.size == 1 }
         if (everyoneEqualized) {
             return globalState
         }
@@ -42,7 +45,7 @@ class Shitter private constructor(override val uid: String) : WheelItem.Event() 
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.Shitter
+        override val itemId = Id(Shitter)
         override fun create() = Companion.create()
     }
 
@@ -54,7 +57,7 @@ class Shitter private constructor(override val uid: String) : WheelItem.Event() 
         companion object {
             fun create(modifier: Int) = Debuff(uid = generateWheelItemUid(), modifier = modifier)
         }
-        override val id = Id.Shitter
+        override val id = Id(Shitter)
         override val name = "Подсеруха"
         override val description = """
             -${modifier.absoluteValue} к броску кубика на ход.

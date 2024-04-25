@@ -25,7 +25,7 @@ class DontCareItemTest : EventGateTest() {
         handleAction(GameRoll(user, Game.Id(2)))
         handleAction(ItemReceive(user, DontCare.create()))
         handleAction(GameSet(user, Game.Id(1)))
-        assertEquals(expected = Game.Status.Next, stateOf(user).gameHistory.lastOrNull()?.status)
+        assertEquals(expected = Game.Status.Next, gamesOf(user).lastOrNull()?.status)
         assertEquals(expected = Game.Id(2), stateOf(user).currentActiveGame?.game?.id)
         handleAction(GameStatusChange(user, Game.Status.Finished))
         assertEquals(expected = Game.Id(1), stateOf(user).currentActiveGame?.game?.id)

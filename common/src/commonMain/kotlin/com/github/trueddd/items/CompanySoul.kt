@@ -4,9 +4,11 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.CompanySoul}")
 class CompanySoul private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.Two<Participant, Boolean>> {
 
@@ -14,7 +16,7 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
         fun create() = CompanySoul(uid = generateWheelItemUid())
     }
 
-    override val id = Id.CompanySoul
+    override val id = Id(CompanySoul)
 
     override val name = "Душа компании"
 
@@ -62,7 +64,7 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.CompanySoul
+        override val itemId = Id(CompanySoul)
         override fun create() = Companion.create()
     }
 
@@ -74,7 +76,7 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
         companion object {
             fun create() = JokerBuff(uid = generateWheelItemUid())
         }
-        override val id = Id.CompanySoul
+        override val id = Id(CompanySoul)
         override val name = "Вы - Душа компании"
         override val description = "+1 к следующему броску кубика на ход."
     }
@@ -87,7 +89,7 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
         companion object {
             fun create() = ListenerBuff(uid = generateWheelItemUid())
         }
-        override val id = Id.CompanySoul
+        override val id = Id(CompanySoul)
         override val name = "Зануда"
         override val description = "Попробуй рассмеши тебя - +1 к следующему броску кубика на ход."
     }
@@ -100,7 +102,7 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
         companion object {
             fun create() = JokerDebuff(uid = generateWheelItemUid())
         }
-        override val id = Id.CompanySoul
+        override val id = Id(CompanySoul)
         override val name = "Вы не Душа компании"
         override val description = "Следующий раз ищи анекдоты посмешнее - -1 к следующему броску кубика на ход."
     }
@@ -113,7 +115,7 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
         companion object {
             fun create() = ListenerDebuff(uid = generateWheelItemUid())
         }
-        override val id = Id.CompanySoul
+        override val id = Id(CompanySoul)
         override val name = "Весельчак"
         override val description = "Посмеялись - и хватит. -1 к следующему броску кубика на ход."
     }

@@ -25,7 +25,7 @@ class DontWannaPlayThisItemTest : EventGateTest() {
         handleAction(ItemUse(user, item.uid))
         assertEquals(expected = 0, inventoryOf(user).size)
         assertEquals(expected = 0, effectsOf(user).size)
-        assertEquals(expected = 1, stateOf(user).gameHistory.size)
+        assertEquals(expected = 1, gamesOf(user).size)
         assertEquals(expected = Game.Status.Rerolled, stateOf(user).currentGame?.status)
     }
 }

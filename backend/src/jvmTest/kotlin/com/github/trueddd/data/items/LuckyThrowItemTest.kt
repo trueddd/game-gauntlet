@@ -8,8 +8,8 @@ import com.github.trueddd.data.Game
 import com.github.trueddd.items.LuckyThrow
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.utils.rollDice
+import com.github.trueddd.utils.serialization
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -35,7 +35,7 @@ class LuckyThrowItemTest : EventGateTest() {
         val genre = eventGate.stateHolder.current.gameGenreDistribution.genreAtPosition(diceValue)
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 0, effectsOf(user).size)
-        handleAction(ItemUse(user, item.uid, listOf(Json.encodeToString(Game.Genre.serializer(), genre))))
+        handleAction(ItemUse(user, item.uid, listOf(serialization.encodeToString(Game.Genre.serializer(), genre))))
         assertEquals(expected = 1, effectsOf(user).size)
         assertIs<WheelItem.Effect.Buff>(effectsOf(user).first())
     }
@@ -48,7 +48,7 @@ class LuckyThrowItemTest : EventGateTest() {
         val genre = eventGate.stateHolder.current.gameGenreDistribution.genreAtPosition(diceValue)
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 0, effectsOf(user).size)
-        handleAction(ItemUse(user, item.uid, listOf(Json.encodeToString(Game.Genre.serializer(), genre))))
+        handleAction(ItemUse(user, item.uid, listOf(serialization.encodeToString(Game.Genre.serializer(), genre))))
         assertEquals(expected = 1, effectsOf(user).size)
         assertIs<WheelItem.Effect.Buff>(effectsOf(user).first())
         handleAction(BoardMove(user, diceValue))
@@ -65,7 +65,7 @@ class LuckyThrowItemTest : EventGateTest() {
         val genre = eventGate.stateHolder.current.gameGenreDistribution.genreAtPosition(2)
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 0, effectsOf(user).size)
-        handleAction(ItemUse(user, item.uid, listOf(Json.encodeToString(Game.Genre.serializer(), genre))))
+        handleAction(ItemUse(user, item.uid, listOf(serialization.encodeToString(Game.Genre.serializer(), genre))))
         assertEquals(expected = 1, effectsOf(user).size)
         assertIs<WheelItem.Effect.Buff>(effectsOf(user).first())
         handleAction(BoardMove(user, diceValue))

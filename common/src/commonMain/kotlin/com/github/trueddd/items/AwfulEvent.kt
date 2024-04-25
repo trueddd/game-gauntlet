@@ -5,10 +5,12 @@ import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.github.trueddd.items.AwfulEvent.Debuff
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
+@SerialName("${WheelItem.AwfulEvent}")
 class AwfulEvent private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Int>> {
 
@@ -16,13 +18,14 @@ class AwfulEvent private constructor(override val uid: String) : WheelItem.Pendi
         fun create() = AwfulEvent(uid = generateWheelItemUid())
     }
 
-    override val id = Id.AwfulEvent
+    override val id = Id(AwfulEvent)
 
     override val name = "Плохой ивент"
 
     override val description = """
-        Отними от следующего броска кубика значение в зависимости от количества стримящих в данный момент участников.
-    """.trimIndent()
+        |Отними от следующего броска кубика значение в зависимости от количества 
+        |стримящих в данный момент участников.
+    """.trimMargin()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Int(name = "Количество стримящих участников"))
@@ -44,7 +47,7 @@ class AwfulEvent private constructor(override val uid: String) : WheelItem.Pendi
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.AwfulEvent
+        override val itemId = Id(AwfulEvent)
         override fun create() = Companion.create()
     }
 
@@ -57,7 +60,7 @@ class AwfulEvent private constructor(override val uid: String) : WheelItem.Pendi
             fun create(modifier: Int) = Debuff(uid = generateWheelItemUid(), modifier = -modifier)
         }
 
-        override val id = Id.AwfulEvent
+        override val id = Id(AwfulEvent)
         override val name = "Плохой ивент"
         override val description = """
             -${modifier.absoluteValue} к броску кубика на ход. Спасибо всем, кто был онлайн.

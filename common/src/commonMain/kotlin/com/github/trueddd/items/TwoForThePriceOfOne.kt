@@ -3,16 +3,18 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.TwoForThePriceOfOne}")
 class TwoForThePriceOfOne private constructor(override val uid: String) : WheelItem.Event() {
 
     companion object {
         fun create() = TwoForThePriceOfOne(uid = generateWheelItemUid())
     }
 
-    override val id = Id.TwoForThePriceOfOne
+    override val id = Id(TwoForThePriceOfOne)
 
     override val name = "Два по цене одного"
 
@@ -26,7 +28,7 @@ class TwoForThePriceOfOne private constructor(override val uid: String) : WheelI
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.TwoForThePriceOfOne
+        override val itemId = Id(TwoForThePriceOfOne)
         override fun create() = Companion.create()
     }
 }

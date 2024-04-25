@@ -2,6 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.PlayersHistory
 import com.github.trueddd.data.globalState
 
 /**
@@ -31,5 +32,8 @@ interface EventManager {
 
     fun stopHandling()
 
-    fun startHandling(initState: GlobalState = globalState())
+    fun startHandling(
+        initState: GlobalState = globalState(),
+        playersHistory: PlayersHistory = initState.defaultPlayersHistory()
+    )
 }

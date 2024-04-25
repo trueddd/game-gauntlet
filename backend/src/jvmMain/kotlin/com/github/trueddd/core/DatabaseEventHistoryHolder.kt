@@ -1,20 +1,13 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
-import com.github.trueddd.data.ActionsTable
-import com.github.trueddd.data.GameGenreDistribution
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.globalState
-import com.github.trueddd.utils.DefaultTimeZone
-import com.github.trueddd.utils.Environment
-import com.github.trueddd.utils.Log
-import com.github.trueddd.utils.StateModificationException
+import com.github.trueddd.data.*
+import com.github.trueddd.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -46,13 +39,13 @@ class DatabaseEventHistoryHolder(
         Log.info(TAG, "Saving Global state")
         val timeRange = "${globalState.startDate}:${globalState.endDate}"
         val eventsToSave = getActions()
-        val mapLayout = Json.encodeToString(
+        val mapLayout = serialization.encodeToString(
             GameGenreDistribution.serializer(),
             globalState.gameGenreDistribution
         )
         val events = eventsToSave
             .asReversed()
-            .joinToString("\n") { Json.encodeToString(it) }
+            .joinToString("\n") { serialization.encodeToString(it) }
         val text = buildString {
             appendLine(timeRange)
             appendLine(mapLayout)
@@ -67,7 +60,7 @@ class DatabaseEventHistoryHolder(
         Log.info(TAG, "Global state saved; ${result.size} lines saved")
     }
 
-    override suspend fun load(): GlobalState {
+    override suspend fun load(): LoadedGameState {
         mutex.lock()
         val records = suspendedTransactionAsync(Dispatchers.IO, database) {
             ActionsTable.selectAll().map { it[ActionsTable.value] }
@@ -75,7 +68,8 @@ class DatabaseEventHistoryHolder(
         Log.info(TAG, "Records found: ${records.size}")
         if (records.isEmpty()) {
             mutex.unlock()
-            return globalState()
+            val state = globalState()
+            return LoadedGameState(state, state.defaultPlayersHistory())
         }
         val eventDatesRegex = Regex("^\\d+:\\d+$")
         val (start, end) = records.firstOrNull { it.matches(eventDatesRegex) }
@@ -87,7 +81,7 @@ class DatabaseEventHistoryHolder(
             }
         val genreDistributionRegex = Regex("^\"\\d+\"$")
         val mapLayout = records.firstOrNull { it.matches(genreDistributionRegex) }
-            ?.let { Json.decodeFromString(GameGenreDistribution.serializer(), it) }
+            ?.let { serialization.decodeFromString(GameGenreDistribution.serializer(), it) }
             ?: run {
                 mutex.unlock()
                 throw IllegalStateException("Distribution must be read, but actions list is empty")
@@ -96,24 +90,34 @@ class DatabaseEventHistoryHolder(
             .filter { it.isNotBlank() }
             .filter { it.first() == '{' && it.last() == '}' }
         val events = withContext(Dispatchers.Default) {
-            eventsContent.map { Json.decodeFromString(Action.serializer(), it) }
+            eventsContent.map { serialization.decodeFromString(Action.serializer(), it) }
         }
         val initialState = globalState(
             genreDistribution = mapLayout,
             startDateTime = Instant.fromEpochMilliseconds(start).toLocalDateTime(DefaultTimeZone),
             activePeriod = (end - start).toDuration(DurationUnit.MILLISECONDS),
         )
-        return events.fold(initialState) { state, action ->
+        var playersHistory = initialState.defaultPlayersHistory()
+        val globalState = events.fold(initialState) { state, action ->
             val handler = actionHandlerRegistry.handlerOf(action) ?: return@fold state
             latestEvents.push(action)
             try {
-                handler.handle(action, state)
+                val newState = handler.handle(action, state)
+                playersHistory = PlayersHistoryCalculator.calculate(
+                    currentHistory = playersHistory,
+                    action = action,
+                    oldState = state,
+                    newState = newState
+                )
+                newState
             } catch (error: StateModificationException) {
                 Log.error(TAG, "Error caught while restoring state at action: $action")
                 Log.error(TAG, "Current state: $state")
                 error.printStackTrace()
                 state
             }
-        }.also { mutex.unlock() }
+        }
+        mutex.unlock()
+        return LoadedGameState(globalState, playersHistory)
     }
 }

@@ -1,5 +1,6 @@
 package com.github.trueddd.actions
 
+import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.PlayerState
@@ -7,11 +8,15 @@ import com.github.trueddd.items.*
 import com.github.trueddd.utils.*
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("a${Action.Key.BoardMove}")
 data class BoardMove(
+    @SerialName("rb")
     val rolledBy: Participant,
+    @SerialName("dv")
     val diceValue: Int,
 ) : Action(Key.BoardMove) {
 
@@ -35,10 +40,10 @@ data class BoardMove(
 
         override suspend fun handle(action: BoardMove, currentState: GlobalState): GlobalState {
             val trapsToClear = mutableListOf<Int>()
-            if (currentState.players[action.rolledBy]?.boardMoveAvailable == false) {
+            if (!currentState.stateOf(action.rolledBy).boardMoveAvailable) {
                 throw StateModificationException(action, "Move is not available")
             }
-            val previousStintIndex = currentState[action.rolledBy.name]!!.stintIndex
+            val previousStintIndex = currentState.stateOf(action.rolledBy).stintIndex
             val newState = currentState.updatePlayer(action.rolledBy) { playerState ->
                 val modifiers = playerState.effects
                     .filterIsInstance<DiceRollModifier>()
@@ -50,9 +55,9 @@ data class BoardMove(
                 val finalPosition = (playerState.position + moveValue).coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
                     .let {
                         when {
-                            currentState.boardTraps[it] is BananaSkin.Trap -> {
+                            currentState.stateSnapshot.boardTraps[it] is BananaSkin.Trap -> {
                                 trapsToClear.add(it)
-                                it - 2
+                                it - BananaSkin.STEPS_BACK
                             }
                             else -> it
                         }
@@ -79,14 +84,17 @@ data class BoardMove(
                             else -> null
                         }
                     },
+                    currentGame = currentState.gamesOf(action.rolledBy).lastOrNull { it.status == Game.Status.Next },
                 )
             }
-            val winner = newState.players.entries
+            val winner = newState.stateSnapshot.playersState.entries
                 .firstOrNull { (_, state) -> state.position == currentState.boardLength }
                 ?.key
             return newState.copy(
-                winner = currentState.winner ?: winner,
-                boardTraps = currentState.boardTraps.filterKeys { it !in trapsToClear },
+                stateSnapshot = newState.stateSnapshot.copy(
+                    winner = newState.stateSnapshot.winner ?: winner,
+                    boardTraps = newState.stateSnapshot.boardTraps.filterKeys { it !in trapsToClear },
+                ),
             )
         }
     }

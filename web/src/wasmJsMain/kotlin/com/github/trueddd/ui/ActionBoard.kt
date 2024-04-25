@@ -17,7 +17,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.github.trueddd.actions.Action
 import com.github.trueddd.core.SocketState
-import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.GameConfig
 import com.github.trueddd.data.Participant
 import com.github.trueddd.util.isDevEnvironment
 import com.github.trueddd.util.updateTextFieldOnCtrlV
@@ -35,7 +35,7 @@ private val actions = mapOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActionsBoard(
-    globalState: GlobalState,
+    gameConfig: GameConfig,
     socketState: SocketState,
     participant: Participant?,
     sendAction: (String) -> Unit = {},
@@ -78,13 +78,13 @@ fun ActionsBoard(
                     expanded = userExpanded,
                     onDismissRequest = { userExpanded = false },
                 ) {
-                    globalState.players.keys.map { it.displayName }.forEach {
+                    gameConfig.players.map { it.displayName }.forEach {
                         DropdownMenuItem(
                             text = {
                                 Text(it)
                             },
                             onClick = {
-                                user = globalState.players.firstNotNullOfOrNull { (key, _) ->
+                                user = gameConfig.players.firstNotNullOfOrNull { key ->
                                     if (key.displayName == it) key else null
                                 }
                                 userExpanded = false

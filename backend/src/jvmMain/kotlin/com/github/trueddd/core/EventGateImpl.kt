@@ -31,19 +31,20 @@ class EventGateImpl(
     }
 
     override fun startNoLoad(initialState: GlobalState) {
-        eventManager.startHandling(initialState)
+        eventManager.startHandling(initialState, initialState.defaultPlayersHistory())
     }
 
     override suspend fun start() {
         Log.info(TAG, "Starting...")
-        val savedHistory = historyHolder.load()
-        eventManager.startHandling(savedHistory)
+        val loadedGameState = historyHolder.load()
+        eventManager.startHandling(loadedGameState.globalState, loadedGameState.playersHistory)
     }
 
     override fun stop() {
         Log.info(TAG, "Stopping and clearing...")
         eventManager.stopHandling()
         stateHolder.update { globalState() }
+        stateHolder.updateHistory { stateHolder.current.defaultPlayersHistory() }
         historyHolder.drop()
     }
 
@@ -51,6 +52,7 @@ class EventGateImpl(
         Log.info(TAG, "Resetting in-memory state...")
         eventManager.stopHandling()
         stateHolder.update { globalState() }
+        stateHolder.updateHistory { stateHolder.current.defaultPlayersHistory() }
         historyHolder.drop()
         eventManager.startHandling()
     }

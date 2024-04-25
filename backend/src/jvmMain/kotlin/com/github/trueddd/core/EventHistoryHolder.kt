@@ -2,6 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.LoadedGameState
 import kotlinx.coroutines.flow.Flow
 
 interface EventHistoryHolder {
@@ -29,7 +30,7 @@ interface EventHistoryHolder {
     /**
      * Returns previously saved game state
      */
-    suspend fun load(): GlobalState
+    suspend fun load(): LoadedGameState
 
     /**
      * Resets previously handled action list

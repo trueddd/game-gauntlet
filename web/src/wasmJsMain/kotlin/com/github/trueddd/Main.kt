@@ -12,16 +12,18 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.CanvasBasedWindow
-import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.AuthManager
+import com.github.trueddd.core.GameStateProvider
 import com.github.trueddd.core.SocketState
-import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.di.KoinIntegration
 import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.theme.DarkColors
-import com.github.trueddd.ui.*
+import com.github.trueddd.ui.Archives
+import com.github.trueddd.ui.Dashboard
+import com.github.trueddd.ui.Destination
+import com.github.trueddd.ui.Map
 import com.github.trueddd.ui.profile.ProfileScreen
 import com.github.trueddd.ui.rules.Rules
 import com.github.trueddd.ui.wheels.Wheels
@@ -31,22 +33,17 @@ import kotlinx.coroutines.delay
 fun main() {
     KoinIntegration.start()
     CanvasBasedWindow("AGG2", canvasElementId = "canvas") {
-        val appClient = remember { get<AppClient>() }
-        DisposableEffect(Unit) {
-            appClient.start()
-            onDispose {
-                appClient.stop()
-            }
+        val gameStateProvider = remember { get<GameStateProvider>() }
+        val socketState by gameStateProvider.serverConnectionStateFlow.collectAsState()
+        LaunchedEffect(Unit) {
+            gameStateProvider.initialize()
         }
-        val state by appClient.globalState.collectAsState()
-        val socketState by appClient.connectionState.collectAsState()
         MaterialTheme(
             colorScheme = DarkColors,
         ) {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.primary) {
                 App(
-                    globalState = state,
-                    socketState = socketState,
+                    socketState = socketState
                 )
             }
         }
@@ -55,13 +52,15 @@ fun main() {
 
 @Composable
 private fun App(
-    globalState: GlobalState?,
     socketState: SocketState,
 ) {
     val destinations = Destination.all()
     var destination by remember { mutableStateOf(destinations.first()) }
     val authManager = remember { get<AuthManager>() }
+    val gameStateProvider = remember { get<GameStateProvider>() }
     val user by authManager.userState.collectAsState()
+    val stateSnapshot by gameStateProvider.snapshotFlow.collectAsState()
+    val gameConfig by gameStateProvider.gameConfig.collectAsState()
     LaunchedEffect(Unit) {
         val arguments = authManager.receiveHashParameters()
         authManager.auth(arguments)
@@ -98,16 +97,18 @@ private fun App(
                     )
                 }
                 is Destination.Map -> {
-                    if (globalState != null) {
+                    if (gameConfig != null) {
                         Map(
-                            globalState = globalState
+                            gameConfig = gameConfig!!,
+                            stateSnapshot = stateSnapshot,
                         )
                     }
                 }
                 is Destination.Dashboard -> {
-                    if (globalState != null) {
+                    if (gameConfig != null && stateSnapshot != null) {
                         Dashboard(
-                            globalState = globalState,
+                            gameConfig = gameConfig!!,
+                            stateSnapshot = stateSnapshot!!,
                             socketState = socketState,
                             participant = user,
                             modifier = Modifier
@@ -120,16 +121,20 @@ private fun App(
                     )
                 }
                 is Destination.Profile -> {
-                    ProfileScreen(
-                        currentParticipant = user,
-                        globalState = globalState,
-                        modifier = Modifier
-                    )
+                    if (gameConfig != null) {
+                        ProfileScreen(
+                            currentParticipant = user,
+                            gameConfig = gameConfig!!,
+                            stateSnapshot = stateSnapshot,
+                            modifier = Modifier
+                        )
+                    }
                 }
                 is Destination.Wheels -> {
-                    if (user != null) {
+                    if (user != null && gameConfig != null) {
                         Wheels(
                             participant = user!!,
+                            gameConfig = gameConfig!!,
                             modifier = Modifier
                                 .fillMaxSize()
                         )
@@ -155,7 +160,7 @@ private fun TopPanel(
             NavigationBarItem(
                 selected = currentDestination == destination,
                 onClick = { onDestinationChanged(destination) },
-                enabled = !destination.isPrivate || participant != null,
+                enabled = !destination.requireAuth || participant != null,
                 icon = {
                     Icon(
                         imageVector = if (currentDestination == destination) {
@@ -171,7 +176,7 @@ private fun TopPanel(
                 },
                 modifier = Modifier
                     .pointerHoverIcon(
-                        if (!destination.isPrivate || participant != null) {
+                        if (!destination.requireAuth || participant != null) {
                             PointerIcon.Hand
                         } else {
                             PointerIcon.Default

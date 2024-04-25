@@ -23,17 +23,21 @@ import androidx.compose.ui.unit.sp
 import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.AppStorage
 import com.github.trueddd.core.Command
+import com.github.trueddd.core.CommandSender
+import com.github.trueddd.data.GameConfig
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.Rollable
 import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.util.positionSpinAnimation
+import com.github.trueddd.utils.wheelItems
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Wheels(
     participant: Participant,
+    gameConfig: GameConfig,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -41,6 +45,7 @@ fun Wheels(
         modifier = modifier
     ) {
         val scope = rememberCoroutineScope()
+        val commandSender = remember { get<CommandSender>() }
         val appClient = remember { get<AppClient>() }
         val appStorage = remember { get<AppStorage>() }
         var wheelState by remember {
@@ -53,9 +58,9 @@ fun Wheels(
         }
         LaunchedEffect(wheelState.type) {
             val items = when (wheelState.type) {
-                WheelType.Items -> appClient.getItems()
+                WheelType.Items -> wheelItems
                 WheelType.Games -> appClient.getGames()
-                WheelType.Players -> appClient.getPlayers()
+                WheelType.Players -> gameConfig.players
             }
             wheelState = appStorage.getSavedWheelState(items, wheelState.type)
         }
@@ -112,7 +117,7 @@ fun Wheels(
                     shape = RoundedCornerShape(50),
                     onClick = {
                         (wheelState.rolledItem as? WheelItem)?.let {
-                            appClient.sendCommand(Command.Action.itemReceive(participant, it.id))
+                            commandSender.sendCommand(Command.Action.itemReceive(participant, it.id))
                             wheelState = wheelState.copy(rolledItem = null)
                         }
                     },

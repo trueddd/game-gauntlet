@@ -4,16 +4,18 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.SamuraiLunge}")
 class SamuraiLunge private constructor(override val uid: String) : WheelItem.InventoryItem() {
 
     companion object {
         fun create() = SamuraiLunge(uid = generateWheelItemUid())
     }
 
-    override val id = Id.SamuraiLunge
+    override val id = Id(SamuraiLunge)
 
     override val name = "Самурайский выпад"
 
@@ -33,7 +35,7 @@ class SamuraiLunge private constructor(override val uid: String) : WheelItem.Inv
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.SamuraiLunge
+        override val itemId = Id(SamuraiLunge)
         override fun create() = Companion.create()
     }
 
@@ -44,7 +46,7 @@ class SamuraiLunge private constructor(override val uid: String) : WheelItem.Inv
             fun create() = Buff(uid = generateWheelItemUid())
         }
 
-        override val id = Id.SamuraiLunge
+        override val id = Id(SamuraiLunge)
 
         override val name = "Самурайский выпад"
 

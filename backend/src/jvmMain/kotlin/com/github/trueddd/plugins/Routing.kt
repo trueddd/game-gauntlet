@@ -3,7 +3,6 @@ package com.github.trueddd.plugins
 import com.github.trueddd.core.*
 import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.request.DownloadGameRequestBody
-import com.github.trueddd.di.getItemFactoriesSet
 import com.github.trueddd.utils.Environment
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -31,6 +30,18 @@ fun Application.configureRouting() {
             cacheControl { listOf(CacheControl.MaxAge(maxAgeSeconds = 3600)) }
         }
 
+        // Called once user opens web app
+        get(Router.CONFIG) {
+            cache()
+            call.respond(eventGate.stateHolder.current.gameConfig)
+        }
+
+        get(Router.SNAPSHOT) {
+            cache()
+            call.respond(eventGate.stateHolder.current.stateSnapshot)
+        }
+
+        // Wheel scope
         authenticate {
             get(Router.ACTIONS) {
                 call.respond(eventGate.historyHolder.getActions())
@@ -38,12 +49,6 @@ fun Application.configureRouting() {
             get(Router.Wheels.GAMES) {
                 cache()
                 val items = gamesProvider.listAll()
-                call.respond(items)
-            }
-            get(Router.Wheels.PLAYERS) {
-                cache()
-                val user = call.userLogin!!
-                val items = eventGate.stateHolder.participants.filter { it.name != user }
                 call.respond(items)
             }
             get(Router.Wheels.ROLL_ITEMS) {
@@ -56,6 +61,14 @@ fun Application.configureRouting() {
                 val user = call.userLogin!!
                 call.respond(eventGate.stateHolder.participants.filter { it.name != user }.random())
             }
+        }
+
+        // Profile scope
+        get(Router.TURNS) {
+            if (call.userLogin == null) {
+                cache()
+            }
+            call.respond(eventGate.stateHolder.currentPlayersHistory)
         }
 
         post(Router.LOAD_GAME) {
@@ -83,12 +96,6 @@ fun Application.configureRouting() {
             if (call.response.isSent) {
                 downloadedFile.delete()
             }
-        }
-
-        get(Router.Wheels.ITEMS) {
-            cache()
-            val items = getItemFactoriesSet().map { it.create() }
-            call.respond(items)
         }
 
         post(Router.USER) {

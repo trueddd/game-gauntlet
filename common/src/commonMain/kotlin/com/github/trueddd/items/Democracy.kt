@@ -6,10 +6,12 @@ import com.github.trueddd.data.without
 import com.github.trueddd.items.Democracy.Buff
 import com.github.trueddd.items.Democracy.Debuff
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
+@SerialName("${WheelItem.Democracy}")
 class Democracy private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Boolean>> {
 
@@ -17,7 +19,7 @@ class Democracy private constructor(override val uid: String) : WheelItem.Pendin
         fun create() = Democracy(uid = generateWheelItemUid())
     }
 
-    override val id = Id.Democracy
+    override val id = Id(Democracy)
 
     override val name = "Демократия"
 
@@ -44,7 +46,7 @@ class Democracy private constructor(override val uid: String) : WheelItem.Pendin
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.Democracy
+        override val itemId = Id(Democracy)
         override fun create() = Companion.create()
     }
 
@@ -56,7 +58,7 @@ class Democracy private constructor(override val uid: String) : WheelItem.Pendin
         companion object {
             fun create() = Buff(uid = generateWheelItemUid())
         }
-        override val id = Id.Democracy
+        override val id = Id(Democracy)
         override val name = "Демократия"
         override val description = "+${modifier.absoluteValue} к броску кубика на ход."
     }
@@ -69,7 +71,7 @@ class Democracy private constructor(override val uid: String) : WheelItem.Pendin
         companion object {
             fun create() = Debuff(uid = generateWheelItemUid())
         }
-        override val id = Id.Democracy
+        override val id = Id(Democracy)
         override val name = "Демократия"
         override val description = "-${modifier.absoluteValue} к броску кубика на ход."
     }

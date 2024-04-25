@@ -40,68 +40,6 @@ sealed class WheelItem : Rollable {
     @Serializable
     value class Id(val value: Int) {
         fun asString() = value.toString()
-        companion object {
-            val PowerThrow = Id(1)
-            val WeakThrow = Id(2)
-            val YouDoNotNeedThis = Id(3)
-            val SamuraiLunge = Id(4)
-            val NegativeWheel = Id(5)
-            val Reroll = Id(6)
-            val Gamer = Id(7)
-            val Viewer = Id(8)
-            val ChargedDice = Id(9)
-            val HaveATry = Id(10)
-            val NoClownery = Id(11)
-            val BananaSkin = Id(12)
-            val WillOfChance = Id(13)
-            val WillOfGoodChance = Id(14)
-            val WillOfBadChance = Id(15)
-            val BabySupport = Id(16)
-            val LoyalModerator = Id(17)
-            val ClimbingRope = Id(18)
-            val WannaSwap = Id(19)
-            val DontWannaPlayThis = Id(20)
-            val HoleyPockets = Id(21)
-            val PlusOneBuff = Id(22)
-            val MinusOneDebuff = Id(23)
-            val PlusToEveryone = Id(24)
-            val PlusToEveryoneButYou = Id(25)
-            val MinusToEveryone = Id(26)
-            val MinusToEveryoneButYou = Id(27)
-            val Plasticine = Id(28)
-            val Earthquake = Id(29)
-            val DontCare = Id(30)
-            val RatMove = Id(31)
-            val LuckyThrow = Id(32)
-            val FamilyFriendlyStreamer = Id(33)
-            val ForgotMyGame = Id(34)
-            val NotDumb = Id(35)
-            val YourStream = Id(36)
-            val IWouldBeatIt = Id(37)
-            val DontUnderstand = Id(38)
-            val CompanySoul = Id(39)
-            val EasterCakeBang = Id(40)
-            val ImportSubstitution = Id(41)
-            val Classic = Id(42)
-            val FarmsDigsAndRobots = Id(43)
-            val DiceBattle = Id(44)
-            val Democracy = Id(45)
-            val UnbelievableDemocracy = Id(46)
-            val Relocation = Id(47)
-            val ShoppingWithChat = Id(48)
-            val TwoForThePriceOfOne = Id(49)
-            val GreatEvent = Id(50)
-            val AwfulEvent = Id(51)
-            val UnrealBoost = Id(52)
-            val MongoliaDoesNotExist = Id(53)
-            val Teleport = Id(54)
-            val NimbleFingers = Id(55)
-            val Poll = Id(56)
-            val Shitter = Id(57)
-            val UnrecognizedDisk = Id(58)
-            val FewLetters = Id(59)
-            val ThereIsGiftAtYourDoor = Id(60)
-        }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -152,6 +90,70 @@ sealed class WheelItem : Rollable {
             override val color: Long
                 get() = Colors.DEBUFF
         }
+    }
+
+    @Suppress("ConstPropertyName")
+    companion object {
+        const val PowerThrow = 1
+        const val WeakThrow = 2
+        const val YouDoNotNeedThis = 3
+        const val SamuraiLunge = 4
+        const val NegativeWheel = 5
+        const val Reroll = 6
+        const val Gamer = 7
+        const val Viewer = 8
+        const val ChargedDice = 9
+        const val HaveATry = 10
+        const val NoClownery = 11
+        const val BananaSkin = 12
+        const val WillOfChance = 13
+        const val WillOfGoodChance = 14
+        const val WillOfBadChance = 15
+        const val BabySupport = 16
+        const val LoyalModerator = 17
+        const val ClimbingRope = 18
+        const val WannaSwap = 19
+        const val DontWannaPlayThis = 20
+        const val HoleyPockets = 21
+        const val PlusOneBuff = 22
+        const val MinusOneDebuff = 23
+        const val PlusToEveryone = 24
+        const val PlusToEveryoneButYou = 25
+        const val MinusToEveryone = 26
+        const val MinusToEveryoneButYou = 27
+        const val Plasticine = 28
+        const val Earthquake = 29
+        const val DontCare = 30
+        const val RatMove = 31
+        const val LuckyThrow = 32
+        const val FamilyFriendlyStreamer = 33
+        const val ForgotMyGame = 34
+        const val NotDumb = 35
+        const val YourStream = 36
+        const val IWouldBeatIt = 37
+        const val DontUnderstand = 38
+        const val CompanySoul = 39
+        const val EasterCakeBang = 40
+        const val ImportSubstitution = 41
+        const val Classic = 42
+        const val FarmsDigsAndRobots = 43
+        const val DiceBattle = 44
+        const val Democracy = 45
+        const val UnbelievableDemocracy = 46
+        const val Relocation = 47
+        const val ShoppingWithChat = 48
+        const val TwoForThePriceOfOne = 49
+        const val GreatEvent = 50
+        const val AwfulEvent = 51
+        const val UnrealBoost = 52
+        const val MongoliaDoesNotExist = 53
+        const val Teleport = 54
+        const val NimbleFingers = 55
+        const val Poll = 56
+        const val Shitter = 57
+        const val UnrecognizedDisk = 58
+        const val FewLetters = 59
+        const val ThereIsGiftAtYourDoor = 60
     }
 }
 

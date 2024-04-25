@@ -25,4 +25,8 @@ object StringResources {
         const val Rerolled = "Реролл"
         const val Next = "Следующая"
     }
+    object RelativeDate {
+        const val Today = "Сегодня"
+        const val Yesterday = "Вчера"
+    }
 }

@@ -2,7 +2,8 @@ package com.github.trueddd.actions
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
-import com.github.trueddd.utils.Timer
+import kotlinx.datetime.Clock
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -12,8 +13,10 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 sealed class Action(
+    @SerialName("id")
     open val id: Int,
-    val issuedAt: Long = Timer.currentTimeMillis(),
+    @SerialName("ia")
+    val issuedAt: Long = Clock.System.now().toEpochMilliseconds(),
 ) {
 
     @Suppress("ConstPropertyName")
@@ -31,9 +34,7 @@ sealed class Action(
      * Action generator is a component that creates actions from entered command by any participant.
      */
     interface Generator<out A : Action> {
-
         val actionKey: Int
-
         fun generate(participant: Participant, arguments: List<String>): A
     }
 

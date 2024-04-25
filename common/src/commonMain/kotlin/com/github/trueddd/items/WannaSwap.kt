@@ -5,9 +5,11 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.WannaSwap}")
 class WannaSwap private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Participant>> {
 
@@ -15,7 +17,7 @@ class WannaSwap private constructor(override val uid: String) : WheelItem.Pendin
         fun create() = WannaSwap(uid = generateWheelItemUid())
     }
 
-    override val id = Id.WannaSwap
+    override val id = Id(WannaSwap)
 
     override val name = "\"Махнёмся не глядя?\""
 
@@ -50,23 +52,19 @@ class WannaSwap private constructor(override val uid: String) : WheelItem.Pendin
             ?: throw IllegalStateException("The game of user must be in active state")
         val gameToSwap = globalState.stateOf(swapPlayer).currentActiveGame
             ?: throw IllegalStateException("The game of another player must be in active state")
-        return globalState.updatePlayers { participant, playerState ->
-            when (participant.name) {
-                usedBy.name -> playerState.copy(
-                    gameHistory = playerState.updatedHistoryWithLast { gameToSwap.copy(status = Game.Status.InProgress) },
-                    pendingEvents = playerState.pendingEvents.without(uid),
-                )
-                swapPlayer.name -> playerState.copy(
-                    gameHistory = playerState.updatedHistoryWithLast { userGame.copy(status = Game.Status.InProgress) },
-                )
-                else -> playerState
-            }
+        return globalState.updateGameHistory(usedBy) { history ->
+            history.dropLast(1) + gameToSwap.copy(status = Game.Status.InProgress)
+        }.updateGameHistory(swapPlayer) { history ->
+            history.dropLast(1) + userGame.copy(status = Game.Status.InProgress)
         }
+            .updateCurrentGame(usedBy)
+            .updateCurrentGame(swapPlayer)
+            .updatePlayer(usedBy) { it.copy(pendingEvents = it.pendingEvents.without(uid)) }
     }
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.WannaSwap
+        override val itemId = Id(WannaSwap)
         override fun create() = Companion.create()
     }
 }

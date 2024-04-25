@@ -1,7 +1,7 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
-import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.StateSnapshot
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -31,9 +31,9 @@ sealed class Response {
 
     abstract val serialized: String
 
-    data class State(val globalState: GlobalState) : Response() {
+    data class State(val snapshot: StateSnapshot) : Response() {
         override val serialized: String
-            get() = "s:${encoder.encodeToString(globalState)}"
+            get() = "s:${encoder.encodeToString(snapshot)}"
     }
 
     data class UserAction(val action: Action) : Response() {

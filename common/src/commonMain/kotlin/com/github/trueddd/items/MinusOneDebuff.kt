@@ -1,15 +1,17 @@
 package com.github.trueddd.items
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.MinusOneDebuff}")
 class MinusOneDebuff private constructor(override val uid: String) : WheelItem.Effect.Debuff(), DiceRollModifier {
 
     companion object {
         fun create() = MinusOneDebuff(uid = generateWheelItemUid())
     }
 
-    override val id = Id.MinusOneDebuff
+    override val id = Id(MinusOneDebuff)
 
     override val name = "Минус один"
 

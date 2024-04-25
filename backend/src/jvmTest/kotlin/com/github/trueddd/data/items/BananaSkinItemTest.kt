@@ -36,6 +36,6 @@ class BananaSkinItemTest : EventGateTest() {
 
         handleAction(BoardMove(userToStep, diceValue = 4))
         assertEquals(expected = 2, positionOf(userToStep))
-        assertTrue(eventGate.stateHolder.current.boardTraps.isEmpty())
+        assertTrue(eventGate.stateHolder.current.stateSnapshot.boardTraps.isEmpty())
     }
 }

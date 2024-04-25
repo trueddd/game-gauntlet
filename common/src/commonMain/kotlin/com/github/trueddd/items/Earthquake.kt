@@ -4,16 +4,18 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.isEven
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.Earthquake}")
 class Earthquake private constructor(override val uid: String) : WheelItem.Event() {
 
     companion object {
         fun create() = Earthquake(uid = generateWheelItemUid())
     }
 
-    override val id = Id.Earthquake
+    override val id = Id(Earthquake)
 
     override val name = "Землетрясение"
 
@@ -35,7 +37,7 @@ class Earthquake private constructor(override val uid: String) : WheelItem.Event
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.Earthquake
+        override val itemId = Id(Earthquake)
         override fun create() = Companion.create()
     }
 }

@@ -1,18 +1,16 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
-import com.github.trueddd.data.GameGenreDistribution
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.globalState
+import com.github.trueddd.data.*
 import com.github.trueddd.utils.DefaultTimeZone
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
+import com.github.trueddd.utils.serialization
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.io.File
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -38,10 +36,13 @@ open class LocalEventHistoryHolder(
         Log.info(TAG, "Saving Global state")
         val eventsToSave = getActions()
         val timeRange = "${globalState.startDate}:${globalState.endDate}"
-        val mapLayout = Json.encodeToString(GameGenreDistribution.serializer(), globalState.gameGenreDistribution)
+        val mapLayout = serialization.encodeToString(
+            GameGenreDistribution.serializer(),
+            globalState.gameGenreDistribution
+        )
         val events = eventsToSave
             .asReversed()
-            .joinToString("\n") { Json.encodeToString(it) }
+            .joinToString("\n") { serialization.encodeToString(it) }
         val text = buildString {
             appendLine(timeRange)
             appendLine(mapLayout)
@@ -57,7 +58,7 @@ open class LocalEventHistoryHolder(
         Log.info(TAG, "Global state saved")
     }
 
-    override suspend fun load(): GlobalState {
+    override suspend fun load(): LoadedGameState {
         val fileContent = withContext(Dispatchers.IO) {
             historyHolderFile.readLines()
         }
@@ -67,21 +68,29 @@ open class LocalEventHistoryHolder(
                 ?.let { (start, end) -> start.toLong() to end.toLong() }
                 ?: throw IllegalArgumentException("Error while parsing game time range")
             val mapLayout = fileContent.getOrNull(1)
-                ?.let { Json.decodeFromString(GameGenreDistribution.serializer(), it) }
+                ?.let { serialization.decodeFromString(GameGenreDistribution.serializer(), it) }
                 ?: throw IllegalArgumentException("Error while parsing map layout")
             val events = fileContent
                 .drop(2)
                 .filter { it.isNotBlank() }
-                .map { Json.decodeFromString(Action.serializer(), it) }
+                .map { serialization.decodeFromString(Action.serializer(), it) }
             val initialState = globalState(
                 genreDistribution = mapLayout,
                 startDateTime = Instant.fromEpochMilliseconds(start).toLocalDateTime(DefaultTimeZone),
                 activePeriod = (end - start).toDuration(DurationUnit.MILLISECONDS),
             )
-            events.fold(initialState) { state, action ->
+            var playersHistory = initialState.defaultPlayersHistory()
+            val globalState = events.fold(initialState) { state, action ->
                 val handler = actionHandlerRegistry.handlerOf(action) ?: return@fold state
                 try {
-                    handler.handle(action, state)
+                    val newState = handler.handle(action, state)
+                    playersHistory = PlayersHistoryCalculator.calculate(
+                        currentHistory = playersHistory,
+                        action = action,
+                        oldState = state,
+                        newState = newState
+                    )
+                    newState
                 } catch (error: StateModificationException) {
                     Log.error(TAG, "Error caught while restoring state at action: $action")
                     Log.error(TAG, "Current state: $state")
@@ -89,6 +98,7 @@ open class LocalEventHistoryHolder(
                     state
                 }
             }
+            LoadedGameState(globalState, playersHistory)
         }
     }
 }

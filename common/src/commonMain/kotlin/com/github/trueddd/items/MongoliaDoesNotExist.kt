@@ -4,10 +4,12 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.absoluteValue
 
 @Serializable
+@SerialName("${WheelItem.MongoliaDoesNotExist}")
 class MongoliaDoesNotExist private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Boolean>> {
 
@@ -15,7 +17,7 @@ class MongoliaDoesNotExist private constructor(override val uid: String) : Wheel
         fun create() = MongoliaDoesNotExist(uid = generateWheelItemUid())
     }
 
-    override val id = Id.MongoliaDoesNotExist
+    override val id = Id(MongoliaDoesNotExist)
 
     override val name = "Монголии не существует"
 
@@ -46,7 +48,7 @@ class MongoliaDoesNotExist private constructor(override val uid: String) : Wheel
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.MongoliaDoesNotExist
+        override val itemId = Id(MongoliaDoesNotExist)
         override fun create() = Companion.create()
     }
 
@@ -59,7 +61,7 @@ class MongoliaDoesNotExist private constructor(override val uid: String) : Wheel
             fun create() = Buff(uid = generateWheelItemUid(), modifier = 2)
         }
 
-        override val id = Id.MongoliaDoesNotExist
+        override val id = Id(MongoliaDoesNotExist)
         override val name = "Монголия существует"
         override val description = """
             Монголия существует. И теперь все это знают. +${modifier.absoluteValue} к броску кубика на ход.
@@ -75,7 +77,7 @@ class MongoliaDoesNotExist private constructor(override val uid: String) : Wheel
             fun create() = Debuff(uid = generateWheelItemUid(), modifier = -2)
         }
 
-        override val id = Id.MongoliaDoesNotExist
+        override val id = Id(MongoliaDoesNotExist)
         override val name = "Монголии не существует"
         override val description = """
             Монголия, кажется, и правда не существует. -${modifier.absoluteValue} к броску кубика на ход.

@@ -1,72 +1,111 @@
 package com.github.trueddd.data
 
-import com.github.trueddd.items.BoardTrap
+import com.github.trueddd.actions.Action
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Contains all information about current game state.
+ * But not everything should be delivered to frontend as single package.
+ */
 @Serializable
 data class GlobalState(
-    val startDate: Long,
-    val endDate: Long,
-    val players: Map<Participant, PlayerState>,
-    val boardLength: Int,
-    val winner: Participant? = null,
+    @SerialName("ac")
+    val actions: List<Action>,
+    @SerialName("pl")
+    val players: List<Participant>,
+    @SerialName("ss")
+    val stateSnapshot: StateSnapshot,
+    @SerialName("gh")
+    val gameHistory: Map<PlayerName, List<GameHistoryEntry>>,
+    @SerialName("gd")
     val gameGenreDistribution: GameGenreDistribution,
-    val boardTraps: Map<Int, BoardTrap> = mapOf(),
+    @SerialName("sd")
+    val startDate: Long,
+    @SerialName("ed")
+    val endDate: Long,
 ) {
 
     companion object {
         const val START_POSITION = 0
         const val STINT_COUNT = 25
         val STINT_SIZE = Game.Genre.entries.size
-        val PLAYABLE_BOARD_RANGE = 1 .. STINT_SIZE * STINT_COUNT
+        val PLAYABLE_BOARD_RANGE = 1..STINT_SIZE * STINT_COUNT
     }
 
-    fun stateOf(participant: Participant) = get(participant.name)!!
+    val boardLength: Int
+        get() = STINT_SIZE * STINT_COUNT
+
+    val gameConfig: GameConfig
+        get() = GameConfig(players, gameGenreDistribution, startDate, endDate)
+
+    fun stateOf(participant: Participant) = stateSnapshot.playersState[participant.name]!!
     fun effectsOf(participant: Participant) = stateOf(participant).effects
     fun pendingEventsOf(participant: Participant) = stateOf(participant).pendingEvents
     fun inventoryOf(participant: Participant) = stateOf(participant).inventory
     fun positionOf(participant: Participant) = stateOf(participant).position
+    fun gamesOf(participant: Participant) = gameHistory[participant.name]!!
 
     fun getAllEverRolledGames(): List<Game> {
-        return players.values
-            .flatMap { it.gameHistory }
-            .map { it.game }
+        return gameHistory.flatMap { (_, games) -> games.map(GameHistoryEntry::game) }
     }
 
     fun getDroppedGames(): List<Game.Id> {
-        return players.values.flatMap { playerState ->
-            playerState.gameHistory
-                .filter { it.status == Game.Status.Dropped }
+        return gameHistory.flatMap { (_, games) ->
+            games.filter { it.status == Game.Status.Dropped }
                 .map { it.game.id }
         }
     }
 
     fun participantByName(name: String): Participant? {
-        return players.keys.firstOrNull { it.name == name }
+        return players.firstOrNull { it.name == name }
     }
 
     fun positionAmongPlayers(player: Participant): Int {
-        val positions = players.values.map { it.position }.distinct().sortedDescending()
+        val positions = stateSnapshot.playersState.values.map { it.position }.distinct().sortedDescending()
         return positions.indexOf(positionOf(player))
     }
 
-    operator fun get(playerName: String): PlayerState? {
-        return players.entries.firstOrNull { (key, _) -> key.name == playerName }?.value
+    fun updateCurrentGame(participant: Participant): GlobalState {
+        return updatePlayer(participant) { state ->
+            state.copy(
+                currentGame = gameHistory[participant.name]?.lastOrNull { it.status != Game.Status.Next }
+            )
+        }
     }
 
-    fun updatePlayer(participant: Participant, block: (PlayerState) -> PlayerState): GlobalState {
-        return this.copy(players = players.mapValues { (player, playerState) ->
-            if (player == participant) {
-                block(playerState)
+    fun updateGameHistory(
+        participant: Participant,
+        block: (List<GameHistoryEntry>) -> List<GameHistoryEntry>
+    ): GlobalState {
+        return this.copy(gameHistory = gameHistory.mapValues { (playerName, history) ->
+            if (playerName == participant.name) {
+                block(history)
             } else {
-                playerState
+                history
             }
         })
     }
 
-    fun updatePlayers(block: (Participant, PlayerState) -> PlayerState): GlobalState {
-        return this.copy(players = players.mapValues { (player, playerState) ->
-            block(player, playerState)
-        })
+    fun updatePlayer(participant: Participant, block: (PlayerState) -> PlayerState): GlobalState {
+        return this.copy(stateSnapshot = stateSnapshot.copy(
+            playersState = stateSnapshot.playersState.mapValues { (player, playerState) ->
+                if (player == participant.name) {
+                    block(playerState)
+                } else {
+                    playerState
+                }
+            }
+        ))
     }
+
+    fun updatePlayers(block: (Participant, PlayerState) -> PlayerState): GlobalState {
+        return this.copy(stateSnapshot = stateSnapshot.copy(
+            playersState = stateSnapshot.playersState.mapValues { (playerName, state) ->
+                block(participantByName(playerName)!!, state)
+            }
+        ))
+    }
+
+    fun defaultPlayersHistory() = players.associate { it.name to PlayerTurnsHistory(emptyList()) }
 }

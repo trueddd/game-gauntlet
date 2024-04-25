@@ -6,11 +6,15 @@ import com.github.trueddd.data.Participant
 import com.github.trueddd.items.*
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("a${Action.Key.ItemReceive}")
 data class ItemReceive(
+    @SerialName("rb")
     val receivedBy: Participant,
+    @SerialName("wi")
     val item: WheelItem,
 ) : Action(Key.ItemReceive) {
 
@@ -61,7 +65,7 @@ data class ItemReceive(
                 }
                 is BabySupport -> {
                     currentState.updatePlayer(action.receivedBy) { state ->
-                        if (currentState.players.minOf { it.value.position } == state.position) {
+                        if (currentState.stateSnapshot.playersState.minOf { it.value.position } == state.position) {
                             state.copy(effects = state.effects + action.item)
                         } else {
                             state

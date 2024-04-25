@@ -4,9 +4,11 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.NimbleFingers}")
 class NimbleFingers private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<String>> {
 
@@ -14,7 +16,7 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
         fun create() = NimbleFingers(uid = generateWheelItemUid())
     }
 
-    override val id = Id.NimbleFingers
+    override val id = Id(NimbleFingers)
 
     override val name = "Ловкие пальцы"
 
@@ -36,9 +38,9 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         val parameters = getParameters(arguments, globalState)
         val targetItemId = parameters.parameter1
-        val targetUser = globalState.players.firstNotNullOfOrNull { (player, state) ->
+        val targetUser = globalState.stateSnapshot.playersState.firstNotNullOfOrNull { (player, state) ->
             if (state.inventory.any { it.uid == targetItemId }) {
-                player
+                globalState.players.firstOrNull { it.name == player }
             } else {
                 null
             }
@@ -60,12 +62,14 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
     }
 
     fun canUse(user: Participant, globalState: GlobalState): Boolean {
-        return globalState.players.any { (player, state) -> player != user && state.inventory.isNotEmpty() }
+        return globalState.stateSnapshot.playersState.any { (player, state) ->
+            player != user.name && state.inventory.isNotEmpty()
+        }
     }
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.NimbleFingers
+        override val itemId = Id(NimbleFingers)
         override fun create() = Companion.create()
     }
 }

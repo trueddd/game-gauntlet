@@ -4,9 +4,11 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("${WheelItem.RatMove}")
 class RatMove private constructor(override val uid: String) : WheelItem.PendingEvent(),
     Parametrized<Parameters.One<Participant?>> {
 
@@ -14,7 +16,7 @@ class RatMove private constructor(override val uid: String) : WheelItem.PendingE
         fun create() = RatMove(uid = generateWheelItemUid())
     }
 
-    override val id = Id.RatMove
+    override val id = Id(RatMove)
 
     override val name = "Крысиный поступок"
 
@@ -51,7 +53,7 @@ class RatMove private constructor(override val uid: String) : WheelItem.PendingE
 
     @ItemFactory
     class Factory : WheelItem.Factory {
-        override val itemId = Id.RatMove
+        override val itemId = Id(RatMove)
         override fun create() = Companion.create()
     }
 }
