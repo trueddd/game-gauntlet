@@ -1,5 +1,6 @@
 package com.github.trueddd.core
 
+import com.github.trueddd.data.Game
 import com.github.trueddd.data.Participant
 import com.github.trueddd.items.WheelItem
 
@@ -52,6 +53,13 @@ sealed class Command(val value: String) {
                 append(":")
                 append(item.uid)
                 arguments.forEach { append(":$it") }
+            }.let { Action(it) }
+            fun gameStatusChange(player: Participant, status: Game.Status) = buildString {
+                append(player.name)
+                append(":")
+                append(com.github.trueddd.actions.Action.Key.GameStatusChange)
+                append(":")
+                append(status.ordinal)
             }.let { Action(it) }
         }
     }

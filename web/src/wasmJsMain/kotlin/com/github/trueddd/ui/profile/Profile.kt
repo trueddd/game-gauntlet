@@ -200,8 +200,10 @@ private fun Profile(
     turnsHistory: PlayerTurnsHistory,
     modifier: Modifier = Modifier,
 ) {
+    val selectedPlayerState = stateSnapshot.playersState[selectedPlayer.name]!!
     val commandSender = remember { get<CommandSender>() }
     var dialogItem by remember { mutableStateOf<WheelItem?>(null) }
+    var gameStatusDialogVisible by remember { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
     val leftSidePanelTopPadding by remember {
         derivedStateOf {
@@ -386,7 +388,14 @@ private fun Profile(
                                     modifier = Modifier
                                         .weight(1f)
                                 ) {
-                                    Text(text = turn.game?.status?.localized ?: "-")
+                                    Text(
+                                        text = turn.game?.status?.localized ?: "-",
+                                        color = when (turn.game?.status) {
+                                            Game.Status.Finished -> Colors.GameStatus.Finished
+                                            Game.Status.Dropped -> Colors.GameStatus.Dropped
+                                            else -> Color.Unspecified
+                                        }
+                                    )
                                 }
                             }
                         }
@@ -402,7 +411,9 @@ private fun Profile(
                     .and(visibleItems.isNotEmpty())
             }
         }
+        // Left side panel
         Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .padding(top = leftSidePanelTopPadding
@@ -420,7 +431,6 @@ private fun Profile(
                     .padding(8.dp)
                     .background(Color.White, CircleShape)
             )
-            Spacer(modifier = Modifier.height(16.dp))
             Card(
                 shape = RoundedCornerShape(50),
                 modifier = Modifier
@@ -432,6 +442,12 @@ private fun Profile(
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 )
+            }
+            TextButton(
+                onClick = { gameStatusDialogVisible = true },
+                enabled = selectedPlayer == currentPlayer && selectedPlayerState.hasCurrentActive,
+            ) {
+                Text("Изменить статус игры")
             }
             AnimatedVisibility(
                 visible = shouldShowSideStats,
@@ -466,6 +482,22 @@ private fun Profile(
                     dialogItem = null
                 },
                 onDialogDismiss = { dialogItem = null }
+            )
+        }
+        if (gameStatusDialogVisible && currentPlayer != null) {
+            GameStatusChangeDialog(
+                player = currentPlayer,
+                stateSnapshot = stateSnapshot,
+                onStatusChangeRequested = { status ->
+                    Log.info(TAG, "setting new status: $status")
+                    if (status == Game.Status.Dropped) {
+//                        commandSender.sendCommand(Command.Action.gameDrop(currentPlayer))
+                    } else {
+                        commandSender.sendCommand(Command.Action.gameStatusChange(currentPlayer, status))
+                    }
+                    gameStatusDialogVisible = false
+                },
+                onDialogDismiss = { gameStatusDialogVisible = false }
             )
         }
     }

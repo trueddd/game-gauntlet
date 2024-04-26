@@ -38,9 +38,13 @@ val DarkColors = darkColorScheme(
 
 @Stable
 object Colors {
-    val Warning = Color(0xFFFBBF24)
+    val Warning = Color(0xFFE1A326)
     val Success = Color(0xFF4ADE80)
     val Error = Color(0xFFF87171)
     val White = Color.White
     val DefaultGenre = Color(0xFFECFDF5)
+    object GameStatus {
+        val Finished = Color(0xFF508E5E)
+        val Dropped = Color(0xFF8C3D51)
+    }
 }

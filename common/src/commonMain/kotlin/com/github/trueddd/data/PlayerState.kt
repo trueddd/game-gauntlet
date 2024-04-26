@@ -13,6 +13,8 @@ import kotlinx.serialization.Serializable
  * @property inventory current set of inventory item of player available for them to use.
  * @property effects current set of effects that are applied to player.
  * @property pendingEvents current set of events that have been received be player and now awaiting to be used.
+ * @property currentGame current game that player is playing. Can be null if player has not rolled any game yet.
+ * For more detailed info see [gameHistory][com.github.trueddd.data.GlobalState.gameHistory].
  */
 @Serializable
 data class PlayerState(
