@@ -61,6 +61,13 @@ sealed class Command(val value: String) {
                 append(":")
                 append(status.ordinal)
             }.let { Action(it) }
+            fun gameDrop(player: Participant, diceValue: Int) = buildString {
+                append(player.name)
+                append(":")
+                append(com.github.trueddd.actions.Action.Key.GameDrop)
+                append(":")
+                append(diceValue)
+            }.let { Action(it) }
         }
     }
 

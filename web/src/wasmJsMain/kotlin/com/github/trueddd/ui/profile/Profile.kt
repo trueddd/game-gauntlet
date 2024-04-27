@@ -488,13 +488,14 @@ private fun Profile(
             GameStatusChangeDialog(
                 player = currentPlayer,
                 stateSnapshot = stateSnapshot,
-                onStatusChangeRequested = { status ->
-                    Log.info(TAG, "setting new status: $status")
-                    if (status == Game.Status.Dropped) {
-//                        commandSender.sendCommand(Command.Action.gameDrop(currentPlayer))
-                    } else {
-                        commandSender.sendCommand(Command.Action.gameStatusChange(currentPlayer, status))
+                onStatusChangeRequested = { statusChangeRequest ->
+                    Log.info(TAG, "setting new status: $statusChangeRequest")
+                    val command = when (statusChangeRequest) {
+                        is StatusChangeRequest.Dropped -> Command.Action.gameDrop(currentPlayer, statusChangeRequest.diceValue)
+                        is StatusChangeRequest.Finished -> Command.Action.gameStatusChange(currentPlayer, Game.Status.Finished)
+                        is StatusChangeRequest.Rerolled -> Command.Action.gameStatusChange(currentPlayer, Game.Status.Rerolled)
                     }
+                    commandSender.sendCommand(command)
                     gameStatusDialogVisible = false
                 },
                 onDialogDismiss = { gameStatusDialogVisible = false }
