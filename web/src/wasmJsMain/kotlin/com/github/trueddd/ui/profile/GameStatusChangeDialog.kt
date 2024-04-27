@@ -13,8 +13,8 @@ import androidx.compose.ui.window.DialogProperties
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.StateSnapshot
-import com.github.trueddd.ui.widget.Dice
-import com.github.trueddd.ui.widget.DiceType
+import com.github.trueddd.ui.widget.DiceAnimation
+import com.github.trueddd.ui.widget.DiceD6
 import com.github.trueddd.ui.widget.WarningTextBlock
 import com.github.trueddd.util.isDevEnvironment
 import com.github.trueddd.util.localized
@@ -121,7 +121,12 @@ fun GameStatusChangeDialog(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Dice(diceValue, DiceType.D6)
+                        DiceD6(
+                            diceValue,
+                            diceAnimation = DiceAnimation(duration = 300),
+                            modifier = Modifier
+                                .size(32.dp)
+                        )
                         Slider(
                             value = diceValue.toFloat(),
                             onValueChange = { diceValue = it.roundToInt() },

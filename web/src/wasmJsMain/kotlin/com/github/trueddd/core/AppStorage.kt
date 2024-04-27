@@ -1,6 +1,7 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.data.Rollable
+import com.github.trueddd.ui.wheels.DiceValue
 import com.github.trueddd.ui.wheels.WheelState
 import com.github.trueddd.ui.wheels.WheelType
 import kotlinx.browser.window
@@ -19,10 +20,12 @@ class AppStorage {
             wheelKeyHash(wheelState.type),
             "${wheelState.items.hash()}"
         )
-        window.localStorage.setItem(
-            wheelKeyRolled(wheelState.type),
-            "${wheelState.targetPosition.rem(wheelState.items.size)}"
-        )
+        val value = if (wheelState.type == WheelType.Dice) {
+            wheelState.targetPosition
+        } else {
+            wheelState.targetPosition.rem(wheelState.items.size)
+        }
+        window.localStorage.setItem(wheelKeyRolled(wheelState.type), "$value")
     }
 
     fun getSavedWheelState(currentItemsList: List<Rollable>, type: WheelType): WheelState {
@@ -31,10 +34,16 @@ class AppStorage {
         val savedRolledItemIndex = window.localStorage.getItem(wheelKeyRolled(type))?.toIntOrNull()
             ?: return WheelState.default(currentItemsList, type)
         return if (currentItemsList.hash() == savedListHash) {
-            WheelState.default(currentItemsList, type).copy(
-                targetPosition = savedRolledItemIndex,
-                rolledItem = currentItemsList.getOrNull(savedRolledItemIndex),
-            )
+            when (type) {
+                WheelType.Dice -> WheelState.default(currentItemsList, type).copy(
+                    targetPosition = savedRolledItemIndex,
+                    rolledItem = DiceValue(savedRolledItemIndex),
+                )
+                else -> WheelState.default(currentItemsList, type).copy(
+                    targetPosition = savedRolledItemIndex,
+                    rolledItem = currentItemsList.getOrNull(savedRolledItemIndex),
+                )
+            }
         } else {
             WheelState.default(currentItemsList, type)
         }
