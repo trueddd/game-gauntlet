@@ -30,6 +30,7 @@ import com.github.trueddd.items.WheelItem
 import com.github.trueddd.ui.widget.DiceAnimation
 import com.github.trueddd.ui.widget.DiceD6
 import com.github.trueddd.util.positionSpinAnimation
+import com.github.trueddd.utils.flipCoin
 import com.github.trueddd.utils.rollDice
 import com.github.trueddd.utils.wheelItems
 import kotlinx.coroutines.launch
@@ -64,6 +65,7 @@ fun Wheels(
                 WheelType.Games -> appClient.getGames()
                 WheelType.Players -> gameConfig.players
                 WheelType.Dice -> DiceValue.All
+                WheelType.Coin -> CoinValue.All
             }
             wheelState = appStorage.getSavedWheelState(items, wheelState.type)
         }
@@ -106,6 +108,16 @@ fun Wheels(
                 selected = wheelState.type == WheelType.Dice,
                 onClick = { wheelState = stateOnTabChange(WheelType.Dice) },
                 label = { Text("Кубик") },
+                shape = RectangleShape,
+                colors = SegmentedButtonDefaults.colors(
+                    activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
+                    inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
+                ),
+            )
+            SegmentedButton(
+                selected = wheelState.type == WheelType.Coin,
+                onClick = { wheelState = stateOnTabChange(WheelType.Coin) },
+                label = { Text("Монетка") },
                 shape = RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50),
                 colors = SegmentedButtonDefaults.colors(
                     activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -129,6 +141,7 @@ fun Wheels(
                                 WheelType.Games -> appClient.rollGame()!!
                                 WheelType.Players -> appClient.rollPlayer()!!
                                 WheelType.Dice -> throw IllegalStateException()
+                                WheelType.Coin -> throw IllegalStateException()
                             }
                         }
                         wheelState = when (wheelState.type) {
@@ -138,6 +151,15 @@ fun Wheels(
                                     rolledItem = DiceValue(value),
                                     running = true,
                                     targetPosition = value,
+                                    initialPosition = wheelState.targetPosition
+                                )
+                            }
+                            WheelType.Coin -> {
+                                val value = flipCoin()
+                                wheelState.copy(
+                                    rolledItem = CoinValue(value),
+                                    running = true,
+                                    targetPosition = if (value) 1 else 0,
                                     initialPosition = wheelState.targetPosition
                                 )
                             }
@@ -195,13 +217,16 @@ fun Wheels(
         AnimatedContent(
             targetState = wheelState.items,
         ) {
-            if (wheelState.type == WheelType.Dice) {
-                DiceBlock(wheelState) {
+            when (wheelState.type) {
+                WheelType.Dice -> DiceBlock(wheelState) {
                     wheelState = wheelState.copy(running = false)
                     appStorage.saveWheelItemsState(wheelState)
                 }
-            } else {
-                Wheel(
+                WheelType.Coin -> CoinBlock(wheelState) {
+                    wheelState = wheelState.copy(running = false)
+                    appStorage.saveWheelItemsState(wheelState)
+                }
+                else -> Wheel(
                     wheelState = wheelState,
                     onRollFinished = {
                         wheelState = wheelState.copy(
@@ -212,6 +237,37 @@ fun Wheels(
                         )
                         appStorage.saveWheelItemsState(wheelState)
                     },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CoinBlock(
+    wheelState: WheelState,
+    onFlipFinished: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(64.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxHeight()
+                .aspectRatio(1f)
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
+        ) {
+            if (wheelState.rolledItem as? CoinValue != null) {
+                Coin(
+                    coinValue = wheelState.rolledItem,
+                    shouldAnimate = wheelState.running,
+                    onFlipFinished = onFlipFinished,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(96.dp)
                 )
             }
         }

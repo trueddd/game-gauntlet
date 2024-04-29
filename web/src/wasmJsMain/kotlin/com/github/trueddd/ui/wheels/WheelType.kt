@@ -5,4 +5,5 @@ enum class WheelType {
     Games,
     Players,
     Dice,
+    Coin,
 }
