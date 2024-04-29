@@ -1,6 +1,8 @@
 package com.github.trueddd.data
 
 import com.github.trueddd.items.DiceRollModifier
+import com.github.trueddd.items.DontCare
+import com.github.trueddd.items.DontUnderstand
 import com.github.trueddd.items.WheelItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -75,3 +77,6 @@ inline fun <reified T : WheelItem.Effect> List<WheelItem.Effect>.without(): List
 fun <T : WheelItem> List<T>.without(itemUid: String): List<T> {
     return filter { it.uid != itemUid }
 }
+
+inline val PlayerState.canSetNextGame: Boolean
+    get() = effects.any { it is DontCare || it is DontUnderstand }

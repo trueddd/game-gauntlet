@@ -16,6 +16,9 @@ data class WheelState(
     val rolledItem: Rollable?,
 ) {
 
+    val isItemsWheel = type == WheelType.Items
+    val isGamesWheel = type == WheelType.Games
+
     companion object {
         fun default(items: List<Rollable>, type: WheelType) = WheelState(
             type = type,

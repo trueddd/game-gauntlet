@@ -29,7 +29,9 @@ data class GameRoll(
         override val actionKey = Key.GameRoll
 
         override fun generate(participant: Participant, arguments: List<String>): GameRoll {
-            val game = gamesProvider.roll()
+            val game = arguments.firstOrNull()?.toIntOrNull()
+                ?.let { gamesProvider.getById(Game.Id(it)) }
+                ?: gamesProvider.roll()
             return GameRoll(participant, game.id)
         }
     }

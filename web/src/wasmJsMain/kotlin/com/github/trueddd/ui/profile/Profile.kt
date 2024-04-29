@@ -373,14 +373,20 @@ private fun Profile(
                                     modifier = Modifier
                                         .weight(1f)
                                 ) {
-                                    Text(text = turn.game?.game?.name ?: "-")
+                                    Text(
+                                        text = turn.game?.game?.name ?: "-",
+                                        textAlign = TextAlign.Center
+                                    )
                                 }
                                 Box(
                                     contentAlignment = Alignment.Center,
                                     modifier = Modifier
                                         .weight(1f)
                                 ) {
-                                    Text(text = turn.game?.game?.genre?.localized ?: "-")
+                                    Text(
+                                        text = turn.game?.game?.genre?.localized ?: "-",
+                                        textAlign = TextAlign.Center
+                                    )
                                 }
                                 Box(
                                     contentAlignment = Alignment.Center,

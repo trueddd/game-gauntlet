@@ -29,6 +29,14 @@ class GameRollActionTest : EventGateTest() {
     }
 
     @Test
+    fun `roll game - given id`() = runTest {
+        val participant = requireRandomParticipant()
+        handleAction(BoardMove(participant, diceValue = 3))
+        eventGate.parseAndHandle("${participant.name}:${Action.Key.GameRoll}:1")
+        assertEquals(expected = Game.Id(1), lastGameOf(participant)?.game?.id)
+    }
+
+    @Test
     fun `roll game twice`() = runTest {
         val participant = requireRandomParticipant()
         handleAction(BoardMove(participant, diceValue = 2))

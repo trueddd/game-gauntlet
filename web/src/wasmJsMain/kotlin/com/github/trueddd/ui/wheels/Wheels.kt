@@ -24,9 +24,7 @@ import com.github.trueddd.core.AppClient
 import com.github.trueddd.core.AppStorage
 import com.github.trueddd.core.Command
 import com.github.trueddd.core.CommandSender
-import com.github.trueddd.data.GameConfig
-import com.github.trueddd.data.Participant
-import com.github.trueddd.data.Rollable
+import com.github.trueddd.data.*
 import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.ui.widget.DiceAnimation
@@ -39,8 +37,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Wheels(
-    participant: Participant,
+    player: Participant,
     gameConfig: GameConfig,
+    currentPlayerState: PlayerState?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -151,14 +150,19 @@ fun Wheels(
             ) {
                 Text(text = "Крутить")
             }
-            if ((wheelState.type == WheelType.Items || wheelState.type == WheelType.Games) && wheelState.rolledItem != null) {
+            if ((wheelState.isItemsWheel || wheelState.isGamesWheel) && wheelState.rolledItem != null) {
                 OutlinedButton(
                     shape = RoundedCornerShape(50),
                     onClick = {
-                        (wheelState.rolledItem as? WheelItem)?.let {
-                            commandSender.sendCommand(Command.Action.itemReceive(participant, it.id))
-                            wheelState = wheelState.copy(rolledItem = null)
+                        when (val rollable = wheelState.rolledItem) {
+                            is WheelItem -> commandSender.sendCommand(
+                                Command.Action.itemReceive(player, rollable.id)
+                            )
+                            is Game -> commandSender.sendCommand(
+                                Command.Action.gameRoll(player, rollable.id)
+                            )
                         }
+                        wheelState = wheelState.copy(rolledItem = null)
                     },
                     modifier = Modifier
                         .pointerHoverIcon(PointerIcon.Hand)
@@ -170,6 +174,21 @@ fun Wheels(
                             else -> "Apply"
                         }
                     )
+                }
+                if (wheelState.isGamesWheel && currentPlayerState?.canSetNextGame == true) {
+                    OutlinedButton(
+                        shape = RoundedCornerShape(50),
+                        onClick = {
+                            (wheelState.rolledItem as? Game)?.let {
+                                commandSender.sendCommand(Command.Action.gameSet(player, it.id))
+                                wheelState = wheelState.copy(rolledItem = null)
+                            }
+                        },
+                        modifier = Modifier
+                            .pointerHoverIcon(PointerIcon.Hand)
+                    ) {
+                        Text(text = "Сделать следующей")
+                    }
                 }
             }
         }

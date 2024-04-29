@@ -68,8 +68,6 @@ class AppClient(
                 session.outgoing.send(Frame.Text(token))
                 for (frame in session.incoming) {
                     val textFrame = frame as? Frame.Text ?: continue
-                    val content = textFrame.readText()
-                    println("New history received: $content")
                     val data = Response.parse(textFrame.readText()) ?: continue
                     if (data is Response.Turns) {
                         this@callbackFlow.send(data.playersHistory)
