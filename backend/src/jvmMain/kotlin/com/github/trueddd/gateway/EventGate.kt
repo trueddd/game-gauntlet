@@ -69,6 +69,15 @@ fun Routing.setupEventGate() {
             .launchIn(this)
         awaitCancellation()
     }
+
+    webSocket(Router.TURNS) {
+        validateWebSocketsAuth(eventGate.stateHolder) { close(it.webSocketCloseReason()) }
+            ?: return@webSocket
+        eventGate.stateHolder.playersTurnsStateFlow
+            .onEach { outgoing.sendResponse(Response.Turns(it)) }
+            .launchIn(this)
+        awaitCancellation()
+    }
 }
 
 suspend fun SendChannel<Frame>.sendResponse(response: Response) {

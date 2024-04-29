@@ -3,10 +3,7 @@ package com.github.trueddd.plugins
 import com.github.trueddd.core.*
 import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.request.DownloadGameRequestBody
-import com.github.trueddd.gateway.sendResponse
 import com.github.trueddd.utils.Environment
-import com.github.trueddd.utils.validateWebSocketsAuth
-import com.github.trueddd.utils.webSocketCloseReason
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -16,12 +13,7 @@ import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.websocket.*
 import io.ktor.util.pipeline.*
-import io.ktor.websocket.*
-import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import org.koin.ktor.ext.get
 import org.koin.ktor.ext.inject
 
@@ -77,14 +69,6 @@ fun Application.configureRouting() {
                 cache()
             }
             call.respond(eventGate.stateHolder.currentPlayersHistory)
-        }
-        webSocket(Router.TURNS) {
-            validateWebSocketsAuth(eventGate.stateHolder) { close(it.webSocketCloseReason()) }
-                ?: return@webSocket
-            eventGate.stateHolder.playersTurnsStateFlow
-                .onEach { outgoing.sendResponse(Response.Turns(it)) }
-                .launchIn(this)
-            awaitCancellation()
         }
 
         post(Router.LOAD_GAME) {
