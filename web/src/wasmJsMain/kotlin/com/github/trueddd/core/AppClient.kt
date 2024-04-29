@@ -57,6 +57,29 @@ class AppClient(
         }
     }
 
+    fun getPlayersHistoryFlow(): Flow<PlayersHistory> {
+        return callbackFlow {
+            val session = httpClient.webSocketSession(router.ws(Router.TURNS))
+            launch {
+                val token = savedJwtToken() ?: run {
+                    this@callbackFlow.cancel()
+                    return@launch
+                }
+                session.outgoing.send(Frame.Text(token))
+                for (frame in session.incoming) {
+                    val textFrame = frame as? Frame.Text ?: continue
+                    val data = Response.parse(textFrame.readText()) ?: continue
+                    if (data is Response.Turns) {
+                        this@callbackFlow.send(data.playersHistory)
+                    }
+                }
+            }
+            awaitClose {
+                session.cancel()
+            }
+        }
+    }
+
     private suspend fun loadActions(): List<Action> =
         getJsonData(router.http(Router.ACTIONS), sendBearerToken = true) ?: emptyList()
 

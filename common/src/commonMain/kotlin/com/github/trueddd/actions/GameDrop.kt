@@ -29,7 +29,7 @@ data class GameDrop(
         override val actionKey = Key.GameDrop
 
         override fun generate(participant: Participant, arguments: List<String>): GameDrop {
-            val dice = rollDice()
+            val dice = arguments.firstOrNull()?.toIntOrNull() ?: rollDice()
             return GameDrop(participant, dice)
         }
     }

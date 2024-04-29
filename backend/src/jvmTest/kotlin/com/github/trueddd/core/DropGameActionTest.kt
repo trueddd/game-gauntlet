@@ -5,6 +5,7 @@ import com.github.trueddd.actions.*
 import com.github.trueddd.data.Game
 import com.github.trueddd.items.SamuraiLunge
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -20,6 +21,18 @@ class DropGameActionTest : EventGateTest() {
         eventGate.parseAndHandle("${user.name}:${Action.Key.GameRoll}")
         handleAction(GameDrop(user, dropDiceValue))
         assertTrue(inventoryOf(user).isEmpty())
+        assertEquals(Game.Status.Dropped, lastGameOf(user)?.status)
+        assertEquals(expected = moveDiceValue - dropDiceValue, positionOf(user))
+    }
+
+    @RepeatedTest(10)
+    fun `drop game - send rolled dice`() = runTest {
+        val user = requireRandomParticipant()
+        val moveDiceValue = 6
+        val dropDiceValue = 4
+        handleAction(BoardMove(user, moveDiceValue))
+        eventGate.parseAndHandle("${user.name}:${Action.Key.GameRoll}")
+        eventGate.parseAndHandle("${user.name}:${Action.Key.GameDrop}:$dropDiceValue")
         assertEquals(Game.Status.Dropped, lastGameOf(user)?.status)
         assertEquals(expected = moveDiceValue - dropDiceValue, positionOf(user))
     }

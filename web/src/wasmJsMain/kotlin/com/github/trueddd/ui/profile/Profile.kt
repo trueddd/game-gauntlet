@@ -200,8 +200,9 @@ private fun Profile(
     turnsHistory: PlayerTurnsHistory,
     modifier: Modifier = Modifier,
 ) {
+    val selectedPlayerState = stateSnapshot.playersState[selectedPlayer.name]!!
     val commandSender = remember { get<CommandSender>() }
-    var dialogItem by remember { mutableStateOf<WheelItem?>(null) }
+    var visibleDialog by remember { mutableStateOf<ProfileDialogs>(ProfileDialogs.None) }
     val lazyListState = rememberLazyListState()
     val leftSidePanelTopPadding by remember {
         derivedStateOf {
@@ -268,7 +269,7 @@ private fun Profile(
                             WheelItemView(
                                 item = item,
                                 onUse = if (selectedPlayer == currentPlayer) {
-                                    { dialogItem = item }
+                                    { visibleDialog = ProfileDialogs.WheelItemView(item) }
                                 } else null
                             )
                         }
@@ -372,21 +373,34 @@ private fun Profile(
                                     modifier = Modifier
                                         .weight(1f)
                                 ) {
-                                    Text(text = turn.game?.game?.name ?: "-")
+                                    Text(
+                                        text = turn.game?.game?.name ?: "-",
+                                        textAlign = TextAlign.Center
+                                    )
                                 }
                                 Box(
                                     contentAlignment = Alignment.Center,
                                     modifier = Modifier
                                         .weight(1f)
                                 ) {
-                                    Text(text = turn.game?.game?.genre?.localized ?: "-")
+                                    Text(
+                                        text = turn.game?.game?.genre?.localized ?: "-",
+                                        textAlign = TextAlign.Center
+                                    )
                                 }
                                 Box(
                                     contentAlignment = Alignment.Center,
                                     modifier = Modifier
                                         .weight(1f)
                                 ) {
-                                    Text(text = turn.game?.status?.localized ?: "-")
+                                    Text(
+                                        text = turn.game?.status?.localized ?: "-",
+                                        color = when (turn.game?.status) {
+                                            Game.Status.Finished -> Colors.GameStatus.Finished
+                                            Game.Status.Dropped -> Colors.GameStatus.Dropped
+                                            else -> Color.Unspecified
+                                        }
+                                    )
                                 }
                             }
                         }
@@ -402,7 +416,9 @@ private fun Profile(
                     .and(visibleItems.isNotEmpty())
             }
         }
+        // Left side panel
         Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .padding(top = leftSidePanelTopPadding
@@ -420,7 +436,6 @@ private fun Profile(
                     .padding(8.dp)
                     .background(Color.White, CircleShape)
             )
-            Spacer(modifier = Modifier.height(16.dp))
             Card(
                 shape = RoundedCornerShape(50),
                 modifier = Modifier
@@ -432,6 +447,20 @@ private fun Profile(
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 )
+            }
+            if (selectedPlayer == currentPlayer) {
+                TextButton(
+                    onClick = { visibleDialog = ProfileDialogs.GameStatusChange },
+                    enabled = selectedPlayer == currentPlayer && selectedPlayerState.hasCurrentActiveGame,
+                ) {
+                    Text("Изменить статус игры")
+                }
+                TextButton(
+                    onClick = { visibleDialog = ProfileDialogs.BoardMove },
+                    enabled = selectedPlayer == currentPlayer && selectedPlayerState.boardMoveAvailable,
+                ) {
+                    Text("Сделать ход")
+                }
             }
             AnimatedVisibility(
                 visible = shouldShowSideStats,
@@ -449,24 +478,46 @@ private fun Profile(
                 )
             }
         }
-        var allItems by remember { mutableStateOf(emptyList<WheelItem>()) }
-        LaunchedEffect(Unit) {
-            allItems = wheelItems.sortedBy { it.name }
-        }
-        if (dialogItem != null && currentPlayer != null) {
-            WheelItemUseDialog(
-                item = dialogItem!!,
-                gameConfig = gameConfig,
-                stateSnapshot = stateSnapshot,
-                player = currentPlayer,
-                items = allItems,
-                onItemUse = { item, parameters ->
-                    Log.info(TAG, "using ${item.name} with parameters $parameters")
-                    commandSender.sendCommand(Command.Action.itemUse(currentPlayer, item, parameters))
-                    dialogItem = null
-                },
-                onDialogDismiss = { dialogItem = null }
-            )
+        // Dialogs
+        if (currentPlayer != null) {
+            when (visibleDialog) {
+                is ProfileDialogs.WheelItemView -> WheelItemUseDialog(
+                    item = (visibleDialog as ProfileDialogs.WheelItemView).item,
+                    gameConfig = gameConfig,
+                    stateSnapshot = stateSnapshot,
+                    player = currentPlayer,
+                    items = wheelItems,
+                    onItemUse = { item, parameters ->
+                        Log.info(TAG, "using ${item.name} with parameters $parameters")
+                        commandSender.sendCommand(Command.Action.itemUse(currentPlayer, item, parameters))
+                        visibleDialog = ProfileDialogs.None
+                    },
+                    onDialogDismiss = { visibleDialog = ProfileDialogs.None }
+                )
+                is ProfileDialogs.BoardMove -> BoardMoveDialog(
+                    onMoveRequested = {
+                        commandSender.sendCommand(Command.Action.boardMove(currentPlayer, it))
+                        visibleDialog = ProfileDialogs.None
+                    },
+                    onDialogDismiss = { visibleDialog = ProfileDialogs.None }
+                )
+                is ProfileDialogs.GameStatusChange -> GameStatusChangeDialog(
+                    player = currentPlayer,
+                    stateSnapshot = stateSnapshot,
+                    onStatusChangeRequested = { statusChangeRequest ->
+                        Log.info(TAG, "setting new status: $statusChangeRequest")
+                        val command = when (statusChangeRequest) {
+                            is StatusChangeRequest.Dropped -> Command.Action.gameDrop(currentPlayer, statusChangeRequest.diceValue)
+                            is StatusChangeRequest.Finished -> Command.Action.gameStatusChange(currentPlayer, Game.Status.Finished)
+                            is StatusChangeRequest.Rerolled -> Command.Action.gameStatusChange(currentPlayer, Game.Status.Rerolled)
+                        }
+                        commandSender.sendCommand(command)
+                        visibleDialog = ProfileDialogs.None
+                    },
+                    onDialogDismiss = { visibleDialog = ProfileDialogs.None }
+                )
+                is ProfileDialogs.None -> {}
+            }
         }
     }
 }

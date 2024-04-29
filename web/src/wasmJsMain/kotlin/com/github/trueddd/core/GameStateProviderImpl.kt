@@ -86,10 +86,10 @@ class GameStateProviderImpl(
                     val textFrame = frame as? Frame.Text ?: continue
                     val data = Response.parse(textFrame.readText()) ?: continue
                     when (data) {
-                        is Response.UserAction -> continue
                         is Response.Error -> Log.error(TAG, "Error occurred: ${data.exception.message}")
                         is Response.Info -> Log.error(TAG, "Message from server: ${data.message}")
                         is Response.State -> _snapshotStateFlow.value = data.snapshot
+                        else -> continue
                     }
                 }
                 if (this.coroutineContext.job.isActive) {
@@ -104,9 +104,10 @@ class GameStateProviderImpl(
     }
 
     override fun playersHistoryFlow(): Flow<PlayersHistory?> {
-        return flow {
-            val history = appClient.getPlayersHistory()
-            emit(history)
+        return if (authManager.userState.value == null) {
+            flow { emit(appClient.getPlayersHistory()) }
+        } else {
+            appClient.getPlayersHistoryFlow()
         }
     }
 }

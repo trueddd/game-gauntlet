@@ -21,6 +21,7 @@ kotlin {
                 implementation(libs.serialization)
                 implementation(libs.uuid)
                 api(libs.datetime)
+                api(libs.kotlin.immutable)
             }
         }
         val commonTest by getting {

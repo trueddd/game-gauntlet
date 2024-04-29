@@ -1,13 +1,13 @@
 package com.github.trueddd.gateway
 
-import com.auth0.jwt.exceptions.TokenExpiredException
 import com.github.trueddd.core.Command
 import com.github.trueddd.core.EventGate
 import com.github.trueddd.core.Response
 import com.github.trueddd.core.Router
-import com.github.trueddd.plugins.Jwt
 import com.github.trueddd.utils.Environment
 import com.github.trueddd.utils.Log
+import com.github.trueddd.utils.validateWebSocketsAuth
+import com.github.trueddd.utils.webSocketCloseReason
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
@@ -26,19 +26,9 @@ fun Routing.setupEventGate() {
     }
 
     webSocket(Router.STATE) {
-        val token = (incoming.receive() as? Frame.Text)?.readText()
-        val user = try {
-            val decoded = Jwt.Verifier.verify(token)
-            val userName = decoded.getClaim("user").asString()
-            eventGate.stateHolder.participants.first { it.name == userName }
-        } catch (e: TokenExpiredException) {
-            close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, Response.ErrorCode.TokenExpired))
-            return@webSocket
-        } catch (e: Exception) {
-            e.printStackTrace()
-            close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, Response.ErrorCode.AuthError))
-            return@webSocket
-        }
+        val user = validateWebSocketsAuth(eventGate.stateHolder) {
+            close(it.webSocketCloseReason())
+        } ?: return@webSocket
         eventGate.stateHolder.globalStateFlow
             .onStart { Log.info(TAG, "Starting $user`s session ${this@webSocket}") }
             .map { it.stateSnapshot }
@@ -79,9 +69,18 @@ fun Routing.setupEventGate() {
             .launchIn(this)
         awaitCancellation()
     }
+
+    webSocket(Router.TURNS) {
+        validateWebSocketsAuth(eventGate.stateHolder) { close(it.webSocketCloseReason()) }
+            ?: return@webSocket
+        eventGate.stateHolder.playersTurnsStateFlow
+            .onEach { outgoing.sendResponse(Response.Turns(it)) }
+            .launchIn(this)
+        awaitCancellation()
+    }
 }
 
-private suspend fun SendChannel<Frame>.sendResponse(response: Response) {
+suspend fun SendChannel<Frame>.sendResponse(response: Response) {
     send(Frame.Text(response.serialized))
 }
 

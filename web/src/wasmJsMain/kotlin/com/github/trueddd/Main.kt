@@ -133,8 +133,9 @@ private fun App(
                 is Destination.Wheels -> {
                     if (user != null && gameConfig != null) {
                         Wheels(
-                            participant = user!!,
+                            player = user!!,
                             gameConfig = gameConfig!!,
+                            currentPlayerState = stateSnapshot?.playersState?.get(user!!.name),
                             modifier = Modifier
                                 .fillMaxSize()
                         )

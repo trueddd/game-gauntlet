@@ -1,6 +1,8 @@
 package com.github.trueddd.data
 
 import com.github.trueddd.items.DiceRollModifier
+import com.github.trueddd.items.DontCare
+import com.github.trueddd.items.DontUnderstand
 import com.github.trueddd.items.WheelItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,6 +15,8 @@ import kotlinx.serialization.Serializable
  * @property inventory current set of inventory item of player available for them to use.
  * @property effects current set of effects that are applied to player.
  * @property pendingEvents current set of events that have been received be player and now awaiting to be used.
+ * @property currentGame current game that player is playing. Can be null if player has not rolled any game yet.
+ * For more detailed info see [gameHistory][com.github.trueddd.data.GlobalState.gameHistory].
  */
 @Serializable
 data class PlayerState(
@@ -53,7 +57,7 @@ data class PlayerState(
     val currentActiveGame: GameHistoryEntry?
         get() = currentGame?.takeIf { it.status == Game.Status.InProgress }
 
-    val hasCurrentActive: Boolean
+    val hasCurrentActiveGame: Boolean
         get() = currentActiveGame != null
 
     val stintIndex: Int
@@ -73,3 +77,6 @@ inline fun <reified T : WheelItem.Effect> List<WheelItem.Effect>.without(): List
 fun <T : WheelItem> List<T>.without(itemUid: String): List<T> {
     return filter { it.uid != itemUid }
 }
+
+inline val PlayerState.canSetNextGame: Boolean
+    get() = effects.any { it is DontCare || it is DontUnderstand }

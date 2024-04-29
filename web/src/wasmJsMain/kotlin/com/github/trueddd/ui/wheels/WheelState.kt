@@ -1,8 +1,10 @@
 package com.github.trueddd.ui.wheels
 
+import androidx.compose.runtime.Immutable
 import com.github.trueddd.data.Rollable
 import kotlin.time.Duration.Companion.seconds
 
+@Immutable
 data class WheelState(
     val type: WheelType,
     val items: List<Rollable>,
@@ -13,6 +15,9 @@ data class WheelState(
     val numberOfOptionsOnScreen: Int,
     val rolledItem: Rollable?,
 ) {
+
+    val isItemsWheel = type == WheelType.Items
+    val isGamesWheel = type == WheelType.Games
 
     companion object {
         fun default(items: List<Rollable>, type: WheelType) = WheelState(
