@@ -68,6 +68,13 @@ sealed class Command(val value: String) {
                 append(":")
                 append(diceValue)
             }.let { Action(it) }
+            fun boardMove(player: Participant, diceValue: Int) = buildString {
+                append(player.name)
+                append(":")
+                append(com.github.trueddd.actions.Action.Key.BoardMove)
+                append(":")
+                append(diceValue)
+            }.let { Action(it) }
         }
     }
 

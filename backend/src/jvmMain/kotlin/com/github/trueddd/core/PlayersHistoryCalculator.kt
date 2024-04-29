@@ -65,7 +65,7 @@ object PlayersHistoryCalculator {
             }
             is GameSet -> {
                 currentHistory.update(action.setBy.name) { history ->
-                    if (oldState.stateOf(action.setBy).hasCurrentActive) {
+                    if (oldState.stateOf(action.setBy).hasCurrentActiveGame) {
                         val turn = Turn(
                             moveDate = action.issuedAt,
                             moveRange = null,

@@ -70,6 +70,7 @@ dependencyResolutionManagement {
             library("koin-ksp", "io.insert-koin", "koin-ksp-compiler").versionRef(koinKsp)
 
             plugin("ksp", "com.google.devtools.ksp").versionRef(ksp)
+            library("kotlin-immutable", "org.jetbrains.kotlinx", "kotlinx-collections-immutable").version("0.3.7")
             library("kotlin-poet", "com.squareup", "kotlinpoet").versionRef(kotlinPoet)
             library("kotlin-ksp-api", "com.google.devtools.ksp", "symbol-processing-api").versionRef(ksp)
 

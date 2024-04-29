@@ -55,7 +55,7 @@ data class PlayerState(
     val currentActiveGame: GameHistoryEntry?
         get() = currentGame?.takeIf { it.status == Game.Status.InProgress }
 
-    val hasCurrentActive: Boolean
+    val hasCurrentActiveGame: Boolean
         get() = currentActiveGame != null
 
     val stintIndex: Int

@@ -43,7 +43,7 @@ data class GameSet(
                 currentState.effectsOf(action.setBy).any { it is DontCare } -> {
                     val entry = GameHistoryEntry(
                         game = game,
-                        status = if (currentState.stateOf(action.setBy).hasCurrentActive) {
+                        status = if (currentState.stateOf(action.setBy).hasCurrentActiveGame) {
                             Game.Status.Next
                         } else {
                             Game.Status.InProgress
@@ -52,7 +52,7 @@ data class GameSet(
                     currentState.updatePlayer(action.setBy) { playerState ->
                         playerState.copy(
                             effects = playerState.effects.without<DontCare>(),
-                            currentGame = if (playerState.hasCurrentActive) playerState.currentGame else entry,
+                            currentGame = if (playerState.hasCurrentActiveGame) playerState.currentGame else entry,
                         )
                     }.copy(gameHistory = currentState.gameHistory.mapValues { (player, history) ->
                         if (player == action.setBy.name) {
@@ -65,7 +65,7 @@ data class GameSet(
                 currentState.effectsOf(action.setBy).any { it is DontUnderstand } -> {
                     val entry = GameHistoryEntry(
                         game = game,
-                        status = if (currentState.stateOf(action.setBy).hasCurrentActive) {
+                        status = if (currentState.stateOf(action.setBy).hasCurrentActiveGame) {
                             Game.Status.Next
                         } else {
                             Game.Status.InProgress
@@ -74,7 +74,7 @@ data class GameSet(
                     currentState.updatePlayer(action.setBy) { playerState ->
                         playerState.copy(
                             effects = playerState.effects.without<DontUnderstand>(),
-                            currentGame = if (playerState.hasCurrentActive) playerState.currentGame else entry,
+                            currentGame = if (playerState.hasCurrentActiveGame) playerState.currentGame else entry,
                         )
                     }.copy(gameHistory = currentState.gameHistory.mapValues { (player, history) ->
                         if (player == action.setBy.name) {

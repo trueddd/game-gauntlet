@@ -10,20 +10,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.github.trueddd.core.AppStorage
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.StateSnapshot
+import com.github.trueddd.di.get
 import com.github.trueddd.ui.widget.DiceAnimation
 import com.github.trueddd.ui.widget.DiceD6
 import com.github.trueddd.ui.widget.WarningTextBlock
 import com.github.trueddd.util.isDevEnvironment
 import com.github.trueddd.util.localized
+import kotlinx.collections.immutable.persistentListOf
 import kotlin.math.roundToInt
 
-@Stable
-private val allowedStatuses = listOf(Game.Status.Dropped, Game.Status.Rerolled, Game.Status.Finished)
+private val allowedStatuses = persistentListOf(Game.Status.Dropped, Game.Status.Rerolled, Game.Status.Finished)
 
-@Stable
+@Immutable
 sealed class StatusChangeRequest {
     data object Finished : StatusChangeRequest()
     data object Rerolled : StatusChangeRequest()
@@ -38,8 +40,9 @@ fun GameStatusChangeDialog(
     onStatusChangeRequested: (StatusChangeRequest) -> Unit,
     onDialogDismiss: () -> Unit,
 ) {
+    val appStorage = remember { get<AppStorage>() }
     var status by remember { mutableStateOf<Game.Status?>(null) }
-    var diceValue by remember { mutableStateOf(1) }
+    var diceValue by remember { mutableStateOf(appStorage.getSavedDiceValue()) }
     AlertDialog(
         onDismissRequest = onDialogDismiss,
         properties = DialogProperties(),
@@ -80,7 +83,6 @@ fun GameStatusChangeDialog(
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
                             append(gameName)
                         }
-                        append(" на:")
                     }
                 )
                 var statusExpanded by remember { mutableStateOf(false) }
@@ -118,6 +120,7 @@ fun GameStatusChangeDialog(
                     }
                 }
                 if (status == Game.Status.Dropped) {
+                    Text(text = "Укажите значение кубика на дроп:")
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {

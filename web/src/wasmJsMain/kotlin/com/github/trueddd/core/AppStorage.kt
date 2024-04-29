@@ -28,6 +28,9 @@ class AppStorage {
         window.localStorage.setItem(wheelKeyRolled(wheelState.type), "$value")
     }
 
+    fun getSavedDiceValue() = getSavedWheelState(DiceValue.All, WheelType.Dice)
+        .targetPosition.takeIf { it > 0 } ?: 1
+
     fun getSavedWheelState(currentItemsList: List<Rollable>, type: WheelType): WheelState {
         val savedListHash = window.localStorage.getItem(wheelKeyHash(type))?.toIntOrNull()
             ?: return WheelState.default(currentItemsList, type)

@@ -202,8 +202,7 @@ private fun Profile(
 ) {
     val selectedPlayerState = stateSnapshot.playersState[selectedPlayer.name]!!
     val commandSender = remember { get<CommandSender>() }
-    var dialogItem by remember { mutableStateOf<WheelItem?>(null) }
-    var gameStatusDialogVisible by remember { mutableStateOf(false) }
+    var visibleDialog by remember { mutableStateOf<ProfileDialogs>(ProfileDialogs.None) }
     val lazyListState = rememberLazyListState()
     val leftSidePanelTopPadding by remember {
         derivedStateOf {
@@ -270,7 +269,7 @@ private fun Profile(
                             WheelItemView(
                                 item = item,
                                 onUse = if (selectedPlayer == currentPlayer) {
-                                    { dialogItem = item }
+                                    { visibleDialog = ProfileDialogs.WheelItemView(item) }
                                 } else null
                             )
                         }
@@ -443,11 +442,19 @@ private fun Profile(
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 )
             }
-            TextButton(
-                onClick = { gameStatusDialogVisible = true },
-                enabled = selectedPlayer == currentPlayer && selectedPlayerState.hasCurrentActive,
-            ) {
-                Text("Изменить статус игры")
+            if (selectedPlayer == currentPlayer) {
+                TextButton(
+                    onClick = { visibleDialog = ProfileDialogs.GameStatusChange },
+                    enabled = selectedPlayer == currentPlayer && selectedPlayerState.hasCurrentActiveGame,
+                ) {
+                    Text("Изменить статус игры")
+                }
+                TextButton(
+                    onClick = { visibleDialog = ProfileDialogs.BoardMove },
+                    enabled = selectedPlayer == currentPlayer && selectedPlayerState.boardMoveAvailable,
+                ) {
+                    Text("Сделать ход")
+                }
             }
             AnimatedVisibility(
                 visible = shouldShowSideStats,
@@ -465,41 +472,46 @@ private fun Profile(
                 )
             }
         }
-        var allItems by remember { mutableStateOf(emptyList<WheelItem>()) }
-        LaunchedEffect(Unit) {
-            allItems = wheelItems.sortedBy { it.name }
-        }
-        if (dialogItem != null && currentPlayer != null) {
-            WheelItemUseDialog(
-                item = dialogItem!!,
-                gameConfig = gameConfig,
-                stateSnapshot = stateSnapshot,
-                player = currentPlayer,
-                items = allItems,
-                onItemUse = { item, parameters ->
-                    Log.info(TAG, "using ${item.name} with parameters $parameters")
-                    commandSender.sendCommand(Command.Action.itemUse(currentPlayer, item, parameters))
-                    dialogItem = null
-                },
-                onDialogDismiss = { dialogItem = null }
-            )
-        }
-        if (gameStatusDialogVisible && currentPlayer != null) {
-            GameStatusChangeDialog(
-                player = currentPlayer,
-                stateSnapshot = stateSnapshot,
-                onStatusChangeRequested = { statusChangeRequest ->
-                    Log.info(TAG, "setting new status: $statusChangeRequest")
-                    val command = when (statusChangeRequest) {
-                        is StatusChangeRequest.Dropped -> Command.Action.gameDrop(currentPlayer, statusChangeRequest.diceValue)
-                        is StatusChangeRequest.Finished -> Command.Action.gameStatusChange(currentPlayer, Game.Status.Finished)
-                        is StatusChangeRequest.Rerolled -> Command.Action.gameStatusChange(currentPlayer, Game.Status.Rerolled)
-                    }
-                    commandSender.sendCommand(command)
-                    gameStatusDialogVisible = false
-                },
-                onDialogDismiss = { gameStatusDialogVisible = false }
-            )
+        // Dialogs
+        if (currentPlayer != null) {
+            when (visibleDialog) {
+                is ProfileDialogs.WheelItemView -> WheelItemUseDialog(
+                    item = (visibleDialog as ProfileDialogs.WheelItemView).item,
+                    gameConfig = gameConfig,
+                    stateSnapshot = stateSnapshot,
+                    player = currentPlayer,
+                    items = wheelItems,
+                    onItemUse = { item, parameters ->
+                        Log.info(TAG, "using ${item.name} with parameters $parameters")
+                        commandSender.sendCommand(Command.Action.itemUse(currentPlayer, item, parameters))
+                        visibleDialog = ProfileDialogs.None
+                    },
+                    onDialogDismiss = { visibleDialog = ProfileDialogs.None }
+                )
+                is ProfileDialogs.BoardMove -> BoardMoveDialog(
+                    onMoveRequested = {
+                        commandSender.sendCommand(Command.Action.boardMove(currentPlayer, it))
+                        visibleDialog = ProfileDialogs.None
+                    },
+                    onDialogDismiss = { visibleDialog = ProfileDialogs.None }
+                )
+                is ProfileDialogs.GameStatusChange -> GameStatusChangeDialog(
+                    player = currentPlayer,
+                    stateSnapshot = stateSnapshot,
+                    onStatusChangeRequested = { statusChangeRequest ->
+                        Log.info(TAG, "setting new status: $statusChangeRequest")
+                        val command = when (statusChangeRequest) {
+                            is StatusChangeRequest.Dropped -> Command.Action.gameDrop(currentPlayer, statusChangeRequest.diceValue)
+                            is StatusChangeRequest.Finished -> Command.Action.gameStatusChange(currentPlayer, Game.Status.Finished)
+                            is StatusChangeRequest.Rerolled -> Command.Action.gameStatusChange(currentPlayer, Game.Status.Rerolled)
+                        }
+                        commandSender.sendCommand(command)
+                        visibleDialog = ProfileDialogs.None
+                    },
+                    onDialogDismiss = { visibleDialog = ProfileDialogs.None }
+                )
+                is ProfileDialogs.None -> {}
+            }
         }
     }
 }

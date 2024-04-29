@@ -1,8 +1,10 @@
 package com.github.trueddd.ui.wheels
 
+import androidx.compose.runtime.Immutable
 import com.github.trueddd.data.Rollable
 import kotlin.time.Duration.Companion.seconds
 
+@Immutable
 data class WheelState(
     val type: WheelType,
     val items: List<Rollable>,

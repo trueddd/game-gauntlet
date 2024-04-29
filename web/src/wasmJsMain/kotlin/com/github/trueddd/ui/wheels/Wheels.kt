@@ -64,7 +64,7 @@ fun Wheels(
                 WheelType.Items -> wheelItems
                 WheelType.Games -> appClient.getGames()
                 WheelType.Players -> gameConfig.players
-                WheelType.Dice -> (1..6).map { DiceValue(it) }
+                WheelType.Dice -> DiceValue.All
             }
             wheelState = appStorage.getSavedWheelState(items, wheelState.type)
         }
