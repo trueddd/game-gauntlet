@@ -15,7 +15,7 @@ fun positionSpinAnimation(
         if (!state.running) return@remember null
         val startPosition = when {
             rotate.value != 0 -> rotate.value // subsequent roll
-            state.initialPosition == 0 -> 0 // first roll, no saved
+            state.initialPosition == 0 -> state.items.size - state.numberOfOptionsOnScreen / 2 // first roll, no saved
             else -> state.initialPosition - state.numberOfOptionsOnScreen / 2 // first roll, saved is present
         }
         TargetBasedAnimation(
