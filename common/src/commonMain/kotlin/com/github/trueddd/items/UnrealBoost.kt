@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -22,10 +23,10 @@ class UnrealBoost private constructor(override val uid: String) : WheelItem.Pend
     override val name = "Нереальный буст"
 
     override val description = """
-        Если участник, наролливший этот пункт сможет простримить 24 часа с учетом текущего времени трансляции, 
-        то он получает +3 к следующим 5 броскам кубика. 
-        Если стример испугался, то он может спокойно реролльнуть колесо без штрафа.
-    """.trimIndent()
+        |Если участник, наролливший этот пункт сможет простримить 24 часа с учетом текущего времени трансляции, 
+        |то он получает `+3` к следующим 5 броскам кубика. 
+        |Если стример испугался, то он может спокойно реролльнуть колесо без штрафа.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Bool(name = "Получилось простримить 24 часа?"))
@@ -63,8 +64,8 @@ class UnrealBoost private constructor(override val uid: String) : WheelItem.Pend
         override val id = Id(UnrealBoost)
         override val name = "Нереальный буст"
         override val description = """
-            Ты легенда. +${modifier.absoluteValue} к броску кубика на ход.
-        """.trimIndent()
+            |Ты легенда. `+${modifier.absoluteValue}` к броску кубика на ход.
+        """.removeTabs()
         override val maxCharges = 5
 
         override fun useCharge(): WithCharges<UnrealBoost.Buff> {

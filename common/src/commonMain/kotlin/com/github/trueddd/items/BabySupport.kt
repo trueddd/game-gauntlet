@@ -1,5 +1,6 @@
 package com.github.trueddd.items
 
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,8 +22,8 @@ class BabySupport private constructor(
 
     override val description = """
         |Если стример, выбивший этот бафф, является аутсайдером (последний или один из последних на карте), 
-        |то он получает +2 к результату броска кубика на следующие 2 хода. В ином случае реролл.
-    """.trimMargin()
+        |то он получает `+2` к результату броска кубика на следующие 2 хода. В ином случае реролл.
+    """.removeTabs()
 
     override val modifier = 2
 

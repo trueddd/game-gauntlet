@@ -5,6 +5,7 @@ import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.github.trueddd.items.Democracy.Buff
 import com.github.trueddd.items.Democracy.Debuff
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -24,8 +25,8 @@ class Democracy private constructor(override val uid: String) : WheelItem.Pendin
     override val name = "Демократия"
 
     override val description = """
-        Чат решает плюс очко или минус очко к следующему броску кубика.
-    """.trimIndent()
+        |Чат решает плюс очко или минус очко к следующему броску кубика.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Bool(name = "Чат выбрал плюс?"))
@@ -60,7 +61,7 @@ class Democracy private constructor(override val uid: String) : WheelItem.Pendin
         }
         override val id = Id(Democracy)
         override val name = "Демократия"
-        override val description = "+${modifier.absoluteValue} к броску кубика на ход."
+        override val description = "`+${modifier.absoluteValue}` к броску кубика на ход."
     }
 
     @Serializable
@@ -73,6 +74,6 @@ class Democracy private constructor(override val uid: String) : WheelItem.Pendin
         }
         override val id = Id(Democracy)
         override val name = "Демократия"
-        override val description = "-${modifier.absoluteValue} к броску кубика на ход."
+        override val description = "`-${modifier.absoluteValue}` к броску кубика на ход."
     }
 }

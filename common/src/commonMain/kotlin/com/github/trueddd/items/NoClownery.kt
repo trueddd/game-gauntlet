@@ -1,5 +1,6 @@
 package com.github.trueddd.items
 
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -18,8 +19,8 @@ class NoClownery private constructor(override val uid: String) : WheelItem.Effec
     override val name = "Никакой клоунады"
 
     override val description = """
-        До пересечения следующего спец-сектора запрещается крутить колесо приколов. Сбросить этот дебафф невозможно.
-    """.trimIndent()
+        |До пересечения следующего спец-сектора запрещается крутить колесо приколов. Сбросить этот дебафф невозможно.
+    """.removeTabs()
 
     @ItemFactory
     class Factory : WheelItem.Factory {

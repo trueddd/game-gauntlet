@@ -15,7 +15,7 @@ class MinusOneDebuff private constructor(override val uid: String) : WheelItem.E
 
     override val name = "Минус один"
 
-    override val description = "-1 к следующему броску кубика на ход"
+    override val description = "`-1` к следующему броску кубика на ход"
 
     override val modifier = -1
 }

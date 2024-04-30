@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.utils.isEven
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,9 +21,9 @@ class WillOfChance private constructor(override val uid: String) : WheelItem.Eve
     override val name = "Воля случая"
 
     override val description = """
-        Если сектор, на котором вы находитесь, четный - получите +2 к следующему броску кубика для перехода по секторам. 
-        Если нечетный - -2.
-    """.trimIndent()
+        |Если сектор, на котором вы находитесь, четный - получите `+2` к следующему броску кубика 
+        |для перехода по секторам. Если нечетный - `-2`.
+    """.removeTabs()
 
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
         return globalState.updatePlayer(rolledBy) { playerState ->
@@ -55,7 +56,7 @@ class WillOfChance private constructor(override val uid: String) : WheelItem.Eve
 
         override val name = "Воля случая. Дебафф"
 
-        override val description = "-2 к следующему броску кубика для перехода по секторам."
+        override val description = "`-2` к следующему броску кубика для перехода по секторам."
     }
 
     @Serializable
@@ -72,6 +73,6 @@ class WillOfChance private constructor(override val uid: String) : WheelItem.Eve
 
         override val name = "Воля случая. Бафф"
 
-        override val description = "+2 к следующему броску кубика для перехода по секторам."
+        override val description = "`+2` к следующему броску кубика для перехода по секторам."
     }
 }

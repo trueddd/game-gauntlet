@@ -1,5 +1,6 @@
 package com.github.trueddd.items
 
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -17,8 +18,8 @@ class DontCare private constructor(override val uid: String) : WheelItem.Effect.
     override val name = "Мне *****"
 
     override val description = """
-        Участник, наролливший этот пункт может выбрать следующую игру из общего списка на свое усмотрение.
-    """.trimIndent()
+        |Участник, наролливший этот пункт может выбрать следующую игру из общего списка на свое усмотрение.
+    """.removeTabs()
 
     @ItemFactory
     class Factory : WheelItem.Factory {

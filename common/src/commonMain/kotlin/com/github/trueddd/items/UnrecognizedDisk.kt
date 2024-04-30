@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -22,9 +23,9 @@ class UnrecognizedDisk private constructor(override val uid: String) : WheelItem
     override val name = "Неопознанная дискета"
 
     override val description = """
-        Вместо наролленой (не начатой) игры ролль спецколесо из игр детства. 
-        Если игра пройдена за один стрим, получи +1 к следующему броску кубика.
-    """.trimIndent()
+        |Вместо наролленой (не начатой) игры ролль спецколесо из игр детства. 
+        |Если игра пройдена за один стрим, получи `+1` к следующему броску кубика.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Bool(name = "Пройдено за один стрим?"))
@@ -60,6 +61,6 @@ class UnrecognizedDisk private constructor(override val uid: String) : WheelItem
 
         override val id = Id(UnrecognizedDisk)
         override val name = "Неопознанная дискета"
-        override val description = "+${modifier.absoluteValue} к следующему броску кубика для перехода по секторам."
+        override val description = "`+${modifier.absoluteValue}` к следующему броску кубика для перехода по секторам."
     }
 }

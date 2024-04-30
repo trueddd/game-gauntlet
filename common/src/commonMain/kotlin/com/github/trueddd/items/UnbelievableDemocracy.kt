@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -22,8 +23,8 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
     override val name = "Невероятная демократия"
 
     override val description = """
-        Чат решает плюс очко или минус очко к следующему броску кубика для всех участников.
-    """.trimIndent()
+        |Чат решает плюс очко или минус очко к следующему броску кубика для всех участников.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Bool(name = "Чат выбрал Плюс очко?"))
@@ -67,8 +68,8 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
         override val id = Id(UnbelievableDemocracy)
         override val name = "Невероятная демократия"
         override val description = """
-            +${modifier.absoluteValue} к броску кубика на ход. Спасибо чату ${causedByPollFrom.name} за это.
-        """.trimIndent()
+            |`+${modifier.absoluteValue}` к броску кубика на ход. Спасибо чату ${causedByPollFrom.displayName} за это.
+        """.removeTabs()
     }
 
     @Serializable
@@ -86,7 +87,7 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
         override val id = Id(UnbelievableDemocracy)
         override val name = "Невероятная демократия"
         override val description = """
-            -${modifier.absoluteValue} к броску кубика на ход. Спасибо чату ${causedByPollFrom.name} за это.
-        """.trimIndent()
+            |`-${modifier.absoluteValue}` к броску кубика на ход. Спасибо чату ${causedByPollFrom.displayName} за это.
+        """.removeTabs()
     }
 }

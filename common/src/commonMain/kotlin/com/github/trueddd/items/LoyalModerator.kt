@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,9 +22,9 @@ class LoyalModerator private constructor(override val uid: String) : WheelItem.I
     override val name = "Верный модер"
 
     override val description = """
-        Принимает выбранный стримером дебафф на себя и уничтожает его. 
-        Не имеет временных ограничений и может быть использовано в любой момент.
-    """.trimIndent()
+        |Принимает выбранный стримером дебафф на себя и уничтожает его. 
+        |Не имеет временных ограничений и может быть использовано в любой момент.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.MyItem(

@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,9 +21,9 @@ class SamuraiLunge private constructor(override val uid: String) : WheelItem.Inv
     override val name = "Самурайский выпад"
 
     override val description = """
-        При выпадении этого пункта позволяет не откатываться назад при дропе игры, 
-        а походить вперед. Имеет 1 заряд.
-    """.trimIndent()
+        |При выпадении этого пункта позволяет не откатываться назад при дропе игры, 
+        |а походить вперед. Для этого предмет необходимо использовать.
+    """.removeTabs()
 
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState.updatePlayer(usedBy) { state ->

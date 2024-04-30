@@ -18,7 +18,7 @@ class MinusToEveryone private constructor(override val uid: String) : WheelItem.
 
     override val name = "Минус всем"
 
-    override val description = "-1 на следующий бросок кубика для всех участников ивента."
+    override val description = "`-1` на следующий бросок кубика для всех участников ивента."
 
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
         return globalState.updatePlayers { _, state ->

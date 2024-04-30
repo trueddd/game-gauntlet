@@ -1,5 +1,6 @@
 package com.github.trueddd.items
 
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -17,9 +18,9 @@ class YourStream private constructor(override val uid: String) : WheelItem.Effec
     override val name = "\"Это твой стрим, делай, что хочешь\""
 
     override val description = """
-        При следующем ролле игры участник, наролливший этот пункт, может сам выбрать в какую игру ему играть из тех, 
-        что видны на экране колеса. Гуглить информацию об игре перед выбором разрешается, все таки стрим твой.
-    """.trimIndent()
+        |При следующем ролле игры участник, наролливший этот пункт, может сам выбрать в какую игру ему играть из тех, 
+        |что видны на экране колеса. Гуглить информацию об игре перед выбором разрешается, все-таки стрим твой.
+    """.removeTabs()
 
     @ItemFactory
     class Factory : WheelItem.Factory {

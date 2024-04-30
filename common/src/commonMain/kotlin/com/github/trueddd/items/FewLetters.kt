@@ -1,5 +1,6 @@
 package com.github.trueddd.items
 
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -18,8 +19,8 @@ class FewLetters private constructor(override val uid: String) : WheelItem.Effec
     override val name = "Мало букв"
 
     override val description = """
-        На следующем ролле следует проходить ту игру в названии которой меньше десяти букв и цифр.
-    """.trimIndent()
+        |На следующем ролле следует проходить ту игру в названии которой меньше десяти букв и цифр.
+    """.removeTabs()
 
     @ItemFactory
     class Factory : WheelItem.Factory {

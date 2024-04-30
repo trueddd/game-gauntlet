@@ -2,12 +2,15 @@ package com.github.trueddd
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
@@ -154,28 +157,31 @@ private fun TopPanel(
     modifier: Modifier = Modifier,
     onDestinationChanged: (Destination) -> Unit = {},
 ) {
-    NavigationBar(
+    Row(
         modifier = modifier
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .height(72.dp)
+            .background(MaterialTheme.colorScheme.onSecondary, RoundedCornerShape(50))
     ) {
         destinations.forEach { destination ->
-            NavigationBarItem(
-                selected = currentDestination == destination,
-                onClick = { onDestinationChanged(destination) },
-                enabled = !destination.requireAuth || participant != null,
-                icon = {
-                    Icon(
-                        imageVector = if (currentDestination == destination) {
-                            destination.icon
-                        } else {
-                            destination.disabledIcon
-                        },
-                        contentDescription = null,
-                    )
-                },
-                label = {
-                    Text(destination.name)
-                },
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+                    .background(
+                        color = if (currentDestination == destination) {
+                            MaterialTheme.colorScheme.secondaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSecondary
+                        },
+                        shape = RoundedCornerShape(50)
+                    )
+                    .clip(RoundedCornerShape(50))
+                    .clickable(enabled = !destination.requireAuth || participant != null) {
+                        onDestinationChanged(destination)
+                    }
                     .pointerHoverIcon(
                         if (!destination.requireAuth || participant != null) {
                             PointerIcon.Hand
@@ -183,7 +189,22 @@ private fun TopPanel(
                             PointerIcon.Default
                         }
                     )
-            )
+            ) {
+                Icon(
+                    imageVector = if (currentDestination == destination) {
+                        destination.icon
+                    } else {
+                        destination.disabledIcon
+                    },
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = destination.name,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
         }
     }
 }

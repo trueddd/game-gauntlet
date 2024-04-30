@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,6 +31,7 @@ import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.ui.widget.DiceAnimation
 import com.github.trueddd.ui.widget.DiceD6
+import com.github.trueddd.util.applyModifiersDecoration
 import com.github.trueddd.util.positionSpinAnimation
 import com.github.trueddd.utils.flipCoin
 import com.github.trueddd.utils.rollDice
@@ -83,6 +86,8 @@ fun Wheels(
                     activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                     inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand)
             )
             SegmentedButton(
                 selected = wheelState.type == WheelType.Players,
@@ -93,6 +98,8 @@ fun Wheels(
                     activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                     inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand)
             )
             SegmentedButton(
                 selected = wheelState.type == WheelType.Games,
@@ -103,6 +110,8 @@ fun Wheels(
                     activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                     inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand)
             )
             SegmentedButton(
                 selected = wheelState.type == WheelType.Dice,
@@ -113,6 +122,8 @@ fun Wheels(
                     activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                     inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand)
             )
             SegmentedButton(
                 selected = wheelState.type == WheelType.Coin,
@@ -123,6 +134,8 @@ fun Wheels(
                     activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                     inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand)
             )
         }
         Row(
@@ -454,9 +467,15 @@ private fun Wheel(
                 ) {
                     if (wheelState.rolledItem != null) {
                         Text(
-                            text = wheelState.rolledItem.description,
+                            text = if (wheelState.type == WheelType.Items) {
+                                wheelState.rolledItem.description.applyModifiersDecoration()
+                            } else {
+                                AnnotatedString(wheelState.rolledItem.description)
+                            },
                             fontSize = 24.sp,
                             lineHeight = 30.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
                         )
                     }
                 }

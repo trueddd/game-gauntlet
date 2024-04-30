@@ -4,6 +4,7 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.github.trueddd.items.AwfulEvent.Debuff
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -25,7 +26,7 @@ class AwfulEvent private constructor(override val uid: String) : WheelItem.Pendi
     override val description = """
         |Отними от следующего броска кубика значение в зависимости от количества 
         |стримящих в данный момент участников.
-    """.trimMargin()
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Int(name = "Количество стримящих участников"))
@@ -63,7 +64,7 @@ class AwfulEvent private constructor(override val uid: String) : WheelItem.Pendi
         override val id = Id(AwfulEvent)
         override val name = "Плохой ивент"
         override val description = """
-            -${modifier.absoluteValue} к броску кубика на ход. Спасибо всем, кто был онлайн.
-        """.trimIndent()
+            |`-${modifier.absoluteValue}` к броску кубика на ход. Спасибо всем, кто был онлайн.
+        """.removeTabs()
     }
 }

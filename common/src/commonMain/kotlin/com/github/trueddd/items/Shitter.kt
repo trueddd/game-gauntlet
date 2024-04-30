@@ -2,6 +2,7 @@ package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,11 +21,11 @@ class Shitter private constructor(override val uid: String) : WheelItem.Event() 
     override val name = "Подсеруха"
 
     override val description = """
-        Стример, наролливший этот пункт получает дебафф в виде минуса к итоговому значению кубика в зависимости 
-        от его текущего положения на карте. Если стример занимает лидирующее место - -3 к итоговому значению кубика, 
-        и -2 если стример занимает второе место и -1 если стример занимает третье место. 
-        Если стример занимает место ниже 4, то колесо рероллится.
-    """.trimIndent()
+        |Стример, наролливший этот пункт получает дебафф в виде минуса к итоговому значению кубика в зависимости 
+        |от его текущего положения на карте. Если стример занимает лидирующее место - `-3` к итоговому значению кубика, 
+        |и `-2` если стример занимает второе место и `-1` если стример занимает третье место. 
+        |Если стример занимает место ниже 4, то колесо рероллится.
+    """.removeTabs()
 
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
         val everyoneEqualized = globalState.stateSnapshot.playersState.values
@@ -60,7 +61,7 @@ class Shitter private constructor(override val uid: String) : WheelItem.Event() 
         override val id = Id(Shitter)
         override val name = "Подсеруха"
         override val description = """
-            -${modifier.absoluteValue} к броску кубика на ход.
-        """.trimIndent()
+            |`-${modifier.absoluteValue}` к броску кубика на ход.
+        """.removeTabs()
     }
 }

@@ -4,6 +4,7 @@ import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -22,8 +23,8 @@ class Relocation private constructor(override val uid: String) : WheelItem.Pendi
     override val name = "Релокейшен"
 
     override val description = """
-        Стример роллит список жанров и переходит на ближайший сектор с выпавшим жанром.
-    """.trimIndent()
+        |Стример роллит список жанров и переходит на ближайший сектор с выпавшим жанром.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Genre(name = "Жанр"))
