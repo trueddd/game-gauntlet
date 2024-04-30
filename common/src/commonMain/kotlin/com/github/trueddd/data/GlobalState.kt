@@ -107,5 +107,5 @@ data class GlobalState(
         ))
     }
 
-    fun defaultPlayersHistory() = players.associate { it.name to PlayerTurnsHistory(emptyList()) }
+    fun defaultPlayersHistory() = players.associate { it.name to PlayerTurnsHistory.default() }
 }

@@ -32,7 +32,12 @@ object PlayersHistoryCalculator {
                         moveRange = oldState.positionOf(action.rolledBy) .. newState.positionOf(action.rolledBy),
                         game = newState.stateOf(action.rolledBy).currentGame,
                     )
-                    history.copy(turns = history.turns + turn)
+                    history.copy(
+                        turns = history.turns + turn,
+                        statistics = history.statistics.copy(
+                            thrownDices = history.statistics.thrownDices + action.diceValue
+                        )
+                    )
                 }
             }
             is GameDrop -> {
@@ -43,7 +48,12 @@ object PlayersHistoryCalculator {
                             ?: oldState.positionOf(action.rolledBy) .. newState.positionOf(action.rolledBy),
                         game = newState.stateOf(action.rolledBy).currentGame,
                     )
-                    history.copy(turns = history.turns.dropLast(1) + turn)
+                    history.copy(
+                        turns = history.turns.dropLast(1) + turn,
+                        statistics = history.statistics.copy(
+                            droppedGames = history.statistics.droppedGames + 1
+                        )
+                    )
                 }
             }
             is GameRoll -> {
@@ -89,7 +99,19 @@ object PlayersHistoryCalculator {
                     val turn = history.turns.last().copy(
                         game = newState.stateOf(action.participant).currentGame,
                     )
-                    history.copy(turns = history.turns.dropLast(1) + turn)
+                    history.copy(
+                        turns = history.turns.dropLast(1) + turn,
+                        statistics = history.statistics.copy(
+                            finishedGames = when (action.gameNewStatus) {
+                                Game.Status.Finished -> history.statistics.finishedGames + 1
+                                else -> history.statistics.finishedGames
+                            },
+                            rerolledGames = when (action.gameNewStatus) {
+                                Game.Status.Rerolled -> history.statistics.rerolledGames + 1
+                                else -> history.statistics.rerolledGames
+                            }
+                        )
+                    )
                 }
             }
             is ItemReceive -> currentHistory

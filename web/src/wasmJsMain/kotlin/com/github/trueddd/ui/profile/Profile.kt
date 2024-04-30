@@ -115,7 +115,7 @@ fun ProfileScreen(
                 currentPlayer = currentParticipant,
                 gameConfig = gameConfig,
                 stateSnapshot = stateSnapshot,
-                turnsHistory = turnsHistory?.get(selected!!.name) ?: PlayerTurnsHistory(emptyList()),
+                turnsHistory = turnsHistory?.get(selected!!.name) ?: PlayerTurnsHistory.default(),
             )
         }
     }
