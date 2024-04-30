@@ -11,7 +11,7 @@ import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-// TODO: split this action to more specific ones or include game drop logics here?
+// TODO: split this action to more specific ones?
 @Serializable
 @SerialName("a${Action.Key.GameStatusChange}")
 data class GameStatusChange(

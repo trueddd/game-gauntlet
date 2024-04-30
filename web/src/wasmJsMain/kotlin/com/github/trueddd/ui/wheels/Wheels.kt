@@ -83,6 +83,8 @@ fun Wheels(
                     activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                     inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand)
             )
             SegmentedButton(
                 selected = wheelState.type == WheelType.Players,
@@ -93,6 +95,8 @@ fun Wheels(
                     activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                     inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand)
             )
             SegmentedButton(
                 selected = wheelState.type == WheelType.Games,
@@ -103,6 +107,8 @@ fun Wheels(
                     activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                     inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand)
             )
             SegmentedButton(
                 selected = wheelState.type == WheelType.Dice,
@@ -113,6 +119,8 @@ fun Wheels(
                     activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                     inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand)
             )
             SegmentedButton(
                 selected = wheelState.type == WheelType.Coin,
@@ -123,6 +131,8 @@ fun Wheels(
                     activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                     inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand)
             )
         }
         Row(

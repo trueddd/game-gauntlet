@@ -78,32 +78,58 @@ fun ProfileScreen(
     PermanentNavigationDrawer(
         drawerContent = {
             Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier
                     .padding(vertical = 32.dp)
                     .fillMaxHeight()
                     .width(leftSideBarWidth)
-                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(topEnd = 32.dp, bottomEnd = 32.dp))
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceDim,
+                        shape = RoundedCornerShape(topEnd = 32.dp, bottomEnd = 32.dp)
+                    )
+                    .padding(vertical = 36.dp)
             ) {
                 gameConfig.players.forEach {
-                    NavigationDrawerItem(
-                        label = { Text(it.displayName) },
-                        selected = selected == it,
+                    Card(
+                        shape = RoundedCornerShape(50),
                         onClick = { selected = it },
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (selected == it) {
+                                MaterialTheme.colorScheme.surfaceVariant
+                            } else {
+                                MaterialTheme.colorScheme.surfaceDim
+                            },
+                        ),
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth()
-                    )
+                            .pointerHoverIcon(PointerIcon.Hand)
+                    ) {
+                        Text(
+                            text = it.displayName,
+                            modifier = Modifier
+                                .padding(16.dp)
+                        )
+                    }
                 }
                 if (currentParticipant == null) {
                     HorizontalDivider()
-                    NavigationDrawerItem(
-                        label = { Text("Войти") },
-                        selected = false,
+                    Card(
+                        shape = RoundedCornerShape(50),
                         onClick = { authManager.requestAuth() },
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceDim
+                        ),
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth()
-                    )
+                    ) {
+                        Text(
+                            text = "Войти",
+                            modifier = Modifier
+                                .padding(16.dp)
+                        )
+                    }
                 }
             }
         },
@@ -223,14 +249,14 @@ private fun Profile(
         modifier = modifier
             .padding(horizontal = 24.dp)
     ) {
-        Box(
+        ElevatedCard(
+            shape = RoundedCornerShape(36.dp),
             modifier = Modifier
                 .width(leftSideBarWidth)
                 .align(Alignment.TopStart)
                 .padding(top = 32.dp, bottom = 32.dp)
                 .fillMaxHeight()
-                .background(MaterialTheme.colorScheme.surfaceDim, RoundedCornerShape(36.dp))
-        )
+        ) {}
         LazyColumn(
             state = lazyListState,
             contentPadding = PaddingValues(vertical = 32.dp),
@@ -452,12 +478,28 @@ private fun Profile(
                 TextButton(
                     onClick = { visibleDialog = ProfileDialogs.GameStatusChange },
                     enabled = selectedPlayer == currentPlayer && selectedPlayerState.hasCurrentActiveGame,
+                    modifier = Modifier
+                        .pointerHoverIcon(
+                            if (selectedPlayer == currentPlayer && selectedPlayerState.hasCurrentActiveGame) {
+                                PointerIcon.Hand
+                            } else {
+                                PointerIcon.Default
+                            }
+                        )
                 ) {
                     Text("Изменить статус игры")
                 }
                 TextButton(
                     onClick = { visibleDialog = ProfileDialogs.BoardMove },
                     enabled = selectedPlayer == currentPlayer && selectedPlayerState.boardMoveAvailable,
+                    modifier = Modifier
+                        .pointerHoverIcon(
+                            if (selectedPlayer == currentPlayer && selectedPlayerState.boardMoveAvailable) {
+                                PointerIcon.Hand
+                            } else {
+                                PointerIcon.Default
+                            }
+                        )
                 ) {
                     Text("Сделать ход")
                 }
@@ -507,9 +549,18 @@ private fun Profile(
                     onStatusChangeRequested = { statusChangeRequest ->
                         Log.info(TAG, "setting new status: $statusChangeRequest")
                         val command = when (statusChangeRequest) {
-                            is StatusChangeRequest.Dropped -> Command.Action.gameDrop(currentPlayer, statusChangeRequest.diceValue)
-                            is StatusChangeRequest.Finished -> Command.Action.gameStatusChange(currentPlayer, Game.Status.Finished)
-                            is StatusChangeRequest.Rerolled -> Command.Action.gameStatusChange(currentPlayer, Game.Status.Rerolled)
+                            is StatusChangeRequest.Dropped -> Command.Action.gameDrop(
+                                player = currentPlayer,
+                                diceValue = statusChangeRequest.diceValue
+                            )
+                            is StatusChangeRequest.Finished -> Command.Action.gameStatusChange(
+                                player = currentPlayer,
+                                status = Game.Status.Finished
+                            )
+                            is StatusChangeRequest.Rerolled -> Command.Action.gameStatusChange(
+                                player = currentPlayer,
+                                status = Game.Status.Rerolled
+                            )
                         }
                         commandSender.sendCommand(command)
                         visibleDialog = ProfileDialogs.None
