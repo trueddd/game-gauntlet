@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -22,8 +23,8 @@ class GreatEvent private constructor(override val uid: String) : WheelItem.Pendi
     override val name = "Крутой ивент"
 
     override val description = """
-        К следующему броску кубика прибавь значение в зависимости от количества стримящих в данный момент участников.
-    """.trimIndent()
+        |К следующему броску кубика прибавь значение в зависимости от количества стримящих в данный момент участников.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Int(name = "Количество стримящих"))
@@ -60,7 +61,7 @@ class GreatEvent private constructor(override val uid: String) : WheelItem.Pendi
         override val id = Id(GreatEvent)
         override val name = "Крутой ивент"
         override val description = """
-            +${modifier.absoluteValue} к броску кубика на ход. Спасибо всем, кто был онлайн.
-        """.trimIndent()
+            |`+${modifier.absoluteValue}` к броску кубика на ход. Спасибо всем, кто был онлайн.
+        """.removeTabs()
     }
 }

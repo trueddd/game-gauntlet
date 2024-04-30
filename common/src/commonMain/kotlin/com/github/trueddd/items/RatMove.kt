@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,10 +22,10 @@ class RatMove private constructor(override val uid: String) : WheelItem.PendingE
     override val name = "Крысиный поступок"
 
     override val description = """
-        Выбери стримера и сбрось его инвентарь, баффы и дебаффы. Теперь ты главная крыса ивента. 
-        Нельзя сбросить пустой инвентарь, нельзя сбросить свой инвентарь, если у всех стримеров пустой инвентарь, 
-        то пункт рероллится.
-    """.trimIndent()
+        |Выбери стримера и сбрось его инвентарь, баффы и дебаффы. Теперь ты главная крыса ивента. 
+        |Нельзя сбросить пустой инвентарь, нельзя сбросить свой инвентарь, если у всех стримеров пустой инвентарь, 
+        |то пункт рероллится.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Player(name = "Стример"))

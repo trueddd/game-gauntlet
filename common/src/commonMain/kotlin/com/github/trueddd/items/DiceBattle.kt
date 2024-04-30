@@ -6,6 +6,7 @@ import com.github.trueddd.data.without
 import com.github.trueddd.items.DiceBattle.Buff
 import com.github.trueddd.items.DiceBattle.Debuff
 import com.github.trueddd.utils.d6Range
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -25,11 +26,12 @@ class DiceBattle private constructor(override val uid: String) : WheelItem.Pendi
     override val name = "Писькомерянье"
 
     override val description = """
-        Наролливший стример рандомно выбирает другого стримера из тех кто сейчас находится в онлайне 
-        (если никого сейчас нет онлайн - реролл колеса) и созванивается в дискорде. Затем оба стримера кидают кубик d6. 
-        Тот у кого число больше получает плюс столько очков сколько на кубике, а тот у кого меньше - 
-        получает количество минус очков своего кубика. При выпавших одинаковых числах, кубики бросаются еще раз.
-    """.trimIndent()
+        |Наролливший стример рандомно выбирает другого стримера из тех кто сейчас находится в онлайне 
+        |(если никого сейчас нет онлайн - реролл колеса) и созванивается в дискорде. 
+        |Затем оба стримера кидают кубик d6. 
+        |Тот у кого число больше получает плюс столько очков сколько на кубике, а тот у кого меньше - 
+        |получает количество минус очков своего кубика. При выпавших одинаковых числах, кубики бросаются еще раз.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(
@@ -91,7 +93,7 @@ class DiceBattle private constructor(override val uid: String) : WheelItem.Pendi
         }
         override val id = Id(DiceBattle)
         override val name = "Писькомерянье"
-        override val description = "+${modifier.absoluteValue} к броску кубика на ход"
+        override val description = "`+${modifier.absoluteValue}` к броску кубика на ход"
     }
 
     @Serializable
@@ -104,6 +106,6 @@ class DiceBattle private constructor(override val uid: String) : WheelItem.Pendi
         }
         override val id = Id(DiceBattle)
         override val name = "Писькомерянье"
-        override val description = "-${modifier.absoluteValue} к броску кубика на ход"
+        override val description = "`-${modifier.absoluteValue}` к броску кубика на ход"
     }
 }

@@ -1,5 +1,6 @@
 package com.github.trueddd.items
 
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,10 +22,10 @@ class PowerThrow private constructor(
     override val name = "Мощный бросок"
 
     override val description = """
-        К следующему броску кубика для перехода по секторам прибавьте 1. 
-        Общее значение не может быть больше 10. 
-        В таком случае излишек переносится на следующий бросок кубика.
-    """.trimIndent()
+        |К следующему броску кубика для перехода по секторам прибавьте `+1`. 
+        |Общее значение не может быть больше 10. 
+        |В таком случае излишек переносится на следующий бросок кубика.
+    """.removeTabs()
 
     override val modifier: Int = 1
 

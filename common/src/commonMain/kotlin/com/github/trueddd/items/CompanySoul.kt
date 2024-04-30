@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,12 +22,12 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
     override val name = "Душа компании"
 
     override val description = """
-        Участник, наролливший этот пункт, идет в войс к любому другому участнику на свой выбор, 
-        и пытается его рассмешить любыми способами за 5 минут. Если рассмешить не получилось, 
-        шутник получает -1 к следующему броску кубика, а стойко выдержавший шутки стример - +1 к следующему 
-        броску кубика. А если удалось рассмешить - +1 к следующему броску кубика шутнику, 
-        -1 к следующему броску кубика стримеру, не выдержевшему напора острых шуток.
-    """.trimIndent()
+        |Участник, наролливший этот пункт, идет в войс к любому другому участнику на свой выбор, 
+        |и пытается его рассмешить любыми способами за 5 минут. Если рассмешить не получилось, 
+        |шутник получает `-1` к следующему броску кубика, а стойко выдержавший шутки стример - `+1` к следующему 
+        |броску кубика. А если удалось рассмешить - `+1` к следующему броску кубика шутнику, 
+        |`-1` к следующему броску кубика стримеру, не выдержевшему напора острых шуток.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(
@@ -78,7 +79,7 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
         }
         override val id = Id(CompanySoul)
         override val name = "Вы - Душа компании"
-        override val description = "+1 к следующему броску кубика на ход."
+        override val description = "`+1` к следующему броску кубика на ход."
     }
 
     @Serializable
@@ -91,7 +92,7 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
         }
         override val id = Id(CompanySoul)
         override val name = "Зануда"
-        override val description = "Попробуй рассмеши тебя - +1 к следующему броску кубика на ход."
+        override val description = "Попробуй рассмеши тебя - `+1` к следующему броску кубика на ход."
     }
 
     @Serializable
@@ -104,7 +105,7 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
         }
         override val id = Id(CompanySoul)
         override val name = "Вы не Душа компании"
-        override val description = "Следующий раз ищи анекдоты посмешнее - -1 к следующему броску кубика на ход."
+        override val description = "Следующий раз ищи анекдоты посмешнее - `-1` к следующему броску кубика на ход."
     }
 
     @Serializable
@@ -117,6 +118,6 @@ class CompanySoul private constructor(override val uid: String) : WheelItem.Pend
         }
         override val id = Id(CompanySoul)
         override val name = "Весельчак"
-        override val description = "Посмеялись - и хватит. -1 к следующему броску кубика на ход."
+        override val description = "Посмеялись - и хватит. `-1` к следующему броску кубика на ход."
     }
 }

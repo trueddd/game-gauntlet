@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,9 +22,9 @@ class Classic private constructor(override val uid: String) : WheelItem.Event() 
     override val name = "Классика"
 
     override val description = """
-        Если на этом ивенте одному из участников выпадала "Супер Корова" или одна из частей "Веселой Фермы", 
-        то все участники получают +1 к следующему броску кубика, иначе ничего не проиходит.
-    """.trimIndent()
+        |Если на этом ивенте одному из участников выпадала "Супер Корова" или одна из частей "Веселой Фермы", 
+        |то все участники получают `+1` к следующему броску кубика, иначе ничего не проиходит.
+    """.removeTabs()
 
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
         return if (globalState.getAllEverRolledGames().any { it.id in TargetGameIds }) {

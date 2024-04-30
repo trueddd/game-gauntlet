@@ -5,6 +5,7 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.github.trueddd.utils.getItemFactoriesSet
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -23,12 +24,12 @@ class Poll private constructor(override val uid: String) : WheelItem.PendingEven
     override val name = "Голосование"
 
     override val description = """
-        Дополнительно прокрути колесо, после чего проведи голосование что делать с выпавшим пунктом. 
-        Первое голосование - оставить себе или кинуть в другого участника. 
-        В случае, если в голосовании победило "кинуть в другого участника", проведи дополнительное голосование 
-        в какого именно участника (проводится между теми участниками, кто сейчас в онлайне, если никого в онлайне нет, 
-        то среди всех).
-    """.trimIndent()
+        |Дополнительно прокрути колесо, после чего проведи голосование что делать с выпавшим пунктом. 
+        |Первое голосование - оставить себе или кинуть в другого участника. 
+        |В случае, если в голосовании победило "кинуть в другого участника", проведи дополнительное голосование 
+        |в какого именно участника (проводится между теми участниками, кто сейчас в онлайне, если никого в онлайне нет, 
+        |то среди всех).
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(

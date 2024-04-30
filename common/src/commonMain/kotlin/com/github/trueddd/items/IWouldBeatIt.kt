@@ -1,5 +1,6 @@
 package com.github.trueddd.items
 
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -17,8 +18,8 @@ class IWouldBeatIt private constructor(override val uid: String) : WheelItem.Eff
     override val name = "А вот я бы прошел"
 
     override val description = """
-        Следующая игра проходится из списка дропнутых на текущем ивенте игр всеми участниками.
-    """.trimIndent()
+        |Следующая игра проходится из списка дропнутых на текущем ивенте игр всеми участниками.
+    """.removeTabs()
 
     @ItemFactory
     class Factory : WheelItem.Factory {

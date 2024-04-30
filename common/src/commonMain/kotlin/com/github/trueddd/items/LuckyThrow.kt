@@ -5,6 +5,7 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
 import com.github.trueddd.items.LuckyThrow.Buff
+import com.github.trueddd.utils.removeTabs
 import com.github.trueddd.utils.serialization
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
@@ -24,9 +25,9 @@ class LuckyThrow private constructor(override val uid: String) : WheelItem.Pendi
     override val name = "Счастливый бросок"
 
     override val description = """
-        При выпадении этого пункта стример роллит жанры и если после следующего броска кубика он попадает на клетку 
-        с выпавшим жанром, то эта клетка автоматически засчитывается пройденной и стример двигается дальше.
-    """.trimIndent()
+        |При выпадении этого пункта стример роллит жанры и если после следующего броска кубика он попадает на клетку 
+        |с выпавшим жанром, то эта клетка автоматически засчитывается пройденной и стример двигается дальше.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Genre(name = "Жанр"))
@@ -66,8 +67,8 @@ class LuckyThrow private constructor(override val uid: String) : WheelItem.Pendi
         override val name = "Счастливый бросок. ${genre.name}"
 
         override val description = """
-        Если после следующего броска кубика стример попадает на клетку с жанром ${genre.name}, 
-        то эта клетка автоматически засчитывается пройденной и стример двигается дальше.
-    """.trimIndent()
+            |Если после следующего броска кубика стример попадает на клетку с жанром ${genre.name}, 
+            |то эта клетка автоматически засчитывается пройденной и стример двигается дальше.
+        """.removeTabs()
     }
 }

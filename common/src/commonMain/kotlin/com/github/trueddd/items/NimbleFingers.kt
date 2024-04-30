@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,10 +22,10 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
     override val name = "Ловкие пальцы"
 
     override val description = """
-        Участник, наролливший этот пункт может своровать любой предмет у одного из участников ивента 
-        по своему усмотрению. Если ни у одного из участников на данный момент нет предметов, 
-        то данный пункт сбрасывается.
-    """.trimIndent()
+        |Участник, наролливший этот пункт может своровать любой предмет у одного из участников ивента 
+        |по своему усмотрению. Если ни у одного из участников на данный момент нет предметов, 
+        |то данный пункт сбрасывается.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(

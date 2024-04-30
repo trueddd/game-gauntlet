@@ -1,5 +1,6 @@
 package com.github.trueddd.items
 
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,10 +21,10 @@ class WeakThrow private constructor(
     override val name = "Слабый бросок"
 
     override val description = """
-        От следующего броска кубика для перехода по секторам отнимется 1. 
-        Общее значение не может равно 0. 
-        В таком случае отрицательные эффекты на бросок переносятся на следующий бросок кубика.
-    """.trimIndent()
+        |От следующего броска кубика для перехода по секторам отнимется 1. 
+        |Общее значение не может равно 0. 
+        |В таком случае отрицательные эффекты на бросок переносятся на следующий бросок кубика.
+    """.removeTabs()
 
     override val modifier: Int = -1
 

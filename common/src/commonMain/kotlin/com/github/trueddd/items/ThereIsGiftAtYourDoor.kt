@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,10 +22,10 @@ class ThereIsGiftAtYourDoor private constructor(override val uid: String) : Whee
     override val name = "\"У вас под дверью насрано\""
 
     override val description = """
-        После прохождения текущий игры участник с этим дебаффом остается на том же секторе. 
-        Можно кинуть на другого участника, но в таком случае кидающий дебафф участник получает -2 
-        к следующему броску кубика.
-    """.trimIndent()
+        |После прохождения текущий игры участник с этим дебаффом остается на том же секторе. 
+        |Можно кинуть на другого участника, но в таком случае кидающий дебафф участник получает `-2` 
+        |к следующему броску кубика.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Player(name = "Кто получает дебафф?"))
@@ -88,6 +89,6 @@ class ThereIsGiftAtYourDoor private constructor(override val uid: String) : Whee
         }
         override val id = Id(ThereIsGiftAtYourDoor)
         override val name = "\"У вас под дверью насрано\""
-        override val description = "-2 к следующему броску кубика для перехода по секторам. Серун..."
+        override val description = "`-2` к следующему броску кубика для перехода по секторам. Серун..."
     }
 }

@@ -2,6 +2,7 @@ package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -19,8 +20,8 @@ class NegativeWheel private constructor(override val uid: String) : WheelItem.Ev
     override val name = "Негативное колесо"
 
     override val description = """
-        Прокрути колесо приколов столько раз, сколько на тебе дебаффов в данный момент.
-    """.trimIndent()
+        |Прокрути колесо приколов столько раз, сколько на тебе дебаффов в данный момент.
+    """.removeTabs()
 
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
         return globalState

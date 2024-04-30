@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,11 +22,11 @@ class Teleport private constructor(override val uid: String) : WheelItem.Pending
     override val name = "Телепорт"
 
     override val description = """
-        Позволяет телепортироваться к одному из соседей по секторам, чтобы определиться к какому соседу 
-        ты телепортируешься, бросается монетка РЕШКА - сосед сзади, ОРЕЛ - сосед спереди 
-        (те с кем ты стоишь на одном секторе, соседями не являются, стример на финишной клетке соседом не является). 
-        Если сосед только один, телепортируешься к нему, если соседей нет вовсе - УВЫ.
-    """.trimIndent()
+        |Позволяет телепортироваться к одному из соседей по секторам, чтобы определиться к какому соседу 
+        |ты телепортируешься, бросается монетка РЕШКА - сосед сзади, ОРЕЛ - сосед спереди 
+        |(те с кем ты стоишь на одном секторе, соседями не являются, стример на финишной клетке соседом не является). 
+        |Если сосед только один, телепортируешься к нему, если соседей нет вовсе - УВЫ.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Bool(name = "Выпал Орёл?"))

@@ -15,7 +15,7 @@ class PlusOneBuff private constructor(override val uid: String) : WheelItem.Effe
 
     override val name = "Плюс один"
 
-    override val description = "+1 к следующему броску кубика на ход"
+    override val description = "`+1` к следующему броску кубика на ход"
 
     override val modifier = 1
 }

@@ -1,5 +1,6 @@
 package com.github.trueddd.items
 
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,9 +22,9 @@ class Viewer private constructor(
     override val name = "Видосник"
 
     override val description = """
-        Следующие две игры, не считая текущей, проходятся на самом сложном уровне сложности. 
-        При наличии "Игровика" оба эффекта уничтожают друг друга.
-    """.trimIndent()
+        |Следующие две игры, не считая текущей, проходятся на самом сложном уровне сложности. 
+        |При наличии "Игровика" оба эффекта уничтожают друг друга.
+    """.removeTabs()
 
     override val maxCharges = 2
 

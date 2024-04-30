@@ -4,6 +4,7 @@ import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -22,11 +23,11 @@ class WannaSwap private constructor(override val uid: String) : WheelItem.Pendin
     override val name = "\"Махнёмся не глядя?\""
 
     override val description = """
-        Выбери стримера и предожи поменятся с ним играми. Если другой стример не согласен на обмен, 
-        то обоими стримерами бросается кубик d6 без модификаторов, если выигрывает стример, предложивший обмен, 
-        то стримеры меняются играми, иначе сделка срывается. При удачной смене прохождение игр у обоих стримеров 
-        начинается с начала.
-    """.trimIndent()
+        |Выбери стримера и предожи поменятся с ним играми. Если другой стример не согласен на обмен, 
+        |то обоими стримерами бросается кубик d6 без модификаторов, если выигрывает стример, предложивший обмен, 
+        |то стримеры меняются играми, иначе сделка срывается. При удачной смене прохождение игр у обоих стримеров 
+        |начинается с начала.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Player(

@@ -3,6 +3,7 @@ package com.github.trueddd.items
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.data.without
+import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -22,12 +23,12 @@ class MongoliaDoesNotExist private constructor(override val uid: String) : Wheel
     override val name = "Монголии не существует"
 
     override val description = """
-        Просматривается данное видео (https://youtu.be/fPjepiWWPkY). 
-        Стример интересуется, есть ли в чате хоть один монгол, и он (предполагаемый монгол) может это доказать, 
-        за время пока идет видеоролик, то стример получает +2 к следующему броску кубика. 
-        Если в чате нет монголов или никто из претендентов не смог это доказать, то -2 к следующему броску кубика. 
-        Если стримеру уже было доказано, что Монголия существует, то он рероллит этот пункт.
-    """.trimIndent()
+        |Просматривается данное видео (https://youtu.be/fPjepiWWPkY). 
+        |Стример интересуется, есть ли в чате хоть один монгол, и он (предполагаемый монгол) может это доказать, 
+        |за время пока идет видеоролик, то стример получает `+2` к следующему броску кубика. 
+        |Если в чате нет монголов или никто из претендентов не смог это доказать, то `-2` к следующему броску кубика. 
+        |Если стримеру уже было доказано, что Монголия существует, то он рероллит этот пункт.
+    """.removeTabs()
 
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Bool(name = "Монголия существует?"))
@@ -64,8 +65,8 @@ class MongoliaDoesNotExist private constructor(override val uid: String) : Wheel
         override val id = Id(MongoliaDoesNotExist)
         override val name = "Монголия существует"
         override val description = """
-            Монголия существует. И теперь все это знают. +${modifier.absoluteValue} к броску кубика на ход.
-        """.trimIndent()
+            |Монголия существует. И теперь все это знают. `+${modifier.absoluteValue}` к броску кубика на ход.
+        """.removeTabs()
     }
 
     @Serializable
@@ -80,7 +81,7 @@ class MongoliaDoesNotExist private constructor(override val uid: String) : Wheel
         override val id = Id(MongoliaDoesNotExist)
         override val name = "Монголии не существует"
         override val description = """
-            Монголия, кажется, и правда не существует. -${modifier.absoluteValue} к броску кубика на ход.
-        """.trimIndent()
+            |Монголия, кажется, и правда не существует. `-${modifier.absoluteValue}` к броску кубика на ход.
+        """.removeTabs()
     }
 }
