@@ -200,7 +200,7 @@ fun Modifier.simpleVerticalScrollbar(
 
             drawRect(
                 color = color,
-                topLeft = Offset(this.size.width - width.toPx() * 2, scrollbarOffsetY),
+                topLeft = Offset(this.size.width - width.toPx() - 16.dp.toPx(), scrollbarOffsetY),
                 size = Size(width.toPx(), scrollbarHeight),
                 alpha = alpha,
             )
