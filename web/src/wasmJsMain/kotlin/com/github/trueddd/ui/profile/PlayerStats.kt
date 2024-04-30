@@ -5,29 +5,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.github.trueddd.data.Game
 import com.github.trueddd.data.PlayerTurnsHistory
 
-// TODO: calculate stats on backend?
+@Stable
 private fun PlayerTurnsHistory.averageMoveDice(): String {
-    val average = turns
-        .mapNotNull { turn -> turn.moveRange?.let { it.last - it.first } }
-        .average()
-    return if (average.isNaN()) {
+    return if (statistics.averageDice.isNaN()) {
         "-"
     } else {
-        val string = average.toString()
+        val string = statistics.averageDice.toString()
         string.substring(0 .. (string.indexOfFirst { !it.isDigit() } + 2))
     }
-}
-
-private fun PlayerTurnsHistory.gamesWithStatus(status: Game.Status): String {
-    return turns.count { it.game?.status == status }.toString()
 }
 
 @Composable
@@ -47,17 +40,17 @@ fun Stats(
         )
         StatsItem(
             title = "Пройденных игр",
-            value = turnsHistory.gamesWithStatus(Game.Status.Finished),
+            value = turnsHistory.statistics.finishedGames.toString(),
             expanded = expanded
         )
         StatsItem(
             title = "Количество рероллов",
-            value = turnsHistory.gamesWithStatus(Game.Status.Rerolled),
+            value = turnsHistory.statistics.rerolledGames.toString(),
             expanded = expanded
         )
         StatsItem(
             title = "Количество дропов",
-            value = turnsHistory.gamesWithStatus(Game.Status.Dropped),
+            value = turnsHistory.statistics.droppedGames.toString(),
             expanded = expanded
         )
     }

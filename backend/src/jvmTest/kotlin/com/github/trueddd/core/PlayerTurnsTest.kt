@@ -33,23 +33,35 @@ class PlayerTurnsTest {
         //
         val playersHistory = eventGate.stateHolder.currentPlayersHistory
         // compare player 1
-        assertEquals(expected = 1, actual = playersHistory[player1.name]!!.turns.size)
-        assertEquals(expected = 0..1, actual = playersHistory[player1.name]!!.turns.first().moveRange)
-        assertEquals(expected = Game.Id(1), actual = playersHistory[player1.name]!!.turns.first().game?.game?.id)
-        assertEquals(expected = Game.Status.InProgress, actual = playersHistory[player1.name]!!.turns.first().game?.status)
+        assertEquals(expected = 1, playersHistory[player1.name]!!.turns.size)
+        assertEquals(expected = 0..1, playersHistory[player1.name]!!.turns.first().moveRange)
+        assertEquals(expected = Game.Id(1), playersHistory[player1.name]!!.turns.first().game?.game?.id)
+        assertEquals(expected = Game.Status.InProgress, playersHistory[player1.name]!!.turns.first().game?.status)
+        assertEquals(expected = 1.0, playersHistory[player1.name]!!.statistics.averageDice)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.finishedGames)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.droppedGames)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.rerolledGames)
         // compare player 2
-        assertEquals(expected = 1, actual = playersHistory[player2.name]!!.turns.size)
-        assertEquals(expected = 0..4, actual = playersHistory[player2.name]!!.turns.first().moveRange)
-        assertEquals(expected = Game.Id(2), actual = playersHistory[player2.name]!!.turns.first().game?.game?.id)
-        assertEquals(expected = Game.Status.InProgress, actual = playersHistory[player2.name]!!.turns.first().game?.status)
+        assertEquals(expected = 1, playersHistory[player2.name]!!.turns.size)
+        assertEquals(expected = 0..4, playersHistory[player2.name]!!.turns.first().moveRange)
+        assertEquals(expected = Game.Id(2), playersHistory[player2.name]!!.turns.first().game?.game?.id)
+        assertEquals(expected = Game.Status.InProgress, playersHistory[player2.name]!!.turns.first().game?.status)
+        assertEquals(expected = 4.0, playersHistory[player2.name]!!.statistics.averageDice)
+        assertEquals(expected = 0, playersHistory[player2.name]!!.statistics.finishedGames)
+        assertEquals(expected = 0, playersHistory[player2.name]!!.statistics.droppedGames)
+        assertEquals(expected = 0, playersHistory[player2.name]!!.statistics.rerolledGames)
         // compare player 3
-        assertEquals(expected = 2, actual = playersHistory[player3.name]!!.turns.size)
-        assertEquals(expected = 0..5, actual = playersHistory[player3.name]!!.turns.first().moveRange)
-        assertEquals(expected = Game.Id(2), actual = playersHistory[player3.name]!!.turns.first().game?.game?.id)
-        assertEquals(expected = Game.Status.Finished, actual = playersHistory[player3.name]!!.turns.first().game?.status)
-        assertEquals(expected = 5..7, actual = playersHistory[player3.name]!!.turns.last().moveRange)
-        assertEquals(expected = Game.Id(4), actual = playersHistory[player3.name]!!.turns.last().game?.game?.id)
-        assertEquals(expected = Game.Status.InProgress, actual = playersHistory[player3.name]!!.turns.last().game?.status)
+        assertEquals(expected = 2, playersHistory[player3.name]!!.turns.size)
+        assertEquals(expected = 0..5, playersHistory[player3.name]!!.turns.first().moveRange)
+        assertEquals(expected = Game.Id(2), playersHistory[player3.name]!!.turns.first().game?.game?.id)
+        assertEquals(expected = Game.Status.Finished, playersHistory[player3.name]!!.turns.first().game?.status)
+        assertEquals(expected = 5..7, playersHistory[player3.name]!!.turns.last().moveRange)
+        assertEquals(expected = Game.Id(4), playersHistory[player3.name]!!.turns.last().game?.game?.id)
+        assertEquals(expected = Game.Status.InProgress, playersHistory[player3.name]!!.turns.last().game?.status)
+        assertEquals(expected = 3.5, playersHistory[player3.name]!!.statistics.averageDice)
+        assertEquals(expected = 1, playersHistory[player3.name]!!.statistics.finishedGames)
+        assertEquals(expected = 0, playersHistory[player3.name]!!.statistics.droppedGames)
+        assertEquals(expected = 0, playersHistory[player3.name]!!.statistics.rerolledGames)
     }
 
     @Test
@@ -65,11 +77,15 @@ class PlayerTurnsTest {
         //
         val playersHistory = eventGate.stateHolder.currentPlayersHistory
         // compare player 1
-        assertEquals(expected = 2, actual = playersHistory[player1.name]!!.turns.size)
-        assertEquals(expected = 0..1, actual = playersHistory[player1.name]!!.turns.first().moveRange)
-        assertEquals(expected = Game.Status.Dropped, actual = playersHistory[player1.name]!!.turns.first().game?.status)
-        assertEquals(expected = null, actual = playersHistory[player1.name]!!.turns.last().moveRange)
-        assertEquals(expected = Game.Status.InProgress, actual = playersHistory[player1.name]!!.turns.last().game?.status)
+        assertEquals(expected = 2, playersHistory[player1.name]!!.turns.size)
+        assertEquals(expected = 0..1, playersHistory[player1.name]!!.turns.first().moveRange)
+        assertEquals(expected = Game.Status.Dropped, playersHistory[player1.name]!!.turns.first().game?.status)
+        assertEquals(expected = null, playersHistory[player1.name]!!.turns.last().moveRange)
+        assertEquals(expected = Game.Status.InProgress, playersHistory[player1.name]!!.turns.last().game?.status)
+        assertEquals(expected = 4.0, playersHistory[player1.name]!!.statistics.averageDice)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.finishedGames)
+        assertEquals(expected = 1, playersHistory[player1.name]!!.statistics.droppedGames)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.rerolledGames)
     }
 
     @Test
@@ -86,11 +102,15 @@ class PlayerTurnsTest {
         //
         val playersHistory = eventGate.stateHolder.currentPlayersHistory
         // compare player 1
-        assertEquals(expected = 2, actual = playersHistory[player1.name]!!.turns.size)
-        assertEquals(expected = 0..4, actual = playersHistory[player1.name]!!.turns.first().moveRange)
-        assertEquals(expected = Game.Status.InProgress, actual = playersHistory[player1.name]!!.turns.first().game?.status)
-        assertEquals(expected = null, actual = playersHistory[player1.name]!!.turns.last().moveRange)
-        assertEquals(expected = Game.Status.Next, actual = playersHistory[player1.name]!!.turns.last().game?.status)
+        assertEquals(expected = 2, playersHistory[player1.name]!!.turns.size)
+        assertEquals(expected = 0..4, playersHistory[player1.name]!!.turns.first().moveRange)
+        assertEquals(expected = Game.Status.InProgress, playersHistory[player1.name]!!.turns.first().game?.status)
+        assertEquals(expected = null, playersHistory[player1.name]!!.turns.last().moveRange)
+        assertEquals(expected = Game.Status.Next, playersHistory[player1.name]!!.turns.last().game?.status)
+        assertEquals(expected = 4.0, playersHistory[player1.name]!!.statistics.averageDice)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.finishedGames)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.droppedGames)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.rerolledGames)
     }
 
     @Test
@@ -106,9 +126,13 @@ class PlayerTurnsTest {
         //
         val playersHistory = eventGate.stateHolder.currentPlayersHistory
         // compare player 1
-        assertEquals(expected = 1, actual = playersHistory[player1.name]!!.turns.size)
-        assertEquals(expected = 0..4, actual = playersHistory[player1.name]!!.turns.first().moveRange)
-        assertEquals(expected = Game.Status.InProgress, actual = playersHistory[player1.name]!!.turns.first().game?.status)
+        assertEquals(expected = 1, playersHistory[player1.name]!!.turns.size)
+        assertEquals(expected = 0..4, playersHistory[player1.name]!!.turns.first().moveRange)
+        assertEquals(expected = Game.Status.InProgress, playersHistory[player1.name]!!.turns.first().game?.status)
+        assertEquals(expected = 4.0, playersHistory[player1.name]!!.statistics.averageDice)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.finishedGames)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.droppedGames)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.rerolledGames)
     }
 
     @Test
@@ -124,10 +148,14 @@ class PlayerTurnsTest {
         //
         val playersHistory = eventGate.stateHolder.currentPlayersHistory
         // compare player 1
-        assertEquals(expected = 2, actual = playersHistory[player1.name]!!.turns.size)
-        assertEquals(expected = 0..4, actual = playersHistory[player1.name]!!.turns.first().moveRange)
-        assertEquals(expected = 4..6, actual = playersHistory[player1.name]!!.turns.last().moveRange)
-        assertEquals(expected = Game.Status.Finished, actual = playersHistory[player1.name]!!.turns.first().game?.status)
-        assertEquals(expected = null, actual = playersHistory[player1.name]!!.turns.last().game?.status)
+        assertEquals(expected = 2, playersHistory[player1.name]!!.turns.size)
+        assertEquals(expected = 0..4, playersHistory[player1.name]!!.turns.first().moveRange)
+        assertEquals(expected = 4..6, playersHistory[player1.name]!!.turns.last().moveRange)
+        assertEquals(expected = Game.Status.Finished, playersHistory[player1.name]!!.turns.first().game?.status)
+        assertEquals(expected = null, playersHistory[player1.name]!!.turns.last().game?.status)
+        assertEquals(expected = 3.0, playersHistory[player1.name]!!.statistics.averageDice)
+        assertEquals(expected = 1, playersHistory[player1.name]!!.statistics.finishedGames)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.droppedGames)
+        assertEquals(expected = 0, playersHistory[player1.name]!!.statistics.rerolledGames)
     }
 }
