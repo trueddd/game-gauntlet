@@ -39,7 +39,7 @@ class LoyalModerator private constructor(override val uid: String) : WheelItem.I
     override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState.updatePlayer(usedBy) { playerState ->
             val targetDebuffId = getParameters(arguments, globalState).parameter1
-            if (playerState.effects.firstOrNull { it.uid == targetDebuffId } is EasterCakeBang) {
+            if (playerState.effects.firstOrNull { it.uid == targetDebuffId } is NonDroppable) {
                 throw IllegalArgumentException("This debuff cannot be dispelled")
             }
             playerState.copy(

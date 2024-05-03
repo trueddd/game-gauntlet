@@ -1,15 +1,22 @@
 package com.github.trueddd.ui.profile
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.github.trueddd.data.*
-import com.github.trueddd.items.*
-import com.github.trueddd.util.isDevEnvironment
+import com.github.trueddd.data.Game
+import com.github.trueddd.data.GameConfig
+import com.github.trueddd.data.Participant
+import com.github.trueddd.data.StateSnapshot
+import com.github.trueddd.items.ParameterType
+import com.github.trueddd.items.Parametrized
+import com.github.trueddd.items.WheelItem
 
 private fun Map<String, String>.updateParametersMap(
     currentParameter: ParameterType,
@@ -225,11 +232,7 @@ private fun ForeignItemParameter(
                 onValueChange = {},
                 readOnly = true,
                 label = { Text(text = "Цель") },
-                trailingIcon = {
-                    if (isDevEnvironment()) {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = playerExpanded)
-                    }
-                },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = playerExpanded) },
                 modifier = Modifier
                     .menuAnchor()
             )
@@ -258,11 +261,7 @@ private fun ForeignItemParameter(
                 onValueChange = {},
                 readOnly = true,
                 label = { Text(text = parameter.name) },
-                trailingIcon = {
-                    if (isDevEnvironment()) {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = itemExpanded)
-                    }
-                },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = itemExpanded) },
                 modifier = Modifier
                     .menuAnchor()
             )
@@ -308,11 +307,7 @@ private fun MyItemParameter(
             onValueChange = {},
             readOnly = true,
             label = { Text(text = parameter.name) },
-            trailingIcon = {
-                if (isDevEnvironment()) {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = itemExpanded)
-                }
-            },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = itemExpanded) },
             modifier = Modifier
                 .menuAnchor()
         )
@@ -356,11 +351,7 @@ private fun ItemParameter(
             onValueChange = {},
             readOnly = true,
             label = { Text(text = parameter.name) },
-            trailingIcon = {
-                if (isDevEnvironment()) {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = itemExpanded)
-                }
-            },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = itemExpanded) },
             modifier = Modifier
                 .menuAnchor()
         )
@@ -401,11 +392,7 @@ private fun GenreParameter(
             onValueChange = {},
             readOnly = true,
             label = { Text(text = parameter.name) },
-            trailingIcon = {
-                if (isDevEnvironment()) {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                }
-            },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor()
         )

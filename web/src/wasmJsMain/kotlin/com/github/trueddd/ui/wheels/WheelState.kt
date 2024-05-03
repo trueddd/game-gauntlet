@@ -16,8 +16,7 @@ data class WheelState(
     val rolledItem: Rollable?,
 ) {
 
-    val isItemsWheel = type == WheelType.Items
-    val isGamesWheel = type == WheelType.Games
+    val isApplyButtonVisible = (type is WheelType.Items || type is WheelType.Games) && rolledItem != null
 
     companion object {
         fun default(items: List<Rollable>, type: WheelType) = WheelState(

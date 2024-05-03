@@ -18,7 +18,6 @@ import com.github.trueddd.di.get
 import com.github.trueddd.ui.widget.DiceAnimation
 import com.github.trueddd.ui.widget.DiceD6
 import com.github.trueddd.ui.widget.WarningTextBlock
-import com.github.trueddd.util.isDevEnvironment
 import com.github.trueddd.util.localized
 import kotlinx.collections.immutable.persistentListOf
 import kotlin.math.roundToInt
@@ -96,11 +95,7 @@ fun GameStatusChangeDialog(
                         onValueChange = {},
                         readOnly = true,
                         label = { Text(text = "Статус") },
-                        trailingIcon = {
-                            if (isDevEnvironment()) {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = statusExpanded)
-                            }
-                        },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = statusExpanded) },
                         modifier = Modifier
                             .menuAnchor()
                     )

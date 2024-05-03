@@ -8,8 +8,8 @@ import kotlinx.browser.window
 
 class AppStorage {
 
-    private fun wheelKeyHash(type: WheelType) = "wheel_${type}_hash"
-    private fun wheelKeyRolled(type: WheelType) = "wheel_${type}_rolled"
+    private fun wheelKeyHash(type: WheelType) = "wheel_${type.key}_hash"
+    private fun wheelKeyRolled(type: WheelType) = "wheel_${type.key}_rolled"
 
     private fun List<Rollable>.hash(): Int {
         return map { it.name }.hashCode()
