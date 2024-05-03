@@ -80,3 +80,7 @@ fun <T : WheelItem> List<T>.without(itemUid: String): List<T> {
 
 inline val PlayerState.canSetNextGame: Boolean
     get() = effects.any { it is DontCare || it is DontUnderstand }
+
+fun PlayerState.genreOfCurrentPosition(gameConfig: GameConfig): Game.Genre {
+    return gameConfig.gameGenreDistribution.genreAtPosition(position)
+}

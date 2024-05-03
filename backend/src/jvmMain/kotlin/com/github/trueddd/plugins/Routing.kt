@@ -2,6 +2,7 @@ package com.github.trueddd.plugins
 
 import com.github.trueddd.core.*
 import com.github.trueddd.data.AuthResponse
+import com.github.trueddd.data.Game
 import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.utils.Environment
 import io.ktor.http.*
@@ -55,7 +56,8 @@ fun Application.configureRouting() {
                 call.respond(itemRoller.pick())
             }
             get(Router.Wheels.ROLL_GAMES) {
-                call.respond(gamesProvider.roll())
+                val genre = call.parameters["genre"]?.toIntOrNull()?.let { Game.Genre.entries.getOrNull(it) }
+                call.respond(gamesProvider.roll(genre))
             }
             get(Router.Wheels.ROLL_PLAYERS) {
                 val user = call.userLogin!!

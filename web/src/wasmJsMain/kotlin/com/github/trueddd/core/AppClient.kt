@@ -139,14 +139,25 @@ class AppClient(
     suspend fun getPlayersHistory(): PlayersHistory? =
         getJsonData(router.http(Router.TURNS), sendBearerToken = true)
 
-    suspend fun getGames(): List<Game> =
-        getJsonData(router.http(Router.Wheels.GAMES), sendBearerToken = true) ?: emptyList()
+    suspend fun getGames(genre: Game.Genre): List<Game> =
+        getJsonData<List<Game>>(router.http(Router.Wheels.GAMES), sendBearerToken = true)
+            ?.filter { it.genre == genre } ?: emptyList()
 
     suspend fun rollItem(): WheelItem? =
         getJsonData(router.http(Router.Wheels.ROLL_ITEMS), sendBearerToken = true)
 
-    suspend fun rollGame(): Game? =
-        getJsonData(router.http(Router.Wheels.ROLL_GAMES), sendBearerToken = true)
+    suspend fun rollGame(genre: Game.Genre): Game? = withContext(coroutineContext) {
+        try {
+            httpClient.get(router.http(Router.Wheels.ROLL_GAMES)) {
+                parameter("genre", genre.ordinal)
+                savedJwtToken()?.let { bearerAuth(it) }
+                contentType(ContentType.Application.Json)
+            }.body<Game>()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
     suspend fun rollPlayer(): Participant? =
         getJsonData(router.http(Router.Wheels.ROLL_PLAYERS), sendBearerToken = true)

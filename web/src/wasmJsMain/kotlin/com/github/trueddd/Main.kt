@@ -157,9 +157,10 @@ private fun TopPanel(
     modifier: Modifier = Modifier,
     onDestinationChanged: (Destination) -> Unit = {},
 ) {
+    val padding = 24.dp
     Row(
         modifier = modifier
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .padding(top = padding, start = padding, end = padding)
             .height(72.dp)
             .background(MaterialTheme.colorScheme.onSecondary, RoundedCornerShape(50))
     ) {

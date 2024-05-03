@@ -8,12 +8,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalDensity
@@ -29,9 +30,11 @@ import com.github.trueddd.core.CommandSender
 import com.github.trueddd.data.*
 import com.github.trueddd.di.get
 import com.github.trueddd.items.WheelItem
+import com.github.trueddd.ui.res.icons.Star
 import com.github.trueddd.ui.widget.DiceAnimation
 import com.github.trueddd.ui.widget.DiceD6
 import com.github.trueddd.util.applyModifiersDecoration
+import com.github.trueddd.util.localized
 import com.github.trueddd.util.positionSpinAnimation
 import com.github.trueddd.utils.flipCoin
 import com.github.trueddd.utils.rollDice
@@ -63,77 +66,115 @@ fun Wheels(
             )
         }
         LaunchedEffect(wheelState.type) {
-            val items = when (wheelState.type) {
-                WheelType.Items -> wheelItems
-                WheelType.Games -> appClient.getGames()
-                WheelType.Players -> gameConfig.players
-                WheelType.Dice -> DiceValue.All
-                WheelType.Coin -> CoinValue.All
+            val items = when (val type = wheelState.type) {
+                is WheelType.Items -> wheelItems
+                is WheelType.Games -> appClient.getGames(type.genre)
+                is WheelType.Players -> gameConfig.players
+                is WheelType.Dice -> DiceValue.All
+                is WheelType.Coin -> CoinValue.All
             }
             wheelState = appStorage.getSavedWheelState(items, wheelState.type)
         }
-        SingleChoiceSegmentedButtonRow(
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(32.dp)
         ) {
-            SegmentedButton(
+            InputChip(
                 selected = wheelState.type == WheelType.Items,
                 onClick = { wheelState = stateOnTabChange(WheelType.Items) },
                 label = { Text("Предметы") },
-                shape = RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50),
-                colors = SegmentedButtonDefaults.colors(
-                    activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                    inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                ),
+                leadingIcon = if (wheelState.type == WheelType.Items) {
+                    { Icon(Icons.Default.Check, contentDescription = null) }
+                } else null,
+                trailingIcon = null,
                 modifier = Modifier
                     .pointerHoverIcon(PointerIcon.Hand)
             )
-            SegmentedButton(
+            InputChip(
                 selected = wheelState.type == WheelType.Players,
                 onClick = { wheelState = stateOnTabChange(WheelType.Players) },
                 label = { Text("Игроки") },
-                shape = RectangleShape,
-                colors = SegmentedButtonDefaults.colors(
-                    activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                    inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                ),
+                leadingIcon = if (wheelState.type == WheelType.Players) {
+                    { Icon(Icons.Default.Check, contentDescription = null) }
+                } else null,
+                trailingIcon = null,
                 modifier = Modifier
                     .pointerHoverIcon(PointerIcon.Hand)
             )
-            SegmentedButton(
-                selected = wheelState.type == WheelType.Games,
-                onClick = { wheelState = stateOnTabChange(WheelType.Games) },
-                label = { Text("Игры") },
-                shape = RectangleShape,
-                colors = SegmentedButtonDefaults.colors(
-                    activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                    inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                ),
+            var gamesExpanded by remember { mutableStateOf(false) }
+            ExposedDropdownMenuBox(
+                expanded = gamesExpanded,
+                onExpandedChange = { gamesExpanded = !gamesExpanded },
                 modifier = Modifier
-                    .pointerHoverIcon(PointerIcon.Hand)
-            )
-            SegmentedButton(
+            ) {
+                InputChip(
+                    selected = wheelState.type is WheelType.Games,
+                    onClick = {},
+                    label = {
+                        Text(text = wheelState.type.let {
+                            if (it is WheelType.Games) "Игры - ${it.genre.localized}" else "Игры"
+                        })
+                    },
+                    leadingIcon = if (wheelState.type is WheelType.Games) {
+                        { Icon(Icons.Default.Check, contentDescription = null) }
+                    } else null,
+                    trailingIcon = null,
+                    modifier = Modifier
+                        .pointerHoverIcon(PointerIcon.Hand)
+                        .menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = gamesExpanded,
+                    onDismissRequest = { gamesExpanded = false },
+                    modifier = Modifier
+                        .width(IntrinsicSize.Max)
+                        .pointerHoverIcon(PointerIcon.Hand)
+                ) {
+                    Game.Genre.entries.forEach {
+                        DropdownMenuItem(
+                            text = { Row {
+                                val current = currentPlayerState?.genreOfCurrentPosition(gameConfig) == it
+                                if (current) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Star,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                    )
+                                } else {
+                                    Spacer(modifier = Modifier.width(24.dp))
+                                }
+                                Text(text = it.localized)
+                                Spacer(modifier = Modifier.width(24.dp))
+                            } },
+                            onClick = {
+                                wheelState = stateOnTabChange(WheelType.Games(it))
+                                gamesExpanded = false
+                            },
+                        )
+                    }
+                }
+            }
+            InputChip(
                 selected = wheelState.type == WheelType.Dice,
                 onClick = { wheelState = stateOnTabChange(WheelType.Dice) },
                 label = { Text("Кубик") },
-                shape = RectangleShape,
-                colors = SegmentedButtonDefaults.colors(
-                    activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                    inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                ),
+                leadingIcon = if (wheelState.type == WheelType.Dice) {
+                    { Icon(Icons.Default.Check, contentDescription = null) }
+                } else null,
+                trailingIcon = null,
                 modifier = Modifier
                     .pointerHoverIcon(PointerIcon.Hand)
             )
-            SegmentedButton(
+            InputChip(
                 selected = wheelState.type == WheelType.Coin,
                 onClick = { wheelState = stateOnTabChange(WheelType.Coin) },
                 label = { Text("Монетка") },
-                shape = RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50),
-                colors = SegmentedButtonDefaults.colors(
-                    activeBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                    inactiveBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                ),
+                leadingIcon = if (wheelState.type == WheelType.Coin) {
+                    { Icon(Icons.Default.Check, contentDescription = null) }
+                } else null,
+                trailingIcon = null,
                 modifier = Modifier
                     .pointerHoverIcon(PointerIcon.Hand)
             )
@@ -149,12 +190,12 @@ fun Wheels(
                 onClick = {
                     scope.launch {
                         val rollLambda = suspend {
-                            when (wheelState.type) {
-                                WheelType.Items -> appClient.rollItem()!!
-                                WheelType.Games -> appClient.rollGame()!!
-                                WheelType.Players -> appClient.rollPlayer()!!
-                                WheelType.Dice -> throw IllegalStateException()
-                                WheelType.Coin -> throw IllegalStateException()
+                            when (val type = wheelState.type) {
+                                is WheelType.Items -> appClient.rollItem()!!
+                                is WheelType.Games -> appClient.rollGame(type.genre)!!
+                                is WheelType.Players -> appClient.rollPlayer()!!
+                                is WheelType.Dice -> throw IllegalStateException()
+                                is WheelType.Coin -> throw IllegalStateException()
                             }
                         }
                         wheelState = when (wheelState.type) {
@@ -185,7 +226,7 @@ fun Wheels(
             ) {
                 Text(text = "Крутить")
             }
-            if ((wheelState.isItemsWheel || wheelState.isGamesWheel) && wheelState.rolledItem != null) {
+            if (wheelState.type.let { it is WheelType.Items || it is WheelType.Games } && wheelState.rolledItem != null) {
                 OutlinedButton(
                     shape = RoundedCornerShape(50),
                     onClick = {
@@ -204,13 +245,13 @@ fun Wheels(
                 ) {
                     Text(
                         text = when (wheelState.type) {
-                            WheelType.Items -> "Принять"
-                            WheelType.Games -> "Сделать текущей"
+                            is WheelType.Items -> "Принять"
+                            is WheelType.Games -> "Сделать текущей"
                             else -> "Apply"
                         }
                     )
                 }
-                if (wheelState.isGamesWheel && currentPlayerState?.canSetNextGame == true) {
+                if (wheelState.type is WheelType.Games && currentPlayerState?.canSetNextGame == true) {
                     OutlinedButton(
                         shape = RoundedCornerShape(50),
                         onClick = {

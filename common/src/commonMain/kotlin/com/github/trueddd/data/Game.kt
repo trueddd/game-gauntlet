@@ -55,7 +55,7 @@ data class Game(
         Shooter,
         @SerialName("three_in_row")
         ThreeInRow,
-        @SerialName("special")
+        @SerialName("special") // TODO: fill up special games
         Special;
 
         val color: Long
