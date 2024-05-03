@@ -24,7 +24,7 @@ class HoleyPockets private constructor(override val uid: String) : WheelItem.Eve
         return globalState.updatePlayer(rolledBy) { playerState ->
             playerState.copy(
                 inventory = emptyList(),
-                effects = playerState.effects.filterIsInstance<EasterCakeBang>(),
+                effects = playerState.effects.filter { it is NonDroppable },
             )
         }
     }

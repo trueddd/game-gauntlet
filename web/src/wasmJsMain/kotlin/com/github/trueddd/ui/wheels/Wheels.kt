@@ -19,8 +19,11 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.trueddd.core.AppClient
@@ -29,6 +32,7 @@ import com.github.trueddd.core.Command
 import com.github.trueddd.core.CommandSender
 import com.github.trueddd.data.*
 import com.github.trueddd.di.get
+import com.github.trueddd.items.NoClownery
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.ui.res.icons.Star
 import com.github.trueddd.ui.widget.DiceAnimation
@@ -226,30 +230,52 @@ fun Wheels(
             ) {
                 Text(text = "Крутить")
             }
-            if (wheelState.type.let { it is WheelType.Items || it is WheelType.Games } && wheelState.rolledItem != null) {
-                OutlinedButton(
-                    shape = RoundedCornerShape(50),
-                    onClick = {
-                        when (val rollable = wheelState.rolledItem) {
-                            is WheelItem -> commandSender.sendCommand(
-                                Command.Action.itemReceive(player, rollable.id)
-                            )
-                            is Game -> commandSender.sendCommand(
-                                Command.Action.gameRoll(player, rollable.id)
+            if (wheelState.isApplyButtonVisible) {
+                val rollForbidden = wheelState.type is WheelType.Items
+                        && currentPlayerState?.effects?.any { it is NoClownery } == true
+                TooltipBox(
+                    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                    tooltip = {
+                        val item = currentPlayerState?.effects?.firstOrNull { it is NoClownery } ?: return@TooltipBox
+                        PlainTooltip {
+                            Text(
+                                text = buildAnnotatedString {
+                                    append("Ролл колеса приколов запрещен, пока Вы находитесь под эффектом ")
+                                    withStyle(SpanStyle(color = Color(WheelItem.Colors.DEBUFF))) {
+                                        append(item.name)
+                                    }
+                                }
                             )
                         }
-                        wheelState = wheelState.copy(rolledItem = null)
                     },
-                    modifier = Modifier
-                        .pointerHoverIcon(PointerIcon.Hand)
+                    state = rememberTooltipState(isPersistent = true)
                 ) {
-                    Text(
-                        text = when (wheelState.type) {
-                            is WheelType.Items -> "Принять"
-                            is WheelType.Games -> "Сделать текущей"
-                            else -> "Apply"
-                        }
-                    )
+                    OutlinedButton(
+                        shape = RoundedCornerShape(50),
+                        onClick = {
+                            when (val rollable = wheelState.rolledItem) {
+                                is WheelItem -> commandSender.sendCommand(
+                                    Command.Action.itemReceive(player, rollable.id)
+                                )
+
+                                is Game -> commandSender.sendCommand(
+                                    Command.Action.gameRoll(player, rollable.id)
+                                )
+                            }
+                            wheelState = wheelState.copy(rolledItem = null)
+                        },
+                        enabled = !rollForbidden,
+                        modifier = Modifier
+                            .pointerHoverIcon(PointerIcon.Hand)
+                    ) {
+                        Text(
+                            text = when (wheelState.type) {
+                                is WheelType.Items -> "Принять"
+                                is WheelType.Games -> "Сделать текущей"
+                                else -> "Apply"
+                            }
+                        )
+                    }
                 }
                 if (wheelState.type is WheelType.Games && currentPlayerState?.canSetNextGame == true) {
                     OutlinedButton(

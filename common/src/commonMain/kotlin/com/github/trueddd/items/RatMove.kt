@@ -42,7 +42,7 @@ class RatMove private constructor(override val uid: String) : WheelItem.PendingE
                 targetUser.name -> if (targetUser != usedBy) {
                     playerState.copy(
                         inventory = emptyList(),
-                        effects = playerState.effects.filterIsInstance<EasterCakeBang>(),
+                        effects = playerState.effects.filter { it is NonDroppable },
                     )
                 } else {
                     playerState

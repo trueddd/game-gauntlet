@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("${WheelItem.EasterCakeBang}")
-class EasterCakeBang private constructor(override val uid: String) : WheelItem.Effect.Debuff() {
+class EasterCakeBang private constructor(override val uid: String) : WheelItem.Effect.Debuff(), NonDroppable {
 
     companion object {
         fun create() = EasterCakeBang(uid = generateWheelItemUid())

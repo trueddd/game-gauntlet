@@ -4,6 +4,7 @@ import com.github.trueddd.core.ItemRoller
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
 import com.github.trueddd.items.*
+import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
 import kotlinx.serialization.SerialName
@@ -36,6 +37,9 @@ data class ItemReceive(
     class Handler : Action.Handler<ItemReceive> {
 
         override suspend fun handle(action: ItemReceive, currentState: GlobalState): GlobalState {
+            if (currentState.effectsOf(action.receivedBy).any { it is NoClownery }){
+                throw StateModificationException(action, "Can't roll items while `NoClownery` is applied")
+            }
             return when (action.item) {
                 is NimbleFingers -> when (action.item.canUse(action.receivedBy, currentState)) {
                     true -> currentState.updatePlayer(action.receivedBy) {

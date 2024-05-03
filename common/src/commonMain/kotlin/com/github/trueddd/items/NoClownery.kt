@@ -5,10 +5,9 @@ import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-// TODO: add warning on item wheel front-end when this effect is applied
 @Serializable
 @SerialName("${WheelItem.NoClownery}")
-class NoClownery private constructor(override val uid: String) : WheelItem.Effect.Debuff() {
+class NoClownery private constructor(override val uid: String) : WheelItem.Effect.Debuff(), NonDroppable {
 
     companion object {
         fun create() = NoClownery(uid = generateWheelItemUid())

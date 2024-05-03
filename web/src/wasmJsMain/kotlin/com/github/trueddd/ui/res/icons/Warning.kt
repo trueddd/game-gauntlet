@@ -7,7 +7,7 @@ import androidx.compose.ui.unit.dp
 import kotlin.Suppress
 
 @Suppress("UnusedReceiverParameter")
-public val Icons.Outlined.Warning: ImageVector
+val Icons.Outlined.Warning: ImageVector
     get() {
         if (savedWarning != null) {
             return savedWarning!!
