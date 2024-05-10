@@ -154,6 +154,7 @@ sealed class WheelItem : Rollable {
         const val UnrecognizedDisk = 58
         const val FewLetters = 59
         const val ThereIsGiftAtYourDoor = 60
+        const val Radio = 61
     }
 }
 

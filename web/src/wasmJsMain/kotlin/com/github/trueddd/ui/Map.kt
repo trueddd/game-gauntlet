@@ -7,7 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,12 +20,13 @@ import com.github.trueddd.items.BoardTrap
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.util.localized
 
-@Stable
+@Immutable
 data class MapCellState(
     val index: Int,
     val genre: Game.Genre?,
     val players: List<Participant>,
     val traps: List<BoardTrap>,
+    val radioStation: RadioStation,
 )
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -49,7 +50,8 @@ fun Map(
                             ?.filterValues { it.position == 0 }?.keys
                             ?.let { names -> gameConfig.players.filter { it.name in names } }
                             ?: emptyList(),
-                        traps = stateSnapshot?.boardTraps?.filterKeys { it == 0 }?.values?.toList() ?: emptyList()
+                        traps = stateSnapshot?.boardTraps?.filterKeys { it == 0 }?.values?.toList() ?: emptyList(),
+                        radioStation = gameConfig.radioCoverage.stationAt(position = 0),
                     )
                 )
                 gameConfig.gameGenreDistribution.genres.forEachIndexed { index, genre ->
@@ -61,7 +63,8 @@ fun Map(
                                 ?.filterValues { it.position == index + 1 }?.keys
                                 ?.let { names -> gameConfig.players.filter { it.name in names } }
                                 ?: emptyList(),
-                            traps = stateSnapshot?.boardTraps?.filterKeys { it == index + 1 }?.values?.toList() ?: emptyList()
+                            traps = stateSnapshot?.boardTraps?.filterKeys { it == index + 1 }?.values?.toList() ?: emptyList(),
+                            radioStation = gameConfig.radioCoverage.stationAt(position = index + 1),
                         )
                     )
                 }
@@ -104,6 +107,7 @@ private fun MapCell(state: MapCellState) {
                         if (state.traps.isNotEmpty()) {
                             Text("Ловушки: ${state.traps.joinToString { it.name }}")
                         }
+                        Text("Радиостанция: ${state.radioStation.localized}")
                     }
                 }
             )

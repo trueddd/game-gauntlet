@@ -40,12 +40,17 @@ open class LocalEventHistoryHolder(
             GameGenreDistribution.serializer(),
             globalState.gameGenreDistribution
         )
+        val radioCoverage = serialization.encodeToString(
+            RadioCoverage.serializer(),
+            globalState.radioCoverage
+        )
         val events = eventsToSave
             .asReversed()
             .joinToString("\n") { serialization.encodeToString(it) }
         val text = buildString {
-            appendLine(timeRange)
-            appendLine(mapLayout)
+            appendLine("time:$timeRange")
+            appendLine("map:$mapLayout")
+            appendLine("radio:$radioCoverage")
             appendLine(events)
         }
         withContext(Dispatchers.IO) {
@@ -63,21 +68,33 @@ open class LocalEventHistoryHolder(
             historyHolderFile.readLines()
         }
         return withContext(Dispatchers.Default) {
-            val (start, end) = fileContent.getOrNull(0)
+            val (start, end) = fileContent.firstOrNull { it.startsWith("time:") }
+                ?.removePrefix("time:")
                 ?.split(":")
                 ?.let { (start, end) -> start.toLong() to end.toLong() }
                 ?: throw IllegalArgumentException("Error while parsing game time range")
-            val mapLayout = fileContent.getOrNull(1)
+            val mapLayout = fileContent.firstOrNull { it.startsWith("map:") }
+                ?.removePrefix("map:")
                 ?.let { serialization.decodeFromString(GameGenreDistribution.serializer(), it) }
                 ?: throw IllegalArgumentException("Error while parsing map layout")
+            val radioCoverage = fileContent.firstOrNull { it.startsWith("radio:") }
+                ?.removePrefix("radio:")
+                ?.let { serialization.decodeFromString(RadioCoverage.serializer(), it) }
+                ?: RadioCoverage.generateRandom(GlobalState.PLAYABLE_BOARD_RANGE, GlobalState.STINT_SIZE)
             val events = fileContent
-                .drop(2)
                 .filter { it.isNotBlank() }
-                .map { serialization.decodeFromString(Action.serializer(), it) }
+                .mapNotNull {
+                    try {
+                        serialization.decodeFromString(Action.serializer(), it)
+                    } catch (_: Exception) {
+                        null
+                    }
+                }
             val initialState = globalState(
                 genreDistribution = mapLayout,
                 startDateTime = Instant.fromEpochMilliseconds(start).toLocalDateTime(DefaultTimeZone),
                 activePeriod = (end - start).toDuration(DurationUnit.MILLISECONDS),
+                radioCoverage = radioCoverage,
             )
             var playersHistory = initialState.defaultPlayersHistory()
             val globalState = events.fold(initialState) { state, action ->

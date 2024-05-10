@@ -43,12 +43,17 @@ class DatabaseEventHistoryHolder(
             GameGenreDistribution.serializer(),
             globalState.gameGenreDistribution
         )
+        val radioCoverage = serialization.encodeToString(
+            RadioCoverage.serializer(),
+            globalState.radioCoverage
+        )
         val events = eventsToSave
             .asReversed()
             .joinToString("\n") { serialization.encodeToString(it) }
         val text = buildString {
-            appendLine(timeRange)
-            appendLine(mapLayout)
+            appendLine("time:$timeRange")
+            appendLine("map:$mapLayout")
+            appendLine("radio:$radioCoverage")
             append(events)
         }
         val result = suspendedTransactionAsync(Dispatchers.IO, database) {
@@ -71,31 +76,40 @@ class DatabaseEventHistoryHolder(
             val state = globalState()
             return LoadedGameState(state, state.defaultPlayersHistory())
         }
-        val eventDatesRegex = Regex("^\\d+:\\d+$")
-        val (start, end) = records.firstOrNull { it.matches(eventDatesRegex) }
+        val (start, end) = records.firstOrNull { it.startsWith("time:") }
+            ?.removePrefix("time:")
             ?.split(":")
             ?.let { (start, end) -> start.toLong() to end.toLong() }
             ?: run {
                 mutex.unlock()
                 throw IllegalArgumentException("Error while parsing game time range")
             }
-        val genreDistributionRegex = Regex("^\"\\d+\"$")
-        val mapLayout = records.firstOrNull { it.matches(genreDistributionRegex) }
+        val mapLayout = records.firstOrNull { it.startsWith("map:") }
+            ?.removePrefix("map:")
             ?.let { serialization.decodeFromString(GameGenreDistribution.serializer(), it) }
             ?: run {
                 mutex.unlock()
                 throw IllegalStateException("Distribution must be read, but actions list is empty")
             }
-        val eventsContent = records
-            .filter { it.isNotBlank() }
-            .filter { it.first() == '{' && it.last() == '}' }
+        val radioCoverage = records.firstOrNull { it.startsWith("radio:") }
+            ?.removePrefix("radio:")
+            ?.let { serialization.decodeFromString(RadioCoverage.serializer(), it) }
+            ?: RadioCoverage.generateRandom(GlobalState.PLAYABLE_BOARD_RANGE, GlobalState.STINT_SIZE)
         val events = withContext(Dispatchers.Default) {
-            eventsContent.map { serialization.decodeFromString(Action.serializer(), it) }
+            records.filter { it.isNotBlank() }
+                .mapNotNull {
+                    try {
+                        serialization.decodeFromString(Action.serializer(), it)
+                    } catch (_: Exception) {
+                        null
+                    }
+                }
         }
         val initialState = globalState(
             genreDistribution = mapLayout,
             startDateTime = Instant.fromEpochMilliseconds(start).toLocalDateTime(DefaultTimeZone),
             activePeriod = (end - start).toDuration(DurationUnit.MILLISECONDS),
+            radioCoverage = radioCoverage,
         )
         var playersHistory = initialState.defaultPlayersHistory()
         val globalState = events.fold(initialState) { state, action ->

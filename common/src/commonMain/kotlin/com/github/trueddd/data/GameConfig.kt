@@ -13,4 +13,6 @@ data class GameConfig(
     val startDate: Long,
     @SerialName("ed")
     val endDate: Long,
+    @SerialName("rc")
+    val radioCoverage: RadioCoverage,
 )

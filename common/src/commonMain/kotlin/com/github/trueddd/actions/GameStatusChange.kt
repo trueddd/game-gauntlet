@@ -66,6 +66,10 @@ data class GameStatusChange(
                         action.gameNewStatus == Game.Status.Finished -> null
                         else -> effect
                     }
+                    is Radio -> when {
+                        action.gameNewStatus == Game.Status.Finished -> effect.charge()
+                        else -> effect
+                    }
                     is ClimbingRope.Buff -> null
                     is ThereIsGiftAtYourDoor.StayAfterGame -> null
                     else -> effect

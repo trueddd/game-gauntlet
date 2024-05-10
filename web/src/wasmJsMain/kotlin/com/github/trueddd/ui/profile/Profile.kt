@@ -39,6 +39,7 @@ import com.github.trueddd.items.WheelItem
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.widget.AsyncImage
 import com.github.trueddd.util.RelativeDate
+import com.github.trueddd.util.isDevEnvironment
 import com.github.trueddd.util.localized
 import com.github.trueddd.util.typeLocalized
 import com.github.trueddd.utils.DefaultTimeZone
@@ -112,20 +113,30 @@ fun ProfileScreen(
                         )
                     }
                 }
-                if (currentParticipant == null) {
+                val showLoginButton = remember(currentParticipant) {
+                    isDevEnvironment() || currentParticipant == null
+                }
+                if (showLoginButton) {
                     HorizontalDivider()
                     Card(
                         shape = RoundedCornerShape(50),
-                        onClick = { authManager.requestAuth() },
+                        onClick = {
+                            if (authManager.isAuthorized) {
+                                authManager.logout()
+                            } else {
+                                authManager.requestAuth()
+                            }
+                        },
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceDim
                         ),
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth()
+                            .pointerHoverIcon(PointerIcon.Hand)
                     ) {
                         Text(
-                            text = "Войти",
+                            text = if (authManager.isAuthorized) "Выход" else "Войти",
                             modifier = Modifier
                                 .padding(16.dp)
                         )

@@ -27,6 +27,9 @@ class AuthManager(
     val userState: StateFlow<Participant?>
         get() = _userState.asStateFlow()
 
+    val isAuthorized: Boolean
+        get() = _userState.value != null
+
     init {
         val user = window.localStorage.getItem(USER_KEY)
             ?.let { serialization.decodeFromString<Participant>(it) }

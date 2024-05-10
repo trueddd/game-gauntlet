@@ -24,6 +24,8 @@ data class GlobalState(
     val startDate: Long,
     @SerialName("ed")
     val endDate: Long,
+    @SerialName("rc")
+    val radioCoverage: RadioCoverage,
 ) {
 
     companion object {
@@ -37,7 +39,7 @@ data class GlobalState(
         get() = STINT_SIZE * STINT_COUNT
 
     val gameConfig: GameConfig
-        get() = GameConfig(players, gameGenreDistribution, startDate, endDate)
+        get() = GameConfig(players, gameGenreDistribution, startDate, endDate, radioCoverage)
 
     fun stateOf(participant: Participant) = stateSnapshot.playersState[participant.name]!!
     fun effectsOf(participant: Participant) = stateOf(participant).effects

@@ -191,6 +191,10 @@ private fun TopPanel(
                         }
                     )
             ) {
+                val destinationContentColor = when {
+                    destination.requireAuth && participant == null -> MaterialTheme.colorScheme.outline
+                    else -> MaterialTheme.colorScheme.onSecondaryContainer
+                }
                 Icon(
                     imageVector = if (currentDestination == destination) {
                         destination.icon
@@ -198,12 +202,12 @@ private fun TopPanel(
                         destination.disabledIcon
                     },
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                    tint = destinationContentColor
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = destination.name,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                    color = destinationContentColor
                 )
             }
         }

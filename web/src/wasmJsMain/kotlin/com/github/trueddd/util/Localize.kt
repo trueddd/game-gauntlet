@@ -2,6 +2,7 @@ package com.github.trueddd.util
 
 import androidx.compose.runtime.Stable
 import com.github.trueddd.data.Game
+import com.github.trueddd.data.RadioStation
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.ui.res.StringResources
 import kotlinx.datetime.LocalDate
@@ -55,4 +56,13 @@ val RelativeDate.localized: String
         is RelativeDate.Today -> StringResources.RelativeDate.Today
         is RelativeDate.Yesterday -> StringResources.RelativeDate.Yesterday
         is RelativeDate.Other -> date.format()
+    }
+
+@Stable
+val RadioStation.localized: String
+    get() = when (this) {
+        RadioStation.Christian -> StringResources.RadioStation.Christian
+        RadioStation.Dacha -> StringResources.RadioStation.Dacha
+        RadioStation.Anime -> StringResources.RadioStation.Anime
+        RadioStation.Custom -> StringResources.RadioStation.Custom
     }
