@@ -3,7 +3,6 @@ package com.github.trueddd.plugins
 import com.github.trueddd.core.*
 import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.Game
-import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.utils.Environment
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -11,11 +10,9 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.cachingheaders.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
-import org.koin.ktor.ext.get
 import org.koin.ktor.ext.inject
 
 fun Application.configureRouting() {
@@ -71,33 +68,6 @@ fun Application.configureRouting() {
                 cache()
             }
             call.respond(eventGate.stateHolder.currentPlayersHistory)
-        }
-
-        post(Router.LOAD_GAME) {
-            val fileToLoad = try {
-                call.receive<DownloadGameRequestBody>().name
-            } catch (e: Exception) {
-                if (Environment.IsDev) {
-                    "Фишдом. Время праздников"
-                } else {
-                    throw e
-                }
-            }
-            val gameLoader = this@routing.get<GameLoader>()
-            val downloadedFile = gameLoader.loadGame(fileToLoad) ?: run {
-                call.respond(HttpStatusCode.NotFound, "No game was found with name `$fileToLoad`")
-                return@post
-            }
-            call.response.header(
-                HttpHeaders.ContentDisposition,
-                ContentDisposition.Attachment
-                    .withParameter(ContentDisposition.Parameters.FileName, downloadedFile.name)
-                    .toString()
-            )
-            call.respondFile(downloadedFile)
-            if (call.response.isSent) {
-                downloadedFile.delete()
-            }
         }
 
         post(Router.USER) {

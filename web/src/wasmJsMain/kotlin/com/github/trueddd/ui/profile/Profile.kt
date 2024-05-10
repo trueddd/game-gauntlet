@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,14 +38,13 @@ import com.github.trueddd.di.get
 import com.github.trueddd.items.Usable
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.theme.Colors
+import com.github.trueddd.ui.res.icons.OpenInNew
 import com.github.trueddd.ui.widget.AsyncImage
-import com.github.trueddd.util.RelativeDate
-import com.github.trueddd.util.isDevEnvironment
-import com.github.trueddd.util.localized
-import com.github.trueddd.util.typeLocalized
+import com.github.trueddd.util.*
 import com.github.trueddd.utils.DefaultTimeZone
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.wheelItems
+import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
@@ -491,7 +491,7 @@ private fun Profile(
                     enabled = selectedPlayer == currentPlayer && selectedPlayerState.hasCurrentActiveGame,
                     modifier = Modifier
                         .pointerHoverIcon(
-                            if (selectedPlayer == currentPlayer && selectedPlayerState.hasCurrentActiveGame) {
+                            if (selectedPlayerState.hasCurrentActiveGame) {
                                 PointerIcon.Hand
                             } else {
                                 PointerIcon.Default
@@ -502,10 +502,10 @@ private fun Profile(
                 }
                 TextButton(
                     onClick = { visibleDialog = ProfileDialogs.BoardMove },
-                    enabled = selectedPlayer == currentPlayer && selectedPlayerState.boardMoveAvailable,
+                    enabled = selectedPlayerState.boardMoveAvailable,
                     modifier = Modifier
                         .pointerHoverIcon(
-                            if (selectedPlayer == currentPlayer && selectedPlayerState.boardMoveAvailable) {
+                            if (selectedPlayerState.boardMoveAvailable) {
                                 PointerIcon.Hand
                             } else {
                                 PointerIcon.Default
@@ -513,6 +513,19 @@ private fun Profile(
                         )
                 ) {
                     Text("Сделать ход")
+                }
+                TextButton(
+                    onClick = { window.open(gamesDownloadLink) },
+                    modifier = Modifier
+                        .pointerHoverIcon(PointerIcon.Hand)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.OpenInNew,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Скачать игру")
                 }
             }
             AnimatedVisibility(

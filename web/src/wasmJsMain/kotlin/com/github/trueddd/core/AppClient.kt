@@ -2,26 +2,20 @@ package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.*
-import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.items.WheelItem
-import com.github.trueddd.util.toBlob
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.plugins.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.*
 import io.ktor.websocket.*
-import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import org.w3c.dom.HTMLAnchorElement
-import org.w3c.dom.url.URL
 
 class AppClient(
     private val httpClient: HttpClient,
@@ -92,28 +86,6 @@ class AppClient(
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
-            }
-        }
-    }
-
-    fun searchGame(name: String) {
-        launch {
-            try {
-                val response = httpClient.post(router.http(Router.LOAD_GAME)) {
-                    contentType(ContentType.Application.Json)
-                    setBody(DownloadGameRequestBody(name))
-                    onDownload { bytesSentTotal, contentLength ->
-                        println("Received $bytesSentTotal bytes from $contentLength")
-                    }
-                }
-                val body = response.body<ByteArray>()
-                println("Received ${body.size} bytes in total")
-                val link = document.createElement("a") as HTMLAnchorElement
-                link.setAttribute("href", URL.createObjectURL(body.toBlob()))
-                link.setAttribute("download", "$name.exe")
-                link.click()
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
         }
     }

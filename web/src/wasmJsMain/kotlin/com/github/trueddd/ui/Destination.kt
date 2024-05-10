@@ -4,11 +4,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.github.trueddd.ui.res.icons.map.Map
@@ -23,7 +21,7 @@ sealed class Destination(
 ) {
 
     companion object {
-        fun all() = listOf(Rules, Map, Dashboard, Wheels, Games, Profile)
+        fun all() = listOf(Rules, Map, Dashboard, Wheels, Profile)
     }
 
     data object Rules : Destination(
@@ -42,13 +40,6 @@ sealed class Destination(
         "Панель управления",
         Icons.Rounded.Menu,
         Icons.Outlined.Menu,
-        requireAuth = true
-    )
-
-    data object Games : Destination(
-        "Загрузка игр",
-        Icons.Rounded.Search,
-        Icons.Outlined.Search,
         requireAuth = true
     )
 
