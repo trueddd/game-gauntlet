@@ -15,6 +15,8 @@ object Router {
     const val TURNS = "/turns"
     /** Resource for user authorizing **/
     const val USER = "/user"
+    /** Resource for user's rewards on Twitch (global events, e.g. Nuke and Tornado) **/
+    const val REWARD = "/reward"
     /** Wheel related resources **/
     object Wheels {
         const val GAMES = "/games"

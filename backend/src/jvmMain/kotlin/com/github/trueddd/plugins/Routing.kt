@@ -3,6 +3,7 @@ package com.github.trueddd.plugins
 import com.github.trueddd.core.*
 import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.Game
+import com.github.trueddd.data.repository.TwitchUsersRepository
 import com.github.trueddd.utils.Environment
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -20,6 +21,7 @@ fun Application.configureRouting() {
     val httpClient by inject<HttpClient>()
     val itemRoller by inject<ItemRoller>()
     val gamesProvider by inject<GamesProvider>()
+    val twitchUsersRepository by inject<TwitchUsersRepository>()
 
     routing {
         install(CachingHeaders)
@@ -39,7 +41,24 @@ fun Application.configureRouting() {
             call.respond(eventGate.stateHolder.current.stateSnapshot)
         }
 
-        // Wheel scope
+        post(Router.USER) {
+            val userToken = call.parameters["token"] ?: run {
+                call.respond(HttpStatusCode.BadRequest, "No access token passed")
+                return@post
+            }
+            val twitchUser = httpClient.getTwitchUser(userToken).getOrNull() ?: run {
+                call.respond(HttpStatusCode.NotFound)
+                return@post
+            }
+            val participant = eventGate.stateHolder.participants.firstOrNull { it.name == twitchUser.login } ?: run {
+                call.respond(HttpStatusCode.NotFound)
+                return@post
+            }
+            twitchUsersRepository.saveUser(twitchUser.id, twitchUser.login, userToken)
+            val token = createJwtToken(twitchUser.login)
+            call.respond(HttpStatusCode.OK, AuthResponse(participant, token))
+        }
+
         authenticate {
             get(Router.ACTIONS) {
                 call.respond(eventGate.historyHolder.getActions())
@@ -60,6 +79,29 @@ fun Application.configureRouting() {
                 val user = call.userLogin!!
                 call.respond(eventGate.stateHolder.participants.filter { it.name != user }.random())
             }
+            get(Router.REWARD) {
+                val user = call.userLogin!!
+                val hasReward = twitchUsersRepository.getUsers().firstOrNull { it.playerName == user }?.rewardId != null
+                call.respond(if (hasReward) HttpStatusCode.OK else HttpStatusCode.NotFound)
+            }
+            post(Router.REWARD) {
+                val user = call.userLogin!!
+                val twitchUser = twitchUsersRepository.getUsers().firstOrNull { it.playerName == user } ?: run {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@post
+                }
+                val hasReward = twitchUser.rewardId != null
+                if (hasReward) {
+                    call.respond(HttpStatusCode.OK)
+                    return@post
+                }
+                val reward = httpClient.createTwitchReward(twitchUser.id, twitchUser.twitchToken).getOrNull() ?: run {
+                    call.respond(HttpStatusCode.InternalServerError)
+                    return@post
+                }
+                twitchUsersRepository.updateReward(twitchUser.playerName, reward.id)
+                call.respond(HttpStatusCode.Created)
+            }
         }
 
         // Profile scope
@@ -68,26 +110,6 @@ fun Application.configureRouting() {
                 cache()
             }
             call.respond(eventGate.stateHolder.currentPlayersHistory)
-        }
-
-        post(Router.USER) {
-            val userToken = call.parameters["token"] ?: run {
-                call.respond(HttpStatusCode.BadRequest, "No access token passed")
-                return@post
-            }
-            val twitchUser = httpClient.getTwitchUser(userToken).getOrNull()
-                ?: run {
-                    call.respond(HttpStatusCode.NotFound)
-                    return@post
-                }
-            val participant = eventGate.stateHolder.participants
-                .firstOrNull { it.name == twitchUser.login }
-                ?: run {
-                    call.respond(HttpStatusCode.NotFound)
-                    return@post
-                }
-            val token = createJwtToken(twitchUser.login)
-            call.respond(HttpStatusCode.OK, AuthResponse(participant, token))
         }
     }
 }

@@ -8,7 +8,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 @Serializable(with = RadioCoverage.Serializer::class)
-class RadioCoverage private constructor(
+data class RadioCoverage(
     val coverage: ArrayList<RadioStation>,
 ) {
 

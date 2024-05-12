@@ -14,5 +14,6 @@ fun main() {
         configureHTTP()
         configureSockets()
         configureRouting()
+        twitchIntegration()
     }.start(wait = true)
 }

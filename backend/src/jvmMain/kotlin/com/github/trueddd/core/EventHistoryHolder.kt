@@ -2,7 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.LoadedGameState
+import com.github.trueddd.data.model.LoadedGameState
 import kotlinx.coroutines.flow.Flow
 
 interface EventHistoryHolder {

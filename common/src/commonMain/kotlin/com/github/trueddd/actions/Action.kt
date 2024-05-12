@@ -28,6 +28,7 @@ sealed class Action(
         const val GameStatusChange = 5
         const val GameRoll = 6
         const val GameSet = 7
+        const val GlobalEvent = 8
     }
 
     /**

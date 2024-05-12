@@ -9,4 +9,5 @@ sealed class ProfileDialogs {
     data object GameStatusChange : ProfileDialogs()
     data object BoardMove : ProfileDialogs()
     data class WheelItemView(val item: WheelItem) : ProfileDialogs()
+    data object TwitchReward : ProfileDialogs()
 }

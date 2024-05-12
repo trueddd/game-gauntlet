@@ -104,6 +104,42 @@ class AppClient(
         }
     }
 
+    suspend fun checkTwitchRewardAvailability(token: String): Result<Unit> {
+        return withContext(coroutineContext) {
+            try {
+                val response = httpClient.get(router.http(Router.REWARD)) {
+                    bearerAuth(token)
+                }
+                if (response.status == HttpStatusCode.OK) {
+                    Result.success(Unit)
+                } else {
+                    Result.failure(IllegalStateException())
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun createTwitchReward(token: String): Result<Unit> {
+        return withContext(coroutineContext) {
+            try {
+                val response = httpClient.post(router.http(Router.REWARD)) {
+                    bearerAuth(token)
+                }
+                if (response.status == HttpStatusCode.OK || response.status == HttpStatusCode.Created) {
+                    Result.success(Unit)
+                } else {
+                    Result.failure(IllegalStateException())
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.failure(e)
+            }
+        }
+    }
+
     suspend fun getGameConfig(): GameConfig? = getJsonData(router.http(Router.CONFIG))
 
     suspend fun getStateSnapshot(): StateSnapshot? = getJsonData(router.http(Router.SNAPSHOT))

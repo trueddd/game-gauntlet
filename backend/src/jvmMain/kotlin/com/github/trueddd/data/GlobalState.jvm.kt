@@ -10,6 +10,7 @@ fun globalState(
     startDateTime: LocalDateTime = Clock.System.now().toLocalDateTime(DefaultTimeZone),
     activePeriod: Duration = 365.days,
     radioCoverage: RadioCoverage = RadioCoverage.generateRandom(GlobalState.PLAYABLE_BOARD_RANGE, GlobalState.STINT_SIZE),
+    raisedAmountOfPoints: Long = 0L,
 ): GlobalState {
     val startDateTimeInstant = startDateTime.toInstant(DefaultTimeZone)
     val players = listOf(
@@ -27,7 +28,8 @@ fun globalState(
         stateSnapshot = StateSnapshot(
             playersState = players.associate { it.name to PlayerState.default() },
             boardTraps = emptyMap(),
-            winner = null
+            winner = null,
+            overallAmountOfPointsRaised = raisedAmountOfPoints,
         ),
         gameHistory = players.associate { it.name to emptyList() },
         radioCoverage = radioCoverage,

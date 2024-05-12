@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,7 +37,6 @@ import com.github.trueddd.di.get
 import com.github.trueddd.items.Usable
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.theme.Colors
-import com.github.trueddd.ui.res.icons.OpenInNew
 import com.github.trueddd.ui.widget.AsyncImage
 import com.github.trueddd.util.*
 import com.github.trueddd.utils.DefaultTimeZone
@@ -514,18 +512,29 @@ private fun Profile(
                 ) {
                     Text("Сделать ход")
                 }
-                TextButton(
-                    onClick = { window.open(gamesDownloadLink) },
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier
-                        .pointerHoverIcon(PointerIcon.Hand)
+                        .padding(horizontal = 16.dp)
+                        .height(IntrinsicSize.Min)
                 ) {
-                    Icon(
-                        imageVector = Icons.Rounded.OpenInNew,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Скачать игру")
+                    TextButton(
+                        onClick = { window.open(gamesDownloadLink) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .pointerHoverIcon(PointerIcon.Hand)
+                    ) {
+                        Text("Игры")
+                    }
+                    VerticalDivider()
+                    TextButton(
+                        onClick = { visibleDialog = ProfileDialogs.TwitchReward },
+                        modifier = Modifier
+                            .weight(1f)
+                            .pointerHoverIcon(PointerIcon.Hand)
+                    ) {
+                        Text("Награды")
+                    }
                 }
             }
             AnimatedVisibility(
@@ -533,7 +542,7 @@ private fun Profile(
                 enter = fadeIn(),
                 exit = fadeOut(),
                 modifier = Modifier
-                    .padding(top = 64.dp)
+                    .padding(top = 16.dp)
             ) {
                 Stats(
                     expanded = false,
@@ -589,6 +598,9 @@ private fun Profile(
                         commandSender.sendCommand(command)
                         visibleDialog = ProfileDialogs.None
                     },
+                    onDialogDismiss = { visibleDialog = ProfileDialogs.None }
+                )
+                is ProfileDialogs.TwitchReward -> TwitchRewardDialog(
                     onDialogDismiss = { visibleDialog = ProfileDialogs.None }
                 )
                 is ProfileDialogs.None -> {}

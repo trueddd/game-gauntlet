@@ -130,6 +130,7 @@ object PlayersHistoryCalculator {
                     else -> currentHistory
                 }
             }
+            is GlobalEvent -> currentHistory
         }
     }
 }
