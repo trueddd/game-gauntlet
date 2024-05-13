@@ -13,10 +13,10 @@ object Router {
     const val ACTIONS = "/actions"
     /** Resource for receiving users' turns (profile tab) **/
     const val TURNS = "/turns"
-    @Deprecated("May be deleted in the future")
-    const val LOAD_GAME = "/game"
     /** Resource for user authorizing **/
     const val USER = "/user"
+    /** Resource for user's rewards on Twitch (global events, e.g. Nuke and Tornado) **/
+    const val REWARD = "/reward"
     /** Wheel related resources **/
     object Wheels {
         const val GAMES = "/games"

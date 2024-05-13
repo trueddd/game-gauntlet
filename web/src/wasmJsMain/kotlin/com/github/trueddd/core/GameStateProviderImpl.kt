@@ -59,7 +59,7 @@ class GameStateProviderImpl(
                 _connectionState.value = SocketState.Disconnected()
                 return@launch
             }
-            if (authManager.userState.value == null) {
+            if (!authManager.isAuthorized) {
                 val result = appClient.getStateSnapshot()
                 if (result != null) {
                     _connectionState.value = SocketState.Connected
@@ -104,10 +104,10 @@ class GameStateProviderImpl(
     }
 
     override fun playersHistoryFlow(): Flow<PlayersHistory?> {
-        return if (authManager.userState.value == null) {
-            flow { emit(appClient.getPlayersHistory()) }
-        } else {
+        return if (authManager.isAuthorized) {
             appClient.getPlayersHistoryFlow()
+        } else {
+            flow { emit(appClient.getPlayersHistory()) }
         }
     }
 }

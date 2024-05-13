@@ -38,22 +38,21 @@ import com.github.trueddd.items.Usable
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.widget.AsyncImage
-import com.github.trueddd.util.RelativeDate
-import com.github.trueddd.util.localized
-import com.github.trueddd.util.typeLocalized
+import com.github.trueddd.util.*
 import com.github.trueddd.utils.DefaultTimeZone
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.wheelItems
+import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
 
-private object ProfileContentType {
-    const val BACKGROUND = "background"
-    const val STATS = "stats"
-    const val HEADER = "header"
-    const val DATE = "date"
-    const val TABLE = "table"
+private enum class ProfileContentType {
+    Background,
+    Stats,
+    Header,
+    Date,
+    Table,
 }
 
 private const val TAG = "ProfileScreen"
@@ -112,20 +111,30 @@ fun ProfileScreen(
                         )
                     }
                 }
-                if (currentParticipant == null) {
+                val showLoginButton = remember(currentParticipant) {
+                    isDevEnvironment() || currentParticipant == null
+                }
+                if (showLoginButton) {
                     HorizontalDivider()
                     Card(
                         shape = RoundedCornerShape(50),
-                        onClick = { authManager.requestAuth() },
+                        onClick = {
+                            if (authManager.isAuthorized) {
+                                authManager.logout()
+                            } else {
+                                authManager.requestAuth()
+                            }
+                        },
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceDim
                         ),
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth()
+                            .pointerHoverIcon(PointerIcon.Hand)
                     ) {
                         Text(
-                            text = "Войти",
+                            text = if (authManager.isAuthorized) "Выход" else "Войти",
                             modifier = Modifier
                                 .padding(16.dp)
                         )
@@ -173,7 +182,7 @@ private fun WheelItemView(
                         }
                     )
                 },
-                text = { Text(item.description) },
+                text = { Text(item.description.applyModifiersDecoration()) },
                 action = if (item is Usable && onUse != null) { {
                     TextButton(
                         onClick = {
@@ -233,7 +242,7 @@ private fun Profile(
     val leftSidePanelTopPadding by remember {
         derivedStateOf {
             lazyListState.layoutInfo.visibleItemsInfo
-                .firstOrNull { it.contentType == ProfileContentType.HEADER }
+                .firstOrNull { it.contentType == ProfileContentType.Header }
                 ?.offset
         }
     }
@@ -263,7 +272,7 @@ private fun Profile(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            item(contentType = ProfileContentType.BACKGROUND) {
+            item(contentType = ProfileContentType.Background) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -272,7 +281,7 @@ private fun Profile(
                         .background(MaterialTheme.colorScheme.primary)
                 )
             }
-            item(contentType = ProfileContentType.STATS) {
+            item(contentType = ProfileContentType.Stats) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier
@@ -302,7 +311,7 @@ private fun Profile(
                     }
                 }
             }
-            stickyHeader(contentType = ProfileContentType.HEADER) {
+            stickyHeader(contentType = ProfileContentType.Header) {
                 Box(
                     modifier = Modifier
                         .padding(start = leftSideBarWidth + leftSideBarPadding)
@@ -363,7 +372,7 @@ private fun Profile(
                 }
             }
             turnsGroupedByDate.forEach { (relativeDate, turns) ->
-                item(contentType = ProfileContentType.DATE) {
+                item(contentType = ProfileContentType.Date) {
                     Text(
                         text = relativeDate.localized,
                         color = Colors.White,
@@ -373,7 +382,7 @@ private fun Profile(
                             .fillMaxWidth()
                     )
                 }
-                item(contentType = ProfileContentType.TABLE) {
+                item(contentType = ProfileContentType.Table) {
                     Card(
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
@@ -438,7 +447,7 @@ private fun Profile(
         val shouldShowSideStats by remember {
             derivedStateOf {
                 val visibleItems = lazyListState.layoutInfo.visibleItemsInfo
-                visibleItems.none { it.contentType == ProfileContentType.STATS }
+                visibleItems.none { it.contentType == ProfileContentType.Stats }
                     .and(visibleItems.isNotEmpty())
             }
         }
@@ -480,7 +489,7 @@ private fun Profile(
                     enabled = selectedPlayer == currentPlayer && selectedPlayerState.hasCurrentActiveGame,
                     modifier = Modifier
                         .pointerHoverIcon(
-                            if (selectedPlayer == currentPlayer && selectedPlayerState.hasCurrentActiveGame) {
+                            if (selectedPlayerState.hasCurrentActiveGame) {
                                 PointerIcon.Hand
                             } else {
                                 PointerIcon.Default
@@ -491,10 +500,10 @@ private fun Profile(
                 }
                 TextButton(
                     onClick = { visibleDialog = ProfileDialogs.BoardMove },
-                    enabled = selectedPlayer == currentPlayer && selectedPlayerState.boardMoveAvailable,
+                    enabled = selectedPlayerState.boardMoveAvailable,
                     modifier = Modifier
                         .pointerHoverIcon(
-                            if (selectedPlayer == currentPlayer && selectedPlayerState.boardMoveAvailable) {
+                            if (selectedPlayerState.boardMoveAvailable) {
                                 PointerIcon.Hand
                             } else {
                                 PointerIcon.Default
@@ -503,13 +512,37 @@ private fun Profile(
                 ) {
                     Text("Сделать ход")
                 }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .height(IntrinsicSize.Min)
+                ) {
+                    TextButton(
+                        onClick = { window.open(gamesDownloadLink) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .pointerHoverIcon(PointerIcon.Hand)
+                    ) {
+                        Text("Игры")
+                    }
+                    VerticalDivider()
+                    TextButton(
+                        onClick = { visibleDialog = ProfileDialogs.TwitchReward },
+                        modifier = Modifier
+                            .weight(1f)
+                            .pointerHoverIcon(PointerIcon.Hand)
+                    ) {
+                        Text("Награды")
+                    }
+                }
             }
             AnimatedVisibility(
                 visible = shouldShowSideStats,
                 enter = fadeIn(),
                 exit = fadeOut(),
                 modifier = Modifier
-                    .padding(top = 64.dp)
+                    .padding(top = 16.dp)
             ) {
                 Stats(
                     expanded = false,
@@ -565,6 +598,9 @@ private fun Profile(
                         commandSender.sendCommand(command)
                         visibleDialog = ProfileDialogs.None
                     },
+                    onDialogDismiss = { visibleDialog = ProfileDialogs.None }
+                )
+                is ProfileDialogs.TwitchReward -> TwitchRewardDialog(
                     onDialogDismiss = { visibleDialog = ProfileDialogs.None }
                 )
                 is ProfileDialogs.None -> {}

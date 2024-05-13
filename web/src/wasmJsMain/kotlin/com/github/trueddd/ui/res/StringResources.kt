@@ -29,4 +29,10 @@ object StringResources {
         const val Today = "Сегодня"
         const val Yesterday = "Вчера"
     }
+    object RadioStation {
+        const val Dacha = "Радио Дача"
+        const val Christian = "Портлендское Радио"
+        const val Anime = "Аниме опенинги"
+        const val Custom = "Радио Турутутсик"
+    }
 }

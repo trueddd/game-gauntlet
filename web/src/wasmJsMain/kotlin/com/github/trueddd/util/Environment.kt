@@ -13,3 +13,5 @@ fun authRedirectUri(): String {
         "https://trueddd.github.io/game-gauntlet"
     }
 }
+
+const val gamesDownloadLink = "https://webtor.io/6a13496f74f33d4f71ef6e402482d81ee55d3c8f"

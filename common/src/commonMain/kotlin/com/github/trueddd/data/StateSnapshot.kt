@@ -12,4 +12,8 @@ data class StateSnapshot(
     val boardTraps: Map<Int, BoardTrap>,
     @SerialName("wi")
     val winner: PlayerName?,
+    @SerialName("or")
+    val overallAmountOfPointsRaised: Long,
+    @SerialName("se")
+    val scheduledEvent: ScheduledEvent?,
 )

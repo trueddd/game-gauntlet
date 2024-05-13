@@ -27,6 +27,9 @@ class AuthManager(
     val userState: StateFlow<Participant?>
         get() = _userState.asStateFlow()
 
+    val isAuthorized: Boolean
+        get() = _userState.value != null
+
     init {
         val user = window.localStorage.getItem(USER_KEY)
             ?.let { serialization.decodeFromString<Participant>(it) }
@@ -63,12 +66,17 @@ class AuthManager(
     fun requestAuth() {
         val state = Clock.System.now().hashCode().toString()
         window.localStorage.setItem(STATE_KEY, state)
+        val scopes = listOf(
+            "user:read:email",
+            "channel:read:redemptions",
+            "channel:manage:redemptions",
+        ).joinToString(" ")
         val url = buildString {
             append("https://id.twitch.tv/oauth2/authorize")
             append("?response_type=token")
             append("&client_id=${twitchClientId()}")
             append("&redirect_uri=${authRedirectUri()}")
-            append("&scope=user:read:email")
+            append("&scope=$scopes")
             append("&state=$state")
         }
         window.location.replace(Url(url).toString())

@@ -1,10 +1,8 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.data.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import com.github.trueddd.utils.GlobalEventConstants
+import kotlinx.coroutines.flow.*
 import org.koin.core.annotation.Single
 
 @Single(binds = [
@@ -12,6 +10,7 @@ import org.koin.core.annotation.Single
     ParticipantProvider::class,
     ParticipantStateProvider::class,
     PlayersHistoryProvider::class,
+    CommunityFundRaisingTracker::class,
 ])
 class StateHolderImpl : StateHolder {
 
@@ -43,5 +42,19 @@ class StateHolderImpl : StateHolder {
 
     override fun updateHistory(block: PlayersHistory.() -> PlayersHistory) {
         _playersTurnsStateFlow.update(block)
+    }
+
+    override val overallAmountRaised: Long
+        get() = current.stateSnapshot.overallAmountOfPointsRaised
+
+    override val raisedAmountOnCurrentStage: Long
+        get() = current.stateSnapshot.overallAmountOfPointsRaised % GlobalEventConstants.EVENT_CAP
+
+    override val currentStageFlow: Flow<Int>
+        get() = _globalStateFlow.map { it.stateSnapshot.overallAmountOfPointsRaised }
+            .map { it.div(GlobalEventConstants.EVENT_CAP).toInt() }
+
+    override fun updateOverallAmountRaised(amount: Long) {
+        update { copy(stateSnapshot = stateSnapshot.copy(overallAmountOfPointsRaised = amount)) }
     }
 }

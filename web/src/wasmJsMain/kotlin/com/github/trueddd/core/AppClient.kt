@@ -2,26 +2,20 @@ package com.github.trueddd.core
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.*
-import com.github.trueddd.data.request.DownloadGameRequestBody
 import com.github.trueddd.items.WheelItem
-import com.github.trueddd.util.toBlob
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.plugins.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.*
 import io.ktor.websocket.*
-import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import org.w3c.dom.HTMLAnchorElement
-import org.w3c.dom.url.URL
 
 class AppClient(
     private val httpClient: HttpClient,
@@ -40,8 +34,9 @@ class AppClient(
         return callbackFlow {
             send(loadActions())
             val session = httpClient.webSocketSession(router.ws(Router.ACTIONS))
-            launch {
+            val wsJob = launch {
                 for (frame in session.incoming) {
+                    if (!isActive) break
                     val textFrame = frame as? Frame.Text ?: continue
                     val content = textFrame.readText()
                     println("New action received: $content")
@@ -52,6 +47,7 @@ class AppClient(
                 }
             }
             awaitClose {
+                wsJob.cancel()
                 session.cancel()
             }
         }
@@ -60,13 +56,14 @@ class AppClient(
     fun getPlayersHistoryFlow(): Flow<PlayersHistory> {
         return callbackFlow {
             val session = httpClient.webSocketSession(router.ws(Router.TURNS))
-            launch {
+            val wsJob = launch {
                 val token = savedJwtToken() ?: run {
                     this@callbackFlow.cancel()
                     return@launch
                 }
                 session.outgoing.send(Frame.Text(token))
                 for (frame in session.incoming) {
+                    if (!isActive) break
                     val textFrame = frame as? Frame.Text ?: continue
                     val data = Response.parse(textFrame.readText()) ?: continue
                     if (data is Response.Turns) {
@@ -75,6 +72,7 @@ class AppClient(
                 }
             }
             awaitClose {
+                wsJob.cancel()
                 session.cancel()
             }
         }
@@ -96,28 +94,6 @@ class AppClient(
         }
     }
 
-    fun searchGame(name: String) {
-        launch {
-            try {
-                val response = httpClient.post(router.http(Router.LOAD_GAME)) {
-                    contentType(ContentType.Application.Json)
-                    setBody(DownloadGameRequestBody(name))
-                    onDownload { bytesSentTotal, contentLength ->
-                        println("Received $bytesSentTotal bytes from $contentLength")
-                    }
-                }
-                val body = response.body<ByteArray>()
-                println("Received ${body.size} bytes in total")
-                val link = document.createElement("a") as HTMLAnchorElement
-                link.setAttribute("href", URL.createObjectURL(body.toBlob()))
-                link.setAttribute("download", "$name.exe")
-                link.click()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
     suspend fun verifyUser(token: String): Result<AuthResponse> {
         return withContext(coroutineContext) {
             try {
@@ -125,6 +101,42 @@ class AppClient(
                     contentType(ContentType.Application.Json)
                     parameter("token", token)
                 }.body<AuthResponse>().let { Result.success(it) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun checkTwitchRewardAvailability(token: String): Result<Unit> {
+        return withContext(coroutineContext) {
+            try {
+                val response = httpClient.get(router.http(Router.REWARD)) {
+                    bearerAuth(token)
+                }
+                if (response.status == HttpStatusCode.OK) {
+                    Result.success(Unit)
+                } else {
+                    Result.failure(IllegalStateException())
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun createTwitchReward(token: String): Result<Unit> {
+        return withContext(coroutineContext) {
+            try {
+                val response = httpClient.post(router.http(Router.REWARD)) {
+                    bearerAuth(token)
+                }
+                if (response.status == HttpStatusCode.OK || response.status == HttpStatusCode.Created) {
+                    Result.success(Unit)
+                } else {
+                    Result.failure(IllegalStateException())
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 Result.failure(e)

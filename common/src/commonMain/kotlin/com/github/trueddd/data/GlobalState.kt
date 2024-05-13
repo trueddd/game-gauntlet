@@ -3,11 +3,13 @@ package com.github.trueddd.data
 import com.github.trueddd.actions.Action
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.math.roundToInt
 
 /**
  * Contains all information about current game state.
  * But not everything should be delivered to frontend as single package.
  */
+// TODO: make GameConfig and StateSnapshot interfaces and implement them here
 @Serializable
 data class GlobalState(
     @SerialName("ac")
@@ -24,6 +26,8 @@ data class GlobalState(
     val startDate: Long,
     @SerialName("ed")
     val endDate: Long,
+    @SerialName("rc")
+    val radioCoverage: RadioCoverage,
 ) {
 
     companion object {
@@ -31,13 +35,14 @@ data class GlobalState(
         const val STINT_COUNT = 25
         val STINT_SIZE = Game.Genre.entries.size
         val PLAYABLE_BOARD_RANGE = 1..STINT_SIZE * STINT_COUNT
+        val BOARD_RANGE = 0..STINT_SIZE * STINT_COUNT
     }
 
     val boardLength: Int
         get() = STINT_SIZE * STINT_COUNT
 
     val gameConfig: GameConfig
-        get() = GameConfig(players, gameGenreDistribution, startDate, endDate)
+        get() = GameConfig(players, gameGenreDistribution, startDate, endDate, radioCoverage)
 
     fun stateOf(participant: Participant) = stateSnapshot.playersState[participant.name]!!
     fun effectsOf(participant: Participant) = stateOf(participant).effects
@@ -108,4 +113,26 @@ data class GlobalState(
     }
 
     fun defaultPlayersHistory() = players.associate { it.name to PlayerTurnsHistory.default() }
+
+    fun getMostPopulatedStintIndex(): Int {
+        val indices = stateSnapshot.playersState
+            .map { (_, state) -> state.stintIndex }
+        val indexMap = mutableMapOf<Int, Int>()
+        for (index in indices) {
+            indexMap[index] = indexMap[index]?.plus(1) ?: 1
+        }
+        var maxAt = -1
+        var maxCount = 0
+        for ((index, count) in indexMap) {
+            if (count > maxCount) {
+                maxAt = index
+                maxCount = count
+            }
+        }
+        return if (maxCount > 1) {
+            maxAt
+        } else {
+            indices.average().roundToInt()
+        }
+    }
 }

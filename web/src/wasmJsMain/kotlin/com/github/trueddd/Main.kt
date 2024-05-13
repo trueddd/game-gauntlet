@@ -5,7 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -23,7 +26,6 @@ import com.github.trueddd.di.KoinIntegration
 import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.theme.DarkColors
-import com.github.trueddd.ui.Archives
 import com.github.trueddd.ui.Dashboard
 import com.github.trueddd.ui.Destination
 import com.github.trueddd.ui.Map
@@ -118,11 +120,6 @@ private fun App(
                         )
                     }
                 }
-                is Destination.Games -> {
-                    Archives(
-                        modifier = Modifier
-                    )
-                }
                 is Destination.Profile -> {
                     if (gameConfig != null) {
                         ProfileScreen(
@@ -191,6 +188,10 @@ private fun TopPanel(
                         }
                     )
             ) {
+                val destinationContentColor = when {
+                    destination.requireAuth && participant == null -> MaterialTheme.colorScheme.outline
+                    else -> MaterialTheme.colorScheme.onSecondaryContainer
+                }
                 Icon(
                     imageVector = if (currentDestination == destination) {
                         destination.icon
@@ -198,12 +199,12 @@ private fun TopPanel(
                         destination.disabledIcon
                     },
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                    tint = destinationContentColor
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = destination.name,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                    color = destinationContentColor
                 )
             }
         }

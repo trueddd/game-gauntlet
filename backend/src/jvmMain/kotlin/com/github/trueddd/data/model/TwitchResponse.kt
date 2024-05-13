@@ -1,4 +1,4 @@
-package com.github.trueddd.data
+package com.github.trueddd.data.model
 
 import kotlinx.serialization.Serializable
 

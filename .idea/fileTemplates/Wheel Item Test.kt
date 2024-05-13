@@ -3,9 +3,9 @@ package ${PACKAGE_NAME}
 #end
 
 import com.github.trueddd.EventGateTest
-import org.junit.jupiter.api.Test
 import kotlinx.coroutines.test.runTest
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
 
 class ${NAME}ItemTest : EventGateTest() {
     

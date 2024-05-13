@@ -2,6 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.actions.*
 import com.github.trueddd.data.*
+import com.github.trueddd.items.DontWannaPlayThis
 
 object PlayersHistoryCalculator {
 
@@ -115,7 +116,21 @@ object PlayersHistoryCalculator {
                 }
             }
             is ItemReceive -> currentHistory
-            is ItemUse -> currentHistory
+            is ItemUse -> {
+                val usedItem = oldState.stateOf(action.usedBy).wheelItems.firstOrNull { it.uid == action.itemUid }
+                    ?: return currentHistory
+                when (usedItem) {
+                    is DontWannaPlayThis -> currentHistory.update(action.usedBy.name) { history ->
+                        history.copy(
+                            statistics = history.statistics.copy(
+                                rerolledGames = history.statistics.rerolledGames + 1
+                            )
+                        )
+                    }
+                    else -> currentHistory
+                }
+            }
+            is GlobalEvent -> currentHistory
         }
     }
 }

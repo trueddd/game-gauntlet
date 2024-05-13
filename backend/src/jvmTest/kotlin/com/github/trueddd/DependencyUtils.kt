@@ -1,11 +1,11 @@
 package com.github.trueddd
 
 import com.github.trueddd.core.*
-import com.github.trueddd.core.EventHistoryHolder
-import com.github.trueddd.core.history.MockedLocalEventHistoryHolder
+import com.github.trueddd.data.repository.FileGameStateRepository
 import com.github.trueddd.di.getActionGeneratorsSet
 import com.github.trueddd.di.getActionHandlersMap
 import com.github.trueddd.di.getItemFactoriesSet
+import java.io.File
 
 internal fun provideEventGate(): EventGate {
     val stateHolder = StateHolderImpl()
@@ -35,5 +35,6 @@ private fun provideActionHandlerRegistry(
 )
 
 private fun provideHistoryHolder(actionHandlerRegistry: ActionHandlerRegistry): EventHistoryHolder {
-    return MockedLocalEventHistoryHolder(actionHandlerRegistry)
+    val file = File(".\\src\\jvmTest\\resources\\history")
+    return LocalEventHistoryHolder(actionHandlerRegistry, FileGameStateRepository(file))
 }

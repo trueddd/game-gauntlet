@@ -3,7 +3,7 @@ package com.github.trueddd.core
 import com.github.trueddd.data.GlobalState
 import kotlinx.coroutines.flow.StateFlow
 
-interface StateHolder : ParticipantProvider, ParticipantStateProvider, PlayersHistoryProvider {
+interface StateHolder : ParticipantProvider, ParticipantStateProvider, PlayersHistoryProvider, CommunityFundRaisingTracker {
 
     val globalStateFlow: StateFlow<GlobalState>
 

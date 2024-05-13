@@ -28,4 +28,18 @@ class DontWannaPlayThisItemTest : EventGateTest() {
         assertEquals(expected = 1, gamesOf(user).size)
         assertEquals(expected = Game.Status.Rerolled, stateOf(user).currentGame?.status)
     }
+
+    @Test
+    fun `reroll game - check stats`() = runTest {
+        val user = requireRandomParticipant()
+        val item = DontWannaPlayThis.create()
+        handleAction(BoardMove(user, diceValue = 5))
+        handleAction(ItemReceive(user, item))
+        handleAction(GameRoll(user, Game.Id(1)))
+        handleAction(ItemUse(user, item.uid))
+        assertEquals(expected = 0, inventoryOf(user).size)
+        assertEquals(expected = Game.Status.Rerolled, stateOf(user).currentGame?.status)
+        assertEquals(expected = 1, historyOf(user).statistics.rerolledGames)
+        assertEquals(expected = 0, historyOf(user).statistics.finishedGames)
+    }
 }

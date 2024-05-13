@@ -41,6 +41,7 @@ fun ActionsLog(
                 is GameStatusChange -> GameStatusChange(it)
                 is ItemReceive -> ItemReceive(it)
                 is ItemUse -> ItemUse(it)
+                is GlobalEvent -> GlobalEvent(it)
             }
         }
     }
@@ -254,6 +255,38 @@ private fun ItemUse(action: ItemUse) {
         )
         Text(
             text = action.arguments.joinToString(),
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .weight(1f)
+        )
+        Text(
+            text = action.issuedAt.formatDate(),
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun GlobalEvent(action: GlobalEvent) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = "Глобальное событие",
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .weight(1f)
+        )
+        Text(
+            text = action.type.name,
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .weight(2f)
+        )
+        Text(
+            text = action.stageIndex.toString(),
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .weight(1f)
