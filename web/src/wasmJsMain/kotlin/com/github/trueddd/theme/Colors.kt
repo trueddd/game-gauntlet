@@ -40,7 +40,7 @@ val DarkColors = darkColorScheme(
 object Colors {
     val Warning = Color(0xFFE1A326)
     val Success = Color(0xFF4ADE80)
-    val Error = Color(0xFFF87171)
+    val Error = Color(0xFF8C3D51)
     val White = Color.White
     val DefaultGenre = Color(0xFFECFDF5)
     object GameStatus {

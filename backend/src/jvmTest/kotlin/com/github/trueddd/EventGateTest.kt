@@ -28,6 +28,7 @@ abstract class EventGateTest {
     protected fun pendingEventsOf(participant: Participant) = stateOf(participant).pendingEvents
     protected fun inventoryOf(participant: Participant) = stateOf(participant).inventory
     protected fun positionOf(participant: Participant) = stateOf(participant).position
+    protected fun stintOf(participant: Participant) = stateOf(participant).stintIndex
     protected fun gamesOf(participant: Participant) = eventGate.stateHolder.current.gamesOf(participant)
     protected fun lastGameOf(participant: Participant) = stateOf(participant).currentGame
     protected fun historyOf(participant: Participant) = eventGate.stateHolder.currentPlayersHistory[participant.name]!!

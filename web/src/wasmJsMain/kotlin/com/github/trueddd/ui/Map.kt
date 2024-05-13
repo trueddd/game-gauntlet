@@ -6,19 +6,23 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.trueddd.actions.GlobalEvent
 import com.github.trueddd.data.*
 import com.github.trueddd.items.BoardTrap
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.util.localized
+import com.github.trueddd.utils.GlobalEventConstants
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.datetime.Clock
+import kotlin.math.roundToInt
 
 @Immutable
 data class MapCellState(
@@ -36,8 +40,9 @@ fun Map(
     stateSnapshot: StateSnapshot?
 ) {
     Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier
-            .padding(16.dp)
+            .padding(32.dp)
             .fillMaxWidth()
     ) {
         val mapState = remember(stateSnapshot, gameConfig) {
@@ -70,6 +75,22 @@ fun Map(
                 }
             }
         }
+        if (stateSnapshot != null) {
+            if (stateSnapshot.scheduledEvent != null) {
+                GlobalEventAnnouncement(
+                    scheduledEvent = stateSnapshot.scheduledEvent!!,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            } else {
+                GlobalEventCounter(
+                    pointsAmount = stateSnapshot.overallAmountOfPointsRaised % GlobalEventConstants.EVENT_CAP,
+                    pointsCap = GlobalEventConstants.EVENT_CAP,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
+        }
         FlowRow(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -78,6 +99,67 @@ fun Map(
                 MapCell(it)
             }
         }
+    }
+}
+
+@Composable
+private fun GlobalEventAnnouncement(scheduledEvent: ScheduledEvent, modifier: Modifier) {
+    var timer by remember { mutableStateOf("") }
+    LaunchedEffect(scheduledEvent) {
+        while (isActive) {
+            val currentTime = Clock.System.now().toEpochMilliseconds()
+            val remaining = scheduledEvent.startTime - currentTime
+            val hours = (remaining / 1000 / 3600 % 60).toString()
+            val minutes = (remaining / 1000 / 60 % 60).toString().padStart(2, '0')
+            val seconds = (remaining / 1000 % 60).toString().padStart(2, '0')
+            timer = "$hours:$minutes:$seconds"
+            delay(1000 - (Clock.System.now().toEpochMilliseconds() - currentTime))
+        }
+    }
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+        modifier = modifier
+            .background(Colors.Error, RoundedCornerShape(8.dp))
+            .padding(16.dp)
+    ) {
+        Text(
+            text = buildString {
+                when (scheduledEvent.eventType) {
+                    GlobalEvent.Type.Tornado -> "Внимание! Приближается ураган!"
+                    GlobalEvent.Type.Nuke -> "Внимание! Ожидается ядерный удар!"
+                }.let { append(it) }
+                if (timer.isNotEmpty()) {
+                    append(" До начала: ")
+                    append(timer)
+                }
+            },
+            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+    }
+}
+
+@Composable
+private fun GlobalEventCounter(pointsAmount: Long, pointsCap: Long, modifier: Modifier) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+        modifier = modifier
+            .border(2.dp, Colors.Error, RoundedCornerShape(8.dp))
+            .padding(16.dp)
+    ) {
+        Text(
+            text = buildString {
+                append("Собрано баллов на глобальное событие: ")
+                append(pointsAmount)
+                append(" из ")
+                append(pointsCap)
+                append(" (")
+                append(pointsAmount.toDouble().div(pointsCap).times(100).roundToInt())
+                append("%)")
+            },
+            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
     }
 }
 

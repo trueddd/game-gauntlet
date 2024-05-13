@@ -1,16 +1,14 @@
 package com.github.trueddd.core
 
-interface CommunityFundRaisingTracker {
+import kotlinx.coroutines.flow.Flow
 
-    companion object {
-        const val SINGLE_EVENT_CAP = 10_000L
-    }
+interface CommunityFundRaisingTracker {
 
     val overallAmountRaised: Long
 
     val raisedAmountOnCurrentStage: Long
 
-    val currentStage: Int
+    val currentStageFlow: Flow<Int>
 
     fun updateOverallAmountRaised(amount: Long)
 }

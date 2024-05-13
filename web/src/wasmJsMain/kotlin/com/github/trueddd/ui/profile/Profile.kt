@@ -47,12 +47,12 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
 
-private object ProfileContentType {
-    const val BACKGROUND = "background"
-    const val STATS = "stats"
-    const val HEADER = "header"
-    const val DATE = "date"
-    const val TABLE = "table"
+private enum class ProfileContentType {
+    Background,
+    Stats,
+    Header,
+    Date,
+    Table,
 }
 
 private const val TAG = "ProfileScreen"
@@ -182,7 +182,7 @@ private fun WheelItemView(
                         }
                     )
                 },
-                text = { Text(item.description) },
+                text = { Text(item.description.applyModifiersDecoration()) },
                 action = if (item is Usable && onUse != null) { {
                     TextButton(
                         onClick = {
@@ -242,7 +242,7 @@ private fun Profile(
     val leftSidePanelTopPadding by remember {
         derivedStateOf {
             lazyListState.layoutInfo.visibleItemsInfo
-                .firstOrNull { it.contentType == ProfileContentType.HEADER }
+                .firstOrNull { it.contentType == ProfileContentType.Header }
                 ?.offset
         }
     }
@@ -272,7 +272,7 @@ private fun Profile(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            item(contentType = ProfileContentType.BACKGROUND) {
+            item(contentType = ProfileContentType.Background) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -281,7 +281,7 @@ private fun Profile(
                         .background(MaterialTheme.colorScheme.primary)
                 )
             }
-            item(contentType = ProfileContentType.STATS) {
+            item(contentType = ProfileContentType.Stats) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier
@@ -311,7 +311,7 @@ private fun Profile(
                     }
                 }
             }
-            stickyHeader(contentType = ProfileContentType.HEADER) {
+            stickyHeader(contentType = ProfileContentType.Header) {
                 Box(
                     modifier = Modifier
                         .padding(start = leftSideBarWidth + leftSideBarPadding)
@@ -372,7 +372,7 @@ private fun Profile(
                 }
             }
             turnsGroupedByDate.forEach { (relativeDate, turns) ->
-                item(contentType = ProfileContentType.DATE) {
+                item(contentType = ProfileContentType.Date) {
                     Text(
                         text = relativeDate.localized,
                         color = Colors.White,
@@ -382,7 +382,7 @@ private fun Profile(
                             .fillMaxWidth()
                     )
                 }
-                item(contentType = ProfileContentType.TABLE) {
+                item(contentType = ProfileContentType.Table) {
                     Card(
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
@@ -447,7 +447,7 @@ private fun Profile(
         val shouldShowSideStats by remember {
             derivedStateOf {
                 val visibleItems = lazyListState.layoutInfo.visibleItemsInfo
-                visibleItems.none { it.contentType == ProfileContentType.STATS }
+                visibleItems.none { it.contentType == ProfileContentType.Stats }
                     .and(visibleItems.isNotEmpty())
             }
         }

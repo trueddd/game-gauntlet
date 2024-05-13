@@ -34,8 +34,9 @@ class AppClient(
         return callbackFlow {
             send(loadActions())
             val session = httpClient.webSocketSession(router.ws(Router.ACTIONS))
-            launch {
+            val wsJob = launch {
                 for (frame in session.incoming) {
+                    if (!isActive) break
                     val textFrame = frame as? Frame.Text ?: continue
                     val content = textFrame.readText()
                     println("New action received: $content")
@@ -46,6 +47,7 @@ class AppClient(
                 }
             }
             awaitClose {
+                wsJob.cancel()
                 session.cancel()
             }
         }
@@ -54,13 +56,14 @@ class AppClient(
     fun getPlayersHistoryFlow(): Flow<PlayersHistory> {
         return callbackFlow {
             val session = httpClient.webSocketSession(router.ws(Router.TURNS))
-            launch {
+            val wsJob = launch {
                 val token = savedJwtToken() ?: run {
                     this@callbackFlow.cancel()
                     return@launch
                 }
                 session.outgoing.send(Frame.Text(token))
                 for (frame in session.incoming) {
+                    if (!isActive) break
                     val textFrame = frame as? Frame.Text ?: continue
                     val data = Response.parse(textFrame.readText()) ?: continue
                     if (data is Response.Turns) {
@@ -69,6 +72,7 @@ class AppClient(
                 }
             }
             awaitClose {
+                wsJob.cancel()
                 session.cancel()
             }
         }

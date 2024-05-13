@@ -14,4 +14,6 @@ data class StateSnapshot(
     val winner: PlayerName?,
     @SerialName("or")
     val overallAmountOfPointsRaised: Long,
+    @SerialName("se")
+    val scheduledEvent: ScheduledEvent?,
 )

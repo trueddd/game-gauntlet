@@ -2,6 +2,7 @@ package com.github.trueddd.core
 
 import com.github.trueddd.data.model.*
 import com.github.trueddd.utils.Environment
+import com.github.trueddd.utils.GlobalEventConstants
 import com.github.trueddd.utils.serialization
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -68,7 +69,7 @@ class HttpClient {
                     parameter("broadcaster_id", broadcasterId)
                     setBody(TwitchRewardCreationRequest(
                         title = "Глобальные события AGG2",
-                        cost = 5000,
+                        cost = GlobalEventConstants.SINGLE_REDEMPTION.toInt(),
                     ))
                 }.body<TwitchResponse<List<TwitchReward>>>().data.let { Result.success(it.first()) }
             } catch (e: Exception) {

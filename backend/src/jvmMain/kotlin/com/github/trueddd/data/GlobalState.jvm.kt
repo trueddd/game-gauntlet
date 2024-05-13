@@ -30,6 +30,7 @@ fun globalState(
             boardTraps = emptyMap(),
             winner = null,
             overallAmountOfPointsRaised = raisedAmountOfPoints,
+            scheduledEvent = null,
         ),
         gameHistory = players.associate { it.name to emptyList() },
         radioCoverage = radioCoverage,

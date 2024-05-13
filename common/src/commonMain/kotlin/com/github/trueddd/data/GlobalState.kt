@@ -3,6 +3,7 @@ package com.github.trueddd.data
 import com.github.trueddd.actions.Action
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.math.roundToInt
 
 /**
  * Contains all information about current game state.
@@ -34,6 +35,7 @@ data class GlobalState(
         const val STINT_COUNT = 25
         val STINT_SIZE = Game.Genre.entries.size
         val PLAYABLE_BOARD_RANGE = 1..STINT_SIZE * STINT_COUNT
+        val BOARD_RANGE = 0..STINT_SIZE * STINT_COUNT
     }
 
     val boardLength: Int
@@ -111,4 +113,26 @@ data class GlobalState(
     }
 
     fun defaultPlayersHistory() = players.associate { it.name to PlayerTurnsHistory.default() }
+
+    fun getMostPopulatedStintIndex(): Int {
+        val indices = stateSnapshot.playersState
+            .map { (_, state) -> state.stintIndex }
+        val indexMap = mutableMapOf<Int, Int>()
+        for (index in indices) {
+            indexMap[index] = indexMap[index]?.plus(1) ?: 1
+        }
+        var maxAt = -1
+        var maxCount = 0
+        for ((index, count) in indexMap) {
+            if (count > maxCount) {
+                maxAt = index
+                maxCount = count
+            }
+        }
+        return if (maxCount > 1) {
+            maxAt
+        } else {
+            indices.average().roundToInt()
+        }
+    }
 }
