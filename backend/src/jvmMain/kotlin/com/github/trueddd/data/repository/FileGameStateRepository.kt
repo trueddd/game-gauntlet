@@ -2,12 +2,8 @@ package com.github.trueddd.data.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.koin.core.annotation.Named
-import org.koin.core.annotation.Single
 import java.io.File
 
-@Named(FileGameStateRepository.TAG)
-@Single(binds = [GameStateRepository::class])
 class FileGameStateRepository(
     private val file: File,
 ) : BaseGameStateRepository() {

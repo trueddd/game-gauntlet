@@ -86,23 +86,25 @@ abstract class BaseEventHistoryHolder(
                     raisedAmountOfPoints = savedState.pointsCollected,
                 )
                 var playersHistory = initialState.defaultPlayersHistory()
-                val globalState = savedState.actions.fold(initialState) { state, action ->
-                    val handler = actionHandlerRegistry.handlerOf(action) ?: return@fold state
-                    latestEvents.push(action)
-                    try {
-                        val newState = handler.handle(action, state)
-                        playersHistory = PlayersHistoryCalculator.calculate(
-                            currentHistory = playersHistory,
-                            action = action,
-                            oldState = state,
-                            newState = newState
-                        )
-                        newState
-                    } catch (error: StateModificationException) {
-                        error.printStackTrace()
-                        state
+                val globalState = savedState.actions
+                    .sortedBy { it.issuedAt }
+                    .fold(initialState) { state, action ->
+                        val handler = actionHandlerRegistry.handlerOf(action) ?: return@fold state
+                        latestEvents.push(action)
+                        try {
+                            val newState = handler.handle(action, state)
+                            playersHistory = PlayersHistoryCalculator.calculate(
+                                currentHistory = playersHistory,
+                                action = action,
+                                oldState = state,
+                                newState = newState
+                            )
+                            newState
+                        } catch (error: StateModificationException) {
+                            error.printStackTrace()
+                            state
+                        }
                     }
-                }
                 LoadedGameState(globalState, playersHistory)
             }
         }
