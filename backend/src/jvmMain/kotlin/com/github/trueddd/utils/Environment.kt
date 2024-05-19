@@ -22,19 +22,11 @@ object Environment {
         appConfig.getProperty("CLIENT_ADDRESS")
     }
 
-    val DatabaseUrl: String by lazy {
-        appConfig.getProperty("DB_URL")
-    }
-
-    val DatabaseUser: String by lazy {
-        appConfig.getProperty("DB_USER")
-    }
-
-    val DatabasePassword: String by lazy {
-        appConfig.getProperty("DB_PASS")
-    }
-
     val TwitchClientId: String by lazy {
         appConfig.getProperty("TWITCH_CLIENT_ID")
+    }
+
+    val DatabaseUrl: String by lazy {
+        appConfig.getProperty("DB_URL")
     }
 }

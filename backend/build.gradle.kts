@@ -53,11 +53,7 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.koin.annotations)
                 implementation(libs.koin.ktor)
-                implementation(libs.torrent.core)
-                implementation(libs.torrent.dht)
-                implementation(libs.exposed.core)
-                implementation(libs.exposed.jdbc)
-                implementation(libs.postgres.driver)
+                implementation(libs.mongodb.driver)
             }
         }
         val jvmTest by getting {

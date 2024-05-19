@@ -29,13 +29,11 @@ dependencyResolutionManagement {
             val ksp = version("ksp", "1.9.22-1.0.17")
             val ktor = version("ktor", "2.3.8")
             val jupiter = version("jupiter", "5.10.0")
-            val torrent = version("bt", "1.10")
             val compose = version("compose", "1.6.1")
             val koin = version("koin", "3.6.0-wasm-alpha2")
             val koinKsp = version("koin-ksp", "1.3.1")
             val kotlinPoet = version("kotlinpoet", "1.16.0")
             val serialization = version("serialization", "1.6.3")
-            val exposed = version("exposed", "0.47.0")
 
             library("logging", "ch.qos.logback", "logback-classic").version("1.4.1")
 
@@ -79,9 +77,6 @@ dependencyResolutionManagement {
 
             library("coroutines-test", "org.jetbrains.kotlinx", "kotlinx-coroutines-test").versionRef(coroutines)
 
-            library("torrent-core", "com.github.atomashpolskiy", "bt-core").versionRef(torrent)
-            library("torrent-dht", "com.github.atomashpolskiy", "bt-dht").versionRef(torrent)
-
             plugin("compose", "org.jetbrains.compose").versionRef(compose)
             library("compose-runtime", "org.jetbrains.compose.runtime", "runtime").versionRef(compose)
             library("compose-foundation", "org.jetbrains.compose.foundation", "foundation").versionRef(compose)
@@ -90,9 +85,7 @@ dependencyResolutionManagement {
             library("uuid", "com.benasher44", "uuid").version("0.8.2")
             library("datetime", "org.jetbrains.kotlinx", "kotlinx-datetime").versionRef(datetime)
 
-            library("postgres-driver", "org.postgresql:postgresql:42.7.1")
-            library("exposed-core", "org.jetbrains.exposed", "exposed-core").versionRef(exposed)
-            library("exposed-jdbc", "org.jetbrains.exposed", "exposed-jdbc").versionRef(exposed)
+            library("mongodb-driver", "org.mongodb", "mongodb-driver-kotlin-coroutine").version("5.1.0")
         }
     }
 }
