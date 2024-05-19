@@ -25,13 +25,7 @@ private val commonModule = module {
         getItemFactoriesSet()
     }
     single {
-        val connectionString = buildString {
-            append("mongodb+srv://default:")
-            append(Environment.MongoPassword)
-            append("@agg.yte3zhl.mongodb.net/")
-            append("?retryWrites=true&w=majority&appName=agg")
-        }
-        MongoClient.create(connectionString).getDatabase("agg")
+        MongoClient.create(Environment.DatabaseUrl).getDatabase("agg")
     }
 }
 

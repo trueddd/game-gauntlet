@@ -26,7 +26,7 @@ object Environment {
         appConfig.getProperty("TWITCH_CLIENT_ID")
     }
 
-    val MongoPassword: String by lazy {
-        appConfig.getProperty("MONGO_PASS")
+    val DatabaseUrl: String by lazy {
+        appConfig.getProperty("DB_URL")
     }
 }
