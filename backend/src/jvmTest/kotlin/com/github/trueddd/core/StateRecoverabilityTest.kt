@@ -2,13 +2,16 @@ package com.github.trueddd.core
 
 import com.github.trueddd.EventGateTest
 import com.github.trueddd.actions.Action
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.RepeatedTest
 import kotlin.test.assertEquals
 
 class StateRecoverabilityTest : EventGateTest() {
 
-    @RepeatedTest(20)
+    @RepeatedTest(50)
     fun `save, load & compare`() = runTest {
         val (user1, user2, user3) = requireParticipants()
         val actionsSequence = sequenceOf(
@@ -24,6 +27,11 @@ class StateRecoverabilityTest : EventGateTest() {
         )
         actionsSequence.forEach {
             eventGate.parseAndHandle(it)
+            // This delay is needed to avoid similar time for different actions to be compared
+            // in game loading process. `withContext` is here to ensure that delay will be not skipped.
+            withContext(Dispatchers.Default) {
+                delay(5L)
+            }
         }
         eventGate.historyHolder.save(eventGate.stateHolder.current)
         eventGate.eventManager.stopHandling()

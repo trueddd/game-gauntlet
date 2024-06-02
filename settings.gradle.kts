@@ -8,7 +8,7 @@ pluginManagement {
         mavenCentral()
     }
     plugins {
-        kotlin("multiplatform") version "1.9.22"
+        kotlin("multiplatform") version "2.0.0"
     }
 }
 
@@ -23,17 +23,17 @@ dependencyResolutionManagement {
     }
     versionCatalogs {
         create("libs") {
-            val kotlin = version("kotlin", "1.9.22")
-            val datetime = version("datetime", "0.5.0")
+            val kotlin = version("kotlin", "2.0.0")
+            val datetime = version("datetime", "0.6.0")
             val coroutines = version("coroutines", "1.8.0")
-            val ksp = version("ksp", "1.9.22-1.0.17")
-            val ktor = version("ktor", "2.3.8")
+            val ksp = version("ksp", "2.0.0-1.0.21")
+            val ktor = version("ktor", "2.3.11")
             val jupiter = version("jupiter", "5.10.0")
-            val compose = version("compose", "1.6.1")
+            val compose = version("compose", "1.6.10")
             val koin = version("koin", "3.6.0-wasm-alpha2")
             val koinKsp = version("koin-ksp", "1.3.1")
             val kotlinPoet = version("kotlinpoet", "1.16.0")
-            val serialization = version("serialization", "1.6.3")
+            val serialization = version("serialization", "1.7.0-RC")
 
             library("logging", "ch.qos.logback", "logback-classic").version("1.4.1")
 
@@ -78,6 +78,7 @@ dependencyResolutionManagement {
             library("coroutines-test", "org.jetbrains.kotlinx", "kotlinx-coroutines-test").versionRef(coroutines)
 
             plugin("compose", "org.jetbrains.compose").versionRef(compose)
+            plugin("compose-compiler", "org.jetbrains.kotlin.plugin.compose").versionRef(kotlin)
             library("compose-runtime", "org.jetbrains.compose.runtime", "runtime").versionRef(compose)
             library("compose-foundation", "org.jetbrains.compose.foundation", "foundation").versionRef(compose)
             library("compose-material", "org.jetbrains.compose.material3", "material3").versionRef(compose)

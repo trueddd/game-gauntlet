@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
@@ -7,8 +8,11 @@ plugins {
 }
 
 kotlin {
-    jvm {
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        freeCompilerArgs = listOf("-Xcontext-receivers")
     }
+    jvm()
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
