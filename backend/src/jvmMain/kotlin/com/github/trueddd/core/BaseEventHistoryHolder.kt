@@ -78,10 +78,10 @@ abstract class BaseEventHistoryHolder(
             is SavedState.Success -> {
                 val initialState = globalState(
                     genreDistribution = savedState.mapLayout,
-                    startDateTime = Instant.fromEpochMilliseconds(savedState.timeRange.first).toLocalDateTime(
-                        DefaultTimeZone
-                    ),
-                    activePeriod = (savedState.timeRange.last - savedState.timeRange.first).toDuration(DurationUnit.MILLISECONDS),
+                    startDateTime = Instant.fromEpochMilliseconds(savedState.timeRange.first)
+                        .toLocalDateTime(DefaultTimeZone),
+                    activePeriod = (savedState.timeRange.last - savedState.timeRange.first)
+                        .toDuration(DurationUnit.MILLISECONDS),
                     radioCoverage = savedState.radioCoverage,
                     raisedAmountOfPoints = savedState.pointsCollected,
                 )
@@ -90,7 +90,6 @@ abstract class BaseEventHistoryHolder(
                     .sortedBy { it.issuedAt }
                     .fold(initialState) { state, action ->
                         val handler = actionHandlerRegistry.handlerOf(action) ?: return@fold state
-                        latestEvents.push(action)
                         try {
                             val newState = handler.handle(action, state)
                             playersHistory = PlayersHistoryCalculator.calculate(
@@ -99,9 +98,10 @@ abstract class BaseEventHistoryHolder(
                                 oldState = state,
                                 newState = newState
                             )
+                            latestEvents.push(action)
                             newState
                         } catch (error: StateModificationException) {
-                            error.printStackTrace()
+                            Log.error(TAG, "Failed to handle action: $action. Got message: ${error.message}")
                             state
                         }
                     }

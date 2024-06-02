@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.io.IOException
@@ -6,6 +7,7 @@ plugins {
     kotlin("multiplatform")
     alias(libs.plugins.serialization)
     alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
@@ -42,9 +44,12 @@ kotlin {
     }
 }
 
-compose {
-    experimental.web.application {}
-    kotlinCompilerPlugin.set("1.5.8")
+composeCompiler {
+    targetKotlinPlatforms.set(setOf(KotlinPlatformType.wasm))
+}
+
+tasks.named("compileProductionExecutableKotlinWasmJsOptimize") {
+    enabled = false
 }
 
 fun composePropertiesFromEnv(

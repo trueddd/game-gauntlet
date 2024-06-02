@@ -26,17 +26,14 @@ class TwitchUsersRepository(
     }
 
     suspend fun saveUser(userId: String, userName: String, twitchToken: String) {
-        val document = SavedTwitchUserData(
-            id = userId,
-            playerName = userName,
-            twitchToken = twitchToken,
-            rewardId = null,
-        )
-            .let { serialization.encodeToString(SavedTwitchUserData.serializer(), it) }
-            .let { Document.parse(it) }
         userCollection.updateOne(
             Filters.eq(SavedTwitchUserData::id.name, userId),
-            document,
+            Updates.combine(
+                Updates.set(SavedTwitchUserData::playerName.name, userName),
+                Updates.set(SavedTwitchUserData::twitchToken.name, twitchToken),
+                Updates.setOnInsert(SavedTwitchUserData::rewardId.name, null),
+                Updates.setOnInsert(SavedTwitchUserData::id.name, userId),
+            ),
             UpdateOptions().upsert(true)
         )
     }
