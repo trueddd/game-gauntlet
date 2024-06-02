@@ -24,7 +24,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Build JS artifacts
-        run: ./gradlew wasmJsBrowserWebpack
+        run: ./gradlew build
         env:
           SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
