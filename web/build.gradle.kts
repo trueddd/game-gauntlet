@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.io.IOException
@@ -42,10 +41,6 @@ kotlin {
             }
         }
     }
-}
-
-composeCompiler {
-    targetKotlinPlatforms.set(setOf(KotlinPlatformType.wasm))
 }
 
 tasks.named("compileProductionExecutableKotlinWasmJsOptimize") {
@@ -99,4 +94,16 @@ tasks.create("mutateResources") {
 
 tasks.named("compileKotlinWasmJs") {
     dependsOn("mutateResources")
+}
+
+tasks.named("wasmJsBrowserWebpack") {
+    doLast {
+        copy {
+            from(
+                "build/kotlin-webpack/wasmJs/productionExecutable",
+                "build/processedResources/wasmJs/main"
+            )
+            into("build/dist/agg")
+        }
+    }
 }

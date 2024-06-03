@@ -2,8 +2,8 @@ name: Deploy
 
 on:
   workflow_dispatch:
-#  push:
-#    branches: [ "master" ]
+  push:
+    branches: [ "master" ]
 
 jobs:
   build_frontend:
@@ -24,7 +24,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Build JS artifacts
-        run: ./gradlew wasmJsBrowserDistribution
+        run: ./gradlew wasmJsBrowserWebpack
         env:
           SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
@@ -32,7 +32,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: web/build/dist/wasmJs/productionExecutable
+          path: web/build/dist/agg
   deploy_frontend:
     name: Deploy frontend to Pages
     runs-on: ubuntu-latest
