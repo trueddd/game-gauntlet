@@ -2,13 +2,13 @@ name: Deploy
 
 on:
   workflow_dispatch:
-#  push:
-#    branches: [ "master" ]
+  push:
+    branches: [ "master" ]
 
 jobs:
   build_frontend:
-    name: Build frontend
-    runs-on: ubuntu-latest
+    name: Build frontend from Windows
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
