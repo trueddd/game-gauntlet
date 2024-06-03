@@ -96,6 +96,10 @@ tasks.named("compileKotlinWasmJs") {
     dependsOn("mutateResources")
 }
 
+tasks.named("wasmJsBrowserProductionWebpack") {
+    outputs.upToDateWhen { false }
+}
+
 tasks.named("wasmJsBrowserWebpack") {
     doLast {
         copy {
