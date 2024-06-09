@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.io.IOException
@@ -43,8 +44,8 @@ kotlin {
     }
 }
 
-tasks.named("compileProductionExecutableKotlinWasmJsOptimize") {
-    enabled = false
+tasks.named<BinaryenExec>("compileProductionExecutableKotlinWasmJsOptimize") {
+    binaryenArgs = mutableListOf("-O1", "--all-features")
 }
 
 fun composePropertiesFromEnv(
@@ -94,20 +95,4 @@ tasks.create("mutateResources") {
 
 tasks.named("compileKotlinWasmJs") {
     dependsOn("mutateResources")
-}
-
-tasks.named("wasmJsBrowserProductionWebpack") {
-    outputs.upToDateWhen { false }
-}
-
-tasks.named("wasmJsBrowserWebpack") {
-    doLast {
-        copy {
-            from(
-                "build/kotlin-webpack/wasmJs/productionExecutable",
-                "build/processedResources/wasmJs/main"
-            )
-            into("build/dist/agg")
-        }
-    }
 }
