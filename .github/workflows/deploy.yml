@@ -32,7 +32,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: web/build/dist/agg
+          path: web/build/dist/wasmJs/productionExecutable
   deploy_frontend:
     name: Deploy frontend to Pages
     runs-on: ubuntu-latest
