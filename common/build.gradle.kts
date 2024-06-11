@@ -10,7 +10,7 @@ plugins {
 kotlin {
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
-        freeCompilerArgs = listOf("-Xcontext-receivers")
+        freeCompilerArgs = listOf("-Xcontext-receivers", "-Xexpect-actual-classes")
     }
     jvm()
     @OptIn(ExperimentalWasmDsl::class)
