@@ -1,3 +1,4 @@
+import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
@@ -31,6 +32,7 @@ kotlin {
         val wasmJsMain by getting {
             dependencies {
                 implementation(project(":common"))
+                implementation(compose.components.resources)
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.material)
                 implementation(libs.compose.foundation)
@@ -42,6 +44,10 @@ kotlin {
             }
         }
     }
+}
+
+compose.resources {
+    generateResClass = ResourcesExtension.ResourceClassGeneration.Always
 }
 
 tasks.named<BinaryenExec>("compileProductionExecutableKotlinWasmJsOptimize") {

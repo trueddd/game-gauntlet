@@ -26,10 +26,12 @@ import com.github.trueddd.di.KoinIntegration
 import com.github.trueddd.di.get
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.theme.DarkColors
+import com.github.trueddd.theme.OpenSansFont
 import com.github.trueddd.ui.Dashboard
 import com.github.trueddd.ui.Destination
 import com.github.trueddd.ui.Map
 import com.github.trueddd.ui.profile.ProfileScreen
+import com.github.trueddd.ui.res.FontTypography
 import com.github.trueddd.ui.rules.Rules
 import com.github.trueddd.ui.wheels.Wheels
 import kotlinx.coroutines.delay
@@ -44,6 +46,7 @@ fun main() {
             gameStateProvider.initialize()
         }
         MaterialTheme(
+            typography = FontTypography(OpenSansFont()),
             colorScheme = DarkColors,
         ) {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.primary) {

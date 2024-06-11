@@ -82,7 +82,7 @@ sealed class Command(val value: String) {
                 append(":")
                 append(gameId.value)
             }.let { Action(it) }
-            fun gameSet(player: Participant, gameId: Game.Id) = buildString{
+            fun gameSet(player: Participant, gameId: Game.Id) = buildString {
                 append(player.name)
                 append(":")
                 append(com.github.trueddd.actions.Action.Key.GameSet)
