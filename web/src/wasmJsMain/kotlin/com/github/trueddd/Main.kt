@@ -32,6 +32,7 @@ import com.github.trueddd.ui.Destination
 import com.github.trueddd.ui.Map
 import com.github.trueddd.ui.profile.ProfileScreen
 import com.github.trueddd.ui.res.FontTypography
+import com.github.trueddd.ui.rules.AllWheelItems
 import com.github.trueddd.ui.rules.Rules
 import com.github.trueddd.ui.wheels.Wheels
 import kotlinx.coroutines.delay
@@ -98,10 +99,15 @@ private fun App(
                 .fillMaxSize()
         ) {
             when (destination) {
-                is Destination.Rules -> {
-                    Rules(
+                is Destination.Items -> {
+                    AllWheelItems(
                         modifier = Modifier
                             .fillMaxSize()
+                    )
+                }
+                is Destination.Rules -> {
+                    Rules(
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
                 is Destination.Map -> {

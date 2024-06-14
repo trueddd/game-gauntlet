@@ -21,11 +21,17 @@ sealed class Destination(
 ) {
 
     companion object {
-        fun all() = listOf(Rules, Map, Dashboard, Wheels, Profile)
+        fun all() = listOf(Rules, Items, Map, Dashboard, Wheels, Profile)
     }
 
     data object Rules : Destination(
         "Правила",
+        Icons.Rounded.Rules,
+        Icons.Outlined.Rules
+    )
+
+    data object Items : Destination(
+        "Предметы",
         Icons.Rounded.Rules,
         Icons.Outlined.Rules
     )
