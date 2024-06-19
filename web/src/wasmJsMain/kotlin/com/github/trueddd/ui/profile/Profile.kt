@@ -188,7 +188,9 @@ private fun WheelItemView(
                         onClick = {
                             onUse()
                             tooltipState.dismiss()
-                        }
+                        },
+                        modifier = Modifier
+                            .pointerHoverIcon(PointerIcon.Hand)
                     ) {
                         Text("Использовать")
                     }

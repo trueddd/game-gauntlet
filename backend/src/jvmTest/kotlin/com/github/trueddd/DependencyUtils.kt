@@ -9,7 +9,7 @@ import java.io.File
 
 internal fun provideEventGate(): EventGate {
     val stateHolder = StateHolderImpl()
-    val gamesProvider = MockedGamesProvider()
+    val gamesProvider = GamesProviderImpl()
     val itemRoller = ItemRollerImpl(getItemFactoriesSet())
     val actionHandlerRegistry = provideActionHandlerRegistry(gamesProvider, itemRoller)
     val inputParser = provideInputParser(stateHolder, gamesProvider, itemRoller)

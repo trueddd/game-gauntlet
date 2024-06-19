@@ -29,7 +29,7 @@ dependencyResolutionManagement {
             val ksp = version("ksp", "2.0.0-1.0.21")
             val ktor = version("ktor", "2.3.11")
             val jupiter = version("jupiter", "5.10.0")
-            val compose = version("compose", "1.6.10")
+            val compose = version("compose", "1.6.11")
             val koin = version("koin", "3.6.0-wasm-alpha2")
             val koinKsp = version("koin-ksp", "1.3.1")
             val kotlinPoet = version("kotlinpoet", "1.16.0")
@@ -58,7 +58,7 @@ dependencyResolutionManagement {
             library("ktor-server-tests", "io.ktor", "ktor-server-tests").versionRef(ktor)
             library("ktor-serialization", "io.ktor", "ktor-serialization-kotlinx-json").versionRef(ktor)
 
-            library("test-kotlin", "org.jetbrains.kotlin", "kotlin-test-junit").versionRef(kotlin)
+            library("test-kotlin", "org.jetbrains.kotlin", "kotlin-test").versionRef(kotlin)
             library("test-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").versionRef(jupiter)
             library("test-jupiter-engine", "org.junit.jupiter", "junit-jupiter-engine").versionRef(jupiter)
 

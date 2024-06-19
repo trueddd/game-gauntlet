@@ -20,7 +20,6 @@ import com.github.trueddd.core.SocketState
 import com.github.trueddd.data.GameConfig
 import com.github.trueddd.data.Participant
 import com.github.trueddd.util.isDevEnvironment
-import com.github.trueddd.util.updateTextFieldOnCtrlV
 
 private val actions = mapOf(
     Action.Key.BoardMove to "Board Move",
@@ -142,7 +141,6 @@ fun ActionsBoard(
                 }
             },
             modifier = Modifier
-                .updateTextFieldOnCtrlV(arguments) { arguments = it }
         )
         Button(
             onClick = {

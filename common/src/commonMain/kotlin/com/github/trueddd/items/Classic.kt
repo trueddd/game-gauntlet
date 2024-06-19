@@ -13,8 +13,17 @@ import kotlinx.serialization.Serializable
 class Classic private constructor(override val uid: String) : WheelItem.Event() {
 
     companion object {
+
         fun create() = Classic(uid = generateWheelItemUid())
-        val TargetGameIds = listOf(Game.Id(5)) // TODO: replace with actual games
+
+        // IDs are coming from `games` files from resources
+        const val SUPER_COW_ID = 1128
+        val FARM_FRENZY_ID_RANGE = 866..876
+
+        private val TargetGameIds: List<Game.Id> = buildList {
+            add(SUPER_COW_ID)
+            addAll(FARM_FRENZY_ID_RANGE)
+        }.map { Game.Id(it) }
     }
 
     override val id = Id(Classic)

@@ -8,6 +8,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.github.trueddd.data.Game
@@ -53,7 +55,11 @@ fun WheelItemUseDialog(
         properties = DialogProperties(),
         title = { Text("Использовать ${item.name}") },
         dismissButton = {
-            TextButton(onClick = onDialogDismiss) {
+            TextButton(
+                onClick = onDialogDismiss,
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand)
+            ) {
                 Text("Отмена")
             }
         },
@@ -67,7 +73,9 @@ fun WheelItemUseDialog(
                     }
                     onItemUse(item, arguments)
                 },
-                enabled = canUse.value
+                enabled = canUse.value,
+                modifier = Modifier
+                    .pointerHoverIcon(if (canUse.value) PointerIcon.Hand else PointerIcon.Default)
             ) {
                 Text("Использовать")
             }

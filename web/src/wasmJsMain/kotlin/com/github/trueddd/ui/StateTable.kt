@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.github.trueddd.data.StateSnapshot
 import com.github.trueddd.items.WheelItem
+import com.github.trueddd.theme.Colors
 import com.github.trueddd.util.copyToClipBoard
 
 @Composable
@@ -41,6 +42,7 @@ private fun WheelItems(items: List<WheelItem>) {
                 text = item.name,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                color = Colors.White,
                 modifier = Modifier
                     .background(Color(item.color), RoundedCornerShape(4.dp))
                     .clickable { copyToClipBoard(item.uid) }

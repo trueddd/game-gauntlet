@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
@@ -148,23 +149,21 @@ fun AllWheelItems(
                                 )
                             }
                     )
-                    // TODO: add selection for text
-                    //  https://github.com/JetBrains/compose-multiplatform/issues/4036
-                    //  Possible workaround:
-                    //  https://github.com/JetBrains/compose-multiplatform/issues/1450#issuecomment-1700968377
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = item.name,
-                            fontSize = 20.sp,
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
-                        Text(
-                            text = item.description.applyModifiersDecoration(),
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
+                    SelectionContainer {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = item.name,
+                                fontSize = 20.sp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                            )
+                            Text(
+                                text = item.description.applyModifiersDecoration(),
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                            )
+                        }
                     }
                 }
             }

@@ -29,7 +29,7 @@ class ClassicItemTest : EventGateTest() {
     fun `ensure buff received by everyone`() = runTest {
         val user = requireRandomParticipant()
         handleAction(BoardMove(user, diceValue = 3))
-        handleAction(GameRoll(user, Game.Id(5)))
+        handleAction(GameRoll(user, Game.Id(Classic.FARM_FRENZY_ID_RANGE.random())))
         handleAction(ItemReceive(user, Classic.create()))
         eventGate.stateHolder.current.stateSnapshot.playersState.forEach { (_, state) ->
             assertEquals(expected = 1, state.modifiersSum)
@@ -41,7 +41,7 @@ class ClassicItemTest : EventGateTest() {
     fun `buff removal after next move`() = runTest {
         val user = requireRandomParticipant()
         handleAction(BoardMove(user, diceValue = 2))
-        handleAction(GameRoll(user, Game.Id(5)))
+        handleAction(GameRoll(user, Game.Id(Classic.SUPER_COW_ID)))
         handleAction(ItemReceive(user, Classic.create()))
         handleAction(GameStatusChange(user, Game.Status.Finished))
         handleAction(BoardMove(user, diceValue = 3))

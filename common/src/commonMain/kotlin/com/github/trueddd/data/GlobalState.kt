@@ -9,7 +9,6 @@ import kotlin.math.roundToInt
  * Contains all information about current game state.
  * But not everything should be delivered to frontend as single package.
  */
-// TODO: make GameConfig and StateSnapshot interfaces and implement them here
 @Serializable
 data class GlobalState(
     @SerialName("ac")
