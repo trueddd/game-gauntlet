@@ -52,7 +52,15 @@ data class BoardMove(
                     .maxBy { it.size }
                 val moveValue = (modifiers.sumOf { it.modifier } + action.diceValue)
                     .let { value -> if (playerState.effects.any { it is ChargedDice }) -value else value }
-                val finalPosition = (playerState.position + moveValue).coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
+                val finalPosition = (playerState.position + moveValue)
+                    .let { position ->
+                        if (playerState.effects.any { it is ConcreteBoots }) {
+                            position / ConcreteBoots.MOVE_DIVISOR
+                        } else {
+                            position
+                        }
+                    }
+                    .coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
                     .let {
                         when {
                             currentState.stateSnapshot.boardTraps[it] is BananaSkin.Trap -> {
@@ -76,6 +84,7 @@ data class BoardMove(
                             effect is LuckyThrow.Buff -> null
                             effect is ChargedDice -> null
                             effect is NoClownery -> if (previousStintIndex + 1 == newStintIndex) null else effect
+                            effect is ConcreteBoots -> effect.charge()
                             effect !is DiceRollModifier -> effect
                             modifiersToDiscard.none { it == effect.uid } -> effect
                             effect is BabySupport -> effect.charge()

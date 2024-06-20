@@ -30,7 +30,7 @@ class StateRecoverabilityTest : EventGateTest() {
             // This delay is needed to avoid similar time for different actions to be compared
             // in game loading process. `withContext` is here to ensure that delay will be not skipped.
             withContext(Dispatchers.Default) {
-                delay(5L)
+                delay(2L)
             }
         }
         eventGate.historyHolder.save(eventGate.stateHolder.current)

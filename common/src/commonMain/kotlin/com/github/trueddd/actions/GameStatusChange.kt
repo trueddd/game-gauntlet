@@ -42,11 +42,10 @@ data class GameStatusChange(
                 ?: throw StateModificationException(action, "No game entries")
             val nextGame = currentState.gameHistory[action.participant.name]
                 ?.firstOrNull { it.status == Game.Status.Next }
+            val isStatusFinished = action.gameNewStatus == Game.Status.Finished
             val newPendingEvents = currentState.pendingEventsOf(action.participant).mapNotNull { pendingEvent ->
                 when (pendingEvent) {
-                    is FamilyFriendlyStreamer -> pendingEvent.takeIf {
-                        action.gameNewStatus != Game.Status.Finished
-                    }
+                    is FamilyFriendlyStreamer -> pendingEvent.takeUnless { isStatusFinished }
                     else -> pendingEvent
                 }
             }
@@ -62,14 +61,8 @@ data class GameStatusChange(
                         !effect.isActive -> effect.setActive(true)
                         else -> effect.charge()
                     }
-                    is EasterCakeBang -> when {
-                        action.gameNewStatus == Game.Status.Finished -> null
-                        else -> effect
-                    }
-                    is Radio -> when {
-                        action.gameNewStatus == Game.Status.Finished -> effect.charge()
-                        else -> effect
-                    }
+                    is EasterCakeBang -> if (isStatusFinished) null else effect
+                    is Radio -> if (isStatusFinished) effect.charge() else effect
                     is ClimbingRope.Buff -> null
                     is ThereIsGiftAtYourDoor.StayAfterGame -> null
                     else -> effect

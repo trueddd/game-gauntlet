@@ -9,6 +9,6 @@ interface WithCharges<out T : WheelItem> {
     fun useCharge(): WithCharges<T>
 }
 
-fun <T: WheelItem.Effect> WithCharges<T>.charge(): WheelItem.Effect? {
-    return useCharge().let { if (it.chargesLeft <= 0) null else it } as? WheelItem.Effect
+inline fun <reified T> T.charge(): T? where T : WheelItem, T : WithCharges<T> {
+    return useCharge().let { if (it.chargesLeft <= 0) null else it as? T }
 }

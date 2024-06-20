@@ -95,7 +95,7 @@ fun WheelItemUseDialog(
                             is ParameterType.Int -> IntParameter(parameter) {
                                 parameters = parameters.updateParametersMap(parameter, it.toString())
                             }
-                            is ParameterType.Player -> PlayerParameter(parameter, gameConfig) {
+                            is ParameterType.Player -> PlayerParameter(parameter, gameConfig, stateSnapshot) {
                                 parameters = parameters.updateParametersMap(parameter, it.name)
                             }
                             is ParameterType.ForeignItem -> ForeignItemParameter(parameter, stateSnapshot, gameConfig, player) {
@@ -166,11 +166,22 @@ private fun IntParameter(
 private fun PlayerParameter(
     parameter: ParameterType.Player,
     gameConfig: GameConfig,
+    stateSnapshot: StateSnapshot,
     onParameterUpdated: (Participant) -> Unit
 ) {
     var value by remember { mutableStateOf<Participant?>(null) }
     var expanded by remember { mutableStateOf(false) }
-    val values = remember { gameConfig.players.filter(parameter.predicate).map { it.displayName } }
+    val values by remember {
+        derivedStateOf {
+            stateSnapshot.playersState.mapNotNull { (name, state) ->
+                if (parameter.predicate(name, state)) {
+                    gameConfig.players.firstOrNull { it.name == name }?.displayName
+                } else {
+                    null
+                }
+            }
+        }
+    }
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },

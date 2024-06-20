@@ -28,9 +28,10 @@ class Earthquake private constructor(override val uid: String) : WheelItem.Event
     override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
         return globalState.updatePlayers { _, playerState ->
             playerState.copy(
-                position = when (playerState.position.isEven) {
-                    true -> playerState.position + 1
-                    false -> playerState.position - 1
+                position = when {
+                    playerState.effects.any { it is ConcreteBoots } -> playerState.position
+                    playerState.position.isEven -> playerState.position + 1
+                    else -> playerState.position - 1
                 }.coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
             )
         }

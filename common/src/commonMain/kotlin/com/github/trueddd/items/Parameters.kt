@@ -2,6 +2,8 @@ package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
+import com.github.trueddd.data.PlayerState
 
 sealed interface Parameters {
     data class One<T1>(
@@ -33,7 +35,7 @@ sealed class ParameterType {
     class Int(override val name: String) : ParameterType()
     class Player(
         override val name: String,
-        val predicate: (Participant) -> Boolean = { true },
+        val predicate: (PlayerName, PlayerState) -> Boolean = { _, _ -> true },
         override val description: String? = null
     ) : ParameterType()
     class MyItem(

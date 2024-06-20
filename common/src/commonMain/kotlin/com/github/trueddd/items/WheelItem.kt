@@ -157,6 +157,9 @@ sealed class WheelItem : Rollable {
         const val Radio = 61
         const val LostFoot = 62
         const val LostLeg = 63
+        const val ConcreteBoots = 64
+        const val Sledgehammer = 65
+        const val SledgehammerDebuff = 66
     }
 }
 
