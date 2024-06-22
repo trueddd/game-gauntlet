@@ -36,5 +36,5 @@ private fun provideActionHandlerRegistry(
 
 private fun provideHistoryHolder(actionHandlerRegistry: ActionHandlerRegistry): EventHistoryHolder {
     val file = File(".\\src\\jvmTest\\resources\\history")
-    return LocalEventHistoryHolder(actionHandlerRegistry, FileGameStateRepository(file))
+    return EventHistoryHolderImpl(actionHandlerRegistry, FileGameStateRepository(file))
 }

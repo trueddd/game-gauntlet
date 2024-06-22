@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Participant(
-    override val name: String,
+    override val name: PlayerName,
     val displayName: String = name,
 ): Rollable {
 

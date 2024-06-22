@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
@@ -35,7 +35,7 @@ class Teleport private constructor(override val uid: String) : WheelItem.Pending
         return Parameters.One(rawArguments.getBooleanParameter(optional = true))
     }
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         val coin = getParameters(arguments, globalState).parameter1
         val userPosition = globalState.positionOf(usedBy)
         val neighborBack = globalState.stateSnapshot.playersState.values

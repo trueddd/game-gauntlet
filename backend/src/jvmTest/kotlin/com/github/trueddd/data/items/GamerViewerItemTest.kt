@@ -17,7 +17,7 @@ class GamerViewerItemTest : EventGateTest() {
 
     @Test
     fun `gamer item test 1`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Gamer.create()
         handleAction(BoardMove(user, diceValue = 3))
         handleAction(GameRoll(user, Game.Id(1)))
@@ -33,7 +33,7 @@ class GamerViewerItemTest : EventGateTest() {
 
     @Test
     fun `gamer item test 2`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Gamer.create()
         handleAction(BoardMove(user, diceValue = 2))
         handleAction(ItemReceive(user, item))
@@ -46,7 +46,7 @@ class GamerViewerItemTest : EventGateTest() {
 
     @Test
     fun `viewer item test`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Viewer.create()
         handleAction(BoardMove(user, diceValue = 3))
         handleAction(GameRoll(user, Game.Id(1)))
@@ -62,7 +62,7 @@ class GamerViewerItemTest : EventGateTest() {
 
     @Test
     fun `game-viewer item test`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val gamerItem = Gamer.create()
         val viewerItem = Viewer.create()
         handleAction(BoardMove(user, diceValue = 4))

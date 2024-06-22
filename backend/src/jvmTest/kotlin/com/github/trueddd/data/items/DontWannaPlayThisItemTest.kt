@@ -15,7 +15,7 @@ class DontWannaPlayThisItemTest : EventGateTest() {
 
     @Test
     fun `reroll game with item`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = DontWannaPlayThis.create()
         handleAction(BoardMove(user, diceValue = 5))
         handleAction(ItemReceive(user, item))
@@ -31,7 +31,7 @@ class DontWannaPlayThisItemTest : EventGateTest() {
 
     @Test
     fun `reroll game - check stats`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = DontWannaPlayThis.create()
         handleAction(BoardMove(user, diceValue = 5))
         handleAction(ItemReceive(user, item))

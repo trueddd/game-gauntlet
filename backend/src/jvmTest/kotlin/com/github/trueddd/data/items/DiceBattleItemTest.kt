@@ -13,10 +13,10 @@ class DiceBattleItemTest : EventGateTest() {
 
     @Test
     fun `dice battle - win`() = runTest {
-        val (user1, user2) = requireParticipants()
+        val (user1, user2) = getPlayerNames()
         val item = DiceBattle.create()
         handleAction(ItemReceive(user1, item))
-        handleAction(ItemUse(user1, item.uid, listOf(user2.name, "4", "2")))
+        handleAction(ItemUse(user1, item.uid, listOf(user2, "4", "2")))
         assertEquals(expected = 4, stateOf(user1).modifiersSum)
         assertEquals(expected = -2, stateOf(user2).modifiersSum)
         assertTrue(pendingEventsOf(user1).isEmpty())
@@ -24,10 +24,10 @@ class DiceBattleItemTest : EventGateTest() {
 
     @Test
     fun `dice battle - lose`() = runTest {
-        val (user1, user2) = requireParticipants()
+        val (user1, user2) = getPlayerNames()
         val item = DiceBattle.create()
         handleAction(ItemReceive(user1, item))
-        handleAction(ItemUse(user1, item.uid, listOf(user2.name, "4", "5")))
+        handleAction(ItemUse(user1, item.uid, listOf(user2, "4", "5")))
         assertEquals(expected = -4, stateOf(user1).modifiersSum)
         assertEquals(expected = 5, stateOf(user2).modifiersSum)
         assertTrue(pendingEventsOf(user1).isEmpty())
@@ -35,10 +35,10 @@ class DiceBattleItemTest : EventGateTest() {
 
     @Test
     fun `dice battle - draw`() = runTest {
-        val (user1, user2) = requireParticipants()
+        val (user1, user2) = getPlayerNames()
         val item = DiceBattle.create()
         handleAction(ItemReceive(user1, item))
-        handleAction(ItemUse(user1, item.uid, listOf(user2.name, "4", "4")))
+        handleAction(ItemUse(user1, item.uid, listOf(user2, "4", "4")))
         assertEquals(expected = 0, stateOf(user1).modifiersSum)
         assertEquals(expected = 0, stateOf(user2).modifiersSum)
         assertTrue(pendingEventsOf(user1).isNotEmpty())

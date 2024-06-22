@@ -14,11 +14,11 @@ class DropGameActionTest : EventGateTest() {
 
     @Test
     fun `drop game`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val moveDiceValue = 6
         val dropDiceValue = 4
         handleAction(BoardMove(user, moveDiceValue))
-        eventGate.parseAndHandle("${user.name}:${Action.Key.GameRoll}")
+        eventGate.parseAndHandle("$user:${Action.Key.GameRoll}")
         handleAction(GameDrop(user, dropDiceValue))
         assertTrue(inventoryOf(user).isEmpty())
         assertEquals(Game.Status.Dropped, lastGameOf(user)?.status)
@@ -27,23 +27,23 @@ class DropGameActionTest : EventGateTest() {
 
     @RepeatedTest(10)
     fun `drop game - send rolled dice`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val moveDiceValue = 6
         val dropDiceValue = 4
         handleAction(BoardMove(user, moveDiceValue))
-        eventGate.parseAndHandle("${user.name}:${Action.Key.GameRoll}")
-        eventGate.parseAndHandle("${user.name}:${Action.Key.GameDrop}:$dropDiceValue")
+        eventGate.parseAndHandle("$user:${Action.Key.GameRoll}")
+        eventGate.parseAndHandle("$user:${Action.Key.GameDrop}:$dropDiceValue")
         assertEquals(Game.Status.Dropped, lastGameOf(user)?.status)
         assertEquals(expected = moveDiceValue - dropDiceValue, positionOf(user))
     }
 
     @Test
     fun `drop game with SamuraiLunge`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val moveDiceValue = 5
         val dropDiceValue = 4
         handleAction(BoardMove(user, moveDiceValue))
-        eventGate.parseAndHandle("${user.name}:${Action.Key.GameRoll}")
+        eventGate.parseAndHandle("$user:${Action.Key.GameRoll}")
         val item = SamuraiLunge.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid))

@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
@@ -36,20 +36,18 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
         return Parameters.One(rawArguments.getStringParameter())
     }
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         val parameters = getParameters(arguments, globalState)
         val targetItemId = parameters.parameter1
-        val targetUser = globalState.stateSnapshot.playersState.firstNotNullOfOrNull { (player, state) ->
-            if (state.inventory.any { it.uid == targetItemId }) {
-                globalState.players.firstOrNull { it.name == player }
-            } else {
-                null
+        val targetUser = globalState.stateSnapshot.playersState
+            .firstNotNullOfOrNull { (playerName, state) ->
+                if (state.inventory.any { it.uid == targetItemId }) playerName else null
             }
-        } ?: throw IllegalArgumentException("Not found target user")
+            ?: throw IllegalArgumentException("Not found target user")
         val targetItem = globalState.inventoryOf(targetUser).firstOrNull { it.uid == parameters.parameter1 }
             ?: throw IllegalArgumentException("ID of target item must be specified")
-        return globalState.updatePlayers { participant, state ->
-            when (participant) {
+        return globalState.updatePlayers { playerName, state ->
+            when (playerName) {
                 usedBy -> state.copy(
                     pendingEvents = state.pendingEvents.without(uid),
                     inventory = state.inventory + targetItem,
@@ -62,9 +60,9 @@ class NimbleFingers private constructor(override val uid: String) : WheelItem.Pe
         }
     }
 
-    fun canUse(user: Participant, globalState: GlobalState): Boolean {
+    fun canUse(playerName: PlayerName, globalState: GlobalState): Boolean {
         return globalState.stateSnapshot.playersState.any { (player, state) ->
-            player != user.name && state.inventory.isNotEmpty()
+            player != playerName && state.inventory.isNotEmpty()
         }
     }
 

@@ -17,7 +17,7 @@ class NoClowneryItemTest : EventGateTest() {
 
     @Test
     fun `item dispose - after special spot`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = NoClownery.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, effectsOf(user).count { it is NoClownery })
@@ -31,11 +31,11 @@ class NoClowneryItemTest : EventGateTest() {
 
     @RepeatedTest(10)
     fun `attempt to roll while debuffed`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = NoClownery.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, effectsOf(user).count { it is NoClownery })
-        eventGate.parseAndHandle("${user.name}:${Action.Key.ItemReceive}")
+        eventGate.parseAndHandle("$user:${Action.Key.ItemReceive}")
         assertEquals(expected = 1, effectsOf(user).size)
         assertEquals(expected = 0, pendingEventsOf(user).size)
         assertEquals(expected = 0, inventoryOf(user).size)
@@ -43,20 +43,20 @@ class NoClowneryItemTest : EventGateTest() {
 
     @Test
     fun `inventory flush - rat move`() = runTest {
-        val (user1, user2) = requireParticipants()
+        val (user1, user2) = getPlayerNames()
         val noClownery = NoClownery.create()
         val ratMove = RatMove.create()
         handleAction(ItemReceive(user1, noClownery))
         handleAction(BoardMove(user1, diceValue = 4))
         handleAction(ItemReceive(user2, ratMove))
         assertEquals(expected = 1, effectsOf(user1).size)
-        handleAction(ItemUse(user2, ratMove.uid, user1.name))
+        handleAction(ItemUse(user2, ratMove.uid, user1))
         assertEquals(expected = 1, effectsOf(user1).size)
     }
 
     @Test
     fun `inventory flush - holey pockets`() = runTest {
-        val (user1) = requireParticipants()
+        val (user1) = getPlayerNames()
         val noClownery = NoClownery.create()
         val holeyPockets = HoleyPockets.create()
         handleAction(ItemReceive(user1, noClownery))
@@ -67,7 +67,7 @@ class NoClowneryItemTest : EventGateTest() {
 
     @Test
     fun `inventory flush - loyal moderator`() = runTest {
-        val (user1) = requireParticipants()
+        val (user1) = getPlayerNames()
         val noClownery = NoClownery.create()
         val loyalModerator = LoyalModerator.create()
         handleAction(ItemReceive(user1, noClownery))

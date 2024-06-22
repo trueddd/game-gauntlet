@@ -16,14 +16,14 @@ class ForgotMyGameItemTest : EventGateTest() {
 
     @Test
     fun `get item`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, ForgotMyGame.create()))
         assertEquals(expected = 1, pendingEventsOf(user).size)
     }
 
     @Test
     fun `result - reroll`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = ForgotMyGame.create()
         handleAction(BoardMove(user, diceValue = 5))
         handleAction(GameRoll(user, Game.Id(1)))
@@ -37,7 +37,7 @@ class ForgotMyGameItemTest : EventGateTest() {
 
     @Test
     fun `result - cancel`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = ForgotMyGame.create()
         handleAction(BoardMove(user, diceValue = 5))
         handleAction(GameRoll(user, Game.Id(1)))

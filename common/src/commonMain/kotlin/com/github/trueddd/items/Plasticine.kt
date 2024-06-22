@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
@@ -24,12 +24,12 @@ class Plasticine private constructor(override val uid: String) : WheelItem.Inven
         |Позволяет превратить этот предмет в любой другой предмет по выбору стримера.
     """.removeTabs()
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState
     }
 
     fun transform(
-        user: Participant,
+        playerName: PlayerName,
         globalState: GlobalState,
         arguments: List<String>,
         factories: Set<WheelItem.Factory>
@@ -37,7 +37,7 @@ class Plasticine private constructor(override val uid: String) : WheelItem.Inven
         val itemId = arguments.getIntParameter()
         val factory = factories.first { it.itemId.value == itemId }
         val item = factory.create() as InventoryItem
-        return globalState.updatePlayer(user) { playerState ->
+        return globalState.updatePlayer(playerName) { playerState ->
             playerState.copy(
                 inventory = playerState.inventory.without(uid) + item,
             )

@@ -17,7 +17,7 @@ class BabySupportItemTest : EventGateTest() {
 
     @Test
     fun `receive by leader`() = runTest {
-        val leader = requireRandomParticipant()
+        val leader = getRandomPlayerName()
         handleAction(BoardMove(leader, diceValue = 6))
         handleAction(ItemReceive(leader, BabySupport.create()))
         assertTrue(effectsOf(leader).isEmpty())
@@ -25,7 +25,7 @@ class BabySupportItemTest : EventGateTest() {
 
     @Test
     fun `regular use`() = runTest {
-        val (outsider, leader) = requireParticipants()
+        val (outsider, leader) = getPlayerNames()
         handleAction(BoardMove(leader, diceValue = 6))
         handleAction(ItemReceive(outsider, BabySupport.create()))
         assertEquals(expected = 2, effectsOf(outsider).filterIsInstance<DiceRollModifier>().sumOf { it.modifier })

@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.items.Sledgehammer.Debuff
 import com.github.trueddd.utils.removeTabs
@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class Sledgehammer private constructor(
     override val uid: String
-) : WheelItem.InventoryItem(), Parametrized<Parameters.Two<Participant, Boolean>> {
+) : WheelItem.InventoryItem(), Parametrized<Parameters.Two<PlayerName, Boolean>> {
 
     companion object {
         fun create() = Sledgehammer(uid = generateWheelItemUid())
@@ -41,22 +41,22 @@ class Sledgehammer private constructor(
     override fun getParameters(
         rawArguments: List<String>,
         currentState: GlobalState
-    ): Parameters.Two<Participant, Boolean> {
+    ): Parameters.Two<PlayerName, Boolean> {
         return Parameters.Two(
             rawArguments.getParticipantParameter(index = 0, currentState)!!,
             rawArguments.getBooleanParameter(index = 1)!!,
         )
     }
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         val (bootsOwner, successfulRemoval) = getParameters(arguments, globalState)
-        return globalState.updatePlayers { participant, playerState ->
-            val withoutHammer = if (participant.name == usedBy.name) {
+        return globalState.updatePlayers { playerName, playerState ->
+            val withoutHammer = if (playerName == usedBy) {
                 playerState.copy(inventory = playerState.inventory.without(uid))
             } else {
                 playerState
             }
-            if (participant.name == bootsOwner.name) {
+            if (playerName == bootsOwner) {
                 if (withoutHammer.effects.none { it is ConcreteBoots }) {
                     throw IllegalStateException("Player $bootsOwner doesn't have ConcreteBoots")
                 }

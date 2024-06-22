@@ -1,9 +1,6 @@
 package com.github.trueddd.actions
 
-import com.github.trueddd.data.Game
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
-import com.github.trueddd.data.PlayerState
+import com.github.trueddd.data.*
 import com.github.trueddd.items.*
 import com.github.trueddd.utils.*
 import com.trueddd.github.annotations.ActionGenerator
@@ -15,7 +12,7 @@ import kotlinx.serialization.Serializable
 @SerialName("a${Action.Key.BoardMove}")
 data class BoardMove(
     @SerialName("rb")
-    val rolledBy: Participant,
+    val rolledBy: PlayerName,
     @SerialName("dv")
     val diceValue: Int,
 ) : Action(Key.BoardMove) {
@@ -29,9 +26,9 @@ data class BoardMove(
 
         override val actionKey = Key.BoardMove
 
-        override fun generate(participant: Participant, arguments: List<String>): BoardMove {
+        override fun generate(playerName: PlayerName, arguments: List<String>): BoardMove {
             val dice = arguments.firstOrNull()?.toIntOrNull() ?: rollDice()
-            return BoardMove(participant, dice)
+            return BoardMove(playerName, dice)
         }
     }
 

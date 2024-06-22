@@ -12,7 +12,7 @@ class MongoliaDoesNotExistItemTest : EventGateTest() {
 
     @Test
     fun `successful use`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = MongoliaDoesNotExist.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, pendingEventsOf(user).size)
@@ -24,7 +24,7 @@ class MongoliaDoesNotExistItemTest : EventGateTest() {
 
     @Test
     fun `unsuccessful use`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = MongoliaDoesNotExist.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, pendingEventsOf(user).size)
@@ -36,7 +36,7 @@ class MongoliaDoesNotExistItemTest : EventGateTest() {
 
     @Test
     fun `parsing failure`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = MongoliaDoesNotExist.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, pendingEventsOf(user).size)

@@ -11,17 +11,17 @@ class GameStatusChangeTest : EventGateTest() {
 
     @Test
     fun `change status with failure`() = runTest {
-        val participant = requireRandomParticipant()
-        eventGate.parseAndHandle("${participant.name}:${Action.Key.GameStatusChange}:${Game.Status.Dropped.ordinal}")
+        val participant = getRandomPlayerName()
+        eventGate.parseAndHandle("$participant:${Action.Key.GameStatusChange}:${Game.Status.Dropped.ordinal}")
         assertEquals(expected = true, gamesOf(participant).isEmpty())
     }
 
     @Test
     fun `change status successfully`() = runTest {
-        val participant = requireRandomParticipant()
-        eventGate.parseAndHandle("${participant.name}:${Action.Key.BoardMove}")
-        eventGate.parseAndHandle("${participant.name}:${Action.Key.GameRoll}")
-        eventGate.parseAndHandle("${participant.name}:${Action.Key.GameStatusChange}:${Game.Status.Finished.ordinal}")
+        val participant = getRandomPlayerName()
+        eventGate.parseAndHandle("$participant:${Action.Key.BoardMove}")
+        eventGate.parseAndHandle("$participant:${Action.Key.GameRoll}")
+        eventGate.parseAndHandle("$participant:${Action.Key.GameStatusChange}:${Game.Status.Finished.ordinal}")
         assertEquals(expected = false, gamesOf(participant).isEmpty())
         assertEquals(Game.Status.Finished, stateOf(participant).currentGame?.status)
     }

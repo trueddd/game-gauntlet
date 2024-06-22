@@ -12,7 +12,7 @@ class AwfulEventItemTest : EventGateTest() {
 
     @Test
     fun `online 2`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = AwfulEvent.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("2")))
@@ -23,7 +23,7 @@ class AwfulEventItemTest : EventGateTest() {
 
     @Test
     fun `online 3`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = AwfulEvent.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("3")))
@@ -33,7 +33,7 @@ class AwfulEventItemTest : EventGateTest() {
 
     @Test
     fun `fail to parse`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = AwfulEvent.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("-1")))

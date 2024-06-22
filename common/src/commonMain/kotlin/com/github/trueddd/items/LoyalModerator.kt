@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
@@ -36,7 +36,7 @@ class LoyalModerator private constructor(override val uid: String) : WheelItem.I
         return Parameters.One(rawArguments.getStringParameter())
     }
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState.updatePlayer(usedBy) { playerState ->
             val targetDebuffId = getParameters(arguments, globalState).parameter1
             if (playerState.effects.firstOrNull { it.uid == targetDebuffId } is NonDroppable) {

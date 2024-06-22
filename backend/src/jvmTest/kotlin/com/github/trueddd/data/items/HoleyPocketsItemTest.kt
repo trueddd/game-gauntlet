@@ -14,7 +14,7 @@ class HoleyPocketsItemTest : EventGateTest() {
 
     @Test
     fun `use event with inventory and effects`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, PowerThrow.create()))
         handleAction(ItemReceive(user, LoyalModerator.create()))
         handleAction(ItemReceive(user, Viewer.create()))
@@ -27,7 +27,7 @@ class HoleyPocketsItemTest : EventGateTest() {
 
     @Test
     fun `use event on empty inventory`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         assertEquals(expected = 0, inventoryOf(user).size)
         assertEquals(expected = 0, effectsOf(user).size)
         handleAction(ItemReceive(user, HoleyPockets.create()))

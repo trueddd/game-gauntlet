@@ -14,7 +14,7 @@ class PlasticineItemTest : EventGateTest() {
 
     @Test
     fun `transform into a rope`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Plasticine.create()
         handleAction(ItemReceive(user, item))
         assertIs<Plasticine>(inventoryOf(user).first())

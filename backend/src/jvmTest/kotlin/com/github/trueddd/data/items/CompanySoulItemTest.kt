@@ -14,11 +14,11 @@ class CompanySoulItemTest : EventGateTest() {
 
     @Test
     fun `joke - corrupted name`() = runTest {
-        val (joker, listener) = requireParticipants()
+        val (joker, listener) = getPlayerNames()
         val item = CompanySoul.create()
         handleAction(ItemReceive(joker, item))
         assertEquals(expected = 1, pendingEventsOf(joker).size)
-        handleAction(ItemUse(joker, item.uid, listOf(listener.name.drop(1), "1")))
+        handleAction(ItemUse(joker, item.uid, listOf(listener.drop(1), "1")))
         assertEquals(expected = 0, stateOf(joker).modifiersSum)
         assertEquals(expected = 0, stateOf(listener).modifiersSum)
         assertFalse(pendingEventsOf(joker).isEmpty())
@@ -26,11 +26,11 @@ class CompanySoulItemTest : EventGateTest() {
 
     @Test
     fun `joke succeed`() = runTest {
-        val (joker, listener) = requireParticipants()
+        val (joker, listener) = getPlayerNames()
         val item = CompanySoul.create()
         handleAction(ItemReceive(joker, item))
         assertEquals(expected = 1, pendingEventsOf(joker).size)
-        handleAction(ItemUse(joker, item.uid, listOf(listener.name, "1")))
+        handleAction(ItemUse(joker, item.uid, listOf(listener, "1")))
         assertEquals(expected = 1, stateOf(joker).modifiersSum)
         assertEquals(expected = -1, stateOf(listener).modifiersSum)
         assertTrue(pendingEventsOf(joker).isEmpty())
@@ -38,11 +38,11 @@ class CompanySoulItemTest : EventGateTest() {
 
     @Test
     fun `joke failed`() = runTest {
-        val (joker, listener) = requireParticipants()
+        val (joker, listener) = getPlayerNames()
         val item = CompanySoul.create()
         handleAction(ItemReceive(joker, item))
         assertEquals(expected = 1, pendingEventsOf(joker).size)
-        handleAction(ItemUse(joker, item.uid, listOf(listener.name, "0")))
+        handleAction(ItemUse(joker, item.uid, listOf(listener, "0")))
         assertEquals(expected = -1, stateOf(joker).modifiersSum)
         assertEquals(expected = 1, stateOf(listener).modifiersSum)
         assertTrue(pendingEventsOf(joker).isEmpty())

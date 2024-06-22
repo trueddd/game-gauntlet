@@ -13,7 +13,7 @@ class BananaSkinItemTest : EventGateTest() {
 
     @Test
     fun `item use`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = BananaSkin.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, inventoryOf(user).count { it is BananaSkin })
@@ -26,7 +26,7 @@ class BananaSkinItemTest : EventGateTest() {
 
     @Test
     fun `step on banana`() = runTest {
-        val (userToPlace, userToStep) = requireParticipants()
+        val (userToPlace, userToStep) = getPlayerNames()
         val item = BananaSkin.create()
         handleAction(ItemReceive(userToPlace, item))
         handleAction(BoardMove(userToPlace, diceValue = 4))

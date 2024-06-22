@@ -2,7 +2,8 @@ package com.github.trueddd.items
 
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
+import com.github.trueddd.items.Classic.Buff
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
@@ -35,7 +36,7 @@ class Classic private constructor(override val uid: String) : WheelItem.Event() 
         |то все участники получают `+1` к следующему броску кубика, иначе ничего не проиходит.
     """.removeTabs()
 
-    override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
+    override suspend fun invoke(globalState: GlobalState, triggeredBy: PlayerName): GlobalState {
         return if (globalState.getAllEverRolledGames().any { it.id in TargetGameIds }) {
             globalState.updatePlayers { _, playerState ->
                 playerState.copy(

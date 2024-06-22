@@ -1,7 +1,8 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
+import com.github.trueddd.items.Shitter.Debuff
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
@@ -27,19 +28,19 @@ class Shitter private constructor(override val uid: String) : WheelItem.Event() 
         |Если стример занимает место ниже 4, то колесо рероллится.
     """.removeTabs()
 
-    override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
+    override suspend fun invoke(globalState: GlobalState, triggeredBy: PlayerName): GlobalState {
         val everyoneEqualized = globalState.stateSnapshot.playersState.values
             .map { it.position }.distinct().let { it.size == 1 }
         if (everyoneEqualized) {
             return globalState
         }
-        val modifier = when (globalState.positionAmongPlayers(rolledBy)) {
+        val modifier = when (globalState.positionAmongPlayers(triggeredBy)) {
             0 -> -3
             1 -> -2
             2 -> -1
             else -> return globalState
         }.let { Debuff.create(it) }
-        return globalState.updatePlayer(rolledBy) { playerState ->
+        return globalState.updatePlayer(triggeredBy) { playerState ->
             playerState.copy(effects = playerState.effects + modifier)
         }
     }

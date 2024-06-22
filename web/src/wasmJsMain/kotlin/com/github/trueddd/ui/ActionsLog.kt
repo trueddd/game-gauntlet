@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.trueddd.actions.*
+import com.github.trueddd.data.GameConfig
 import com.github.trueddd.utils.DefaultTimeZone
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
@@ -23,6 +24,7 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 fun ActionsLog(
     actions: List<Action>,
+    gameConfig: GameConfig,
     modifier: Modifier
 ) {
     LazyColumn(
@@ -34,14 +36,14 @@ fun ActionsLog(
     ) {
         items(actions) {
             when (it) {
-                is BoardMove -> BoardMove(it)
-                is GameDrop -> GameDrop(it)
-                is GameRoll -> GameRoll(it)
-                is GameSet -> GameSet(it)
-                is GameStatusChange -> GameStatusChange(it)
-                is ItemReceive -> ItemReceive(it)
-                is ItemUse -> ItemUse(it)
-                is GlobalEvent -> GlobalEvent(it)
+                is BoardMove -> BoardMoveAction(it, gameConfig)
+                is GameDrop -> GameDropAction(it, gameConfig)
+                is GameRoll -> GameRollAction(it, gameConfig)
+                is GameSet -> GameSetAction(it, gameConfig)
+                is GameStatusChange -> GameStatusChangeAction(it, gameConfig)
+                is ItemReceive -> ItemReceiveAction(it, gameConfig)
+                is ItemUse -> ItemUseAction(it, gameConfig)
+                is GlobalEvent -> GlobalEventAction(it)
             }
         }
     }
@@ -71,7 +73,7 @@ private fun Long.formatDate(): String {
 }
 
 @Composable
-private fun BoardMove(action: BoardMove) {
+private fun BoardMoveAction(action: BoardMove, gameConfig: GameConfig) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -82,7 +84,7 @@ private fun BoardMove(action: BoardMove) {
                 .weight(1f)
         )
         Text(
-            text = action.rolledBy.displayName,
+            text = gameConfig.displayNameOf(action.rolledBy),
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .weight(1f)
@@ -103,7 +105,7 @@ private fun BoardMove(action: BoardMove) {
 }
 
 @Composable
-private fun ItemReceive(action: ItemReceive) {
+private fun ItemReceiveAction(action: ItemReceive, gameConfig: GameConfig) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -114,7 +116,7 @@ private fun ItemReceive(action: ItemReceive) {
                 .weight(1f)
         )
         Text(
-            text = action.receivedBy.displayName,
+            text = gameConfig.displayNameOf(action.receivedBy),
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .weight(1f)
@@ -135,7 +137,7 @@ private fun ItemReceive(action: ItemReceive) {
 }
 
 @Composable
-private fun GameRoll(action: GameRoll) {
+private fun GameRollAction(action: GameRoll, gameConfig: GameConfig) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -146,7 +148,7 @@ private fun GameRoll(action: GameRoll) {
                 .weight(1f)
         )
         Text(
-            text = action.participant.displayName,
+            text = gameConfig.displayNameOf(action.playerName),
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .weight(1f)
@@ -167,7 +169,7 @@ private fun GameRoll(action: GameRoll) {
 }
 
 @Composable
-private fun GameDrop(action: GameDrop) {
+private fun GameDropAction(action: GameDrop, gameConfig: GameConfig) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -178,7 +180,7 @@ private fun GameDrop(action: GameDrop) {
                 .weight(1f)
         )
         Text(
-            text = action.rolledBy.displayName,
+            text = gameConfig.displayNameOf(action.rolledBy),
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .weight(1f)
@@ -199,7 +201,7 @@ private fun GameDrop(action: GameDrop) {
 }
 
 @Composable
-private fun GameStatusChange(action: GameStatusChange) {
+private fun GameStatusChangeAction(action: GameStatusChange, gameConfig: GameConfig) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -210,7 +212,7 @@ private fun GameStatusChange(action: GameStatusChange) {
                 .weight(1f)
         )
         Text(
-            text = action.participant.displayName,
+            text = gameConfig.displayNameOf(action.playerName),
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .weight(1f)
@@ -231,7 +233,7 @@ private fun GameStatusChange(action: GameStatusChange) {
 }
 
 @Composable
-private fun ItemUse(action: ItemUse) {
+private fun ItemUseAction(action: ItemUse, gameConfig: GameConfig) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -242,7 +244,7 @@ private fun ItemUse(action: ItemUse) {
                 .weight(1f)
         )
         Text(
-            text = action.usedBy.displayName,
+            text = gameConfig.displayNameOf(action.usedBy),
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .weight(1f)
@@ -269,7 +271,7 @@ private fun ItemUse(action: ItemUse) {
 }
 
 @Composable
-private fun GlobalEvent(action: GlobalEvent) {
+private fun GlobalEventAction(action: GlobalEvent) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -301,7 +303,7 @@ private fun GlobalEvent(action: GlobalEvent) {
 }
 
 @Composable
-private fun GameSet(action: GameSet) {
+private fun GameSetAction(action: GameSet, gameConfig: GameConfig) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -312,7 +314,7 @@ private fun GameSet(action: GameSet) {
                 .weight(1f)
         )
         Text(
-            text = action.setBy.displayName,
+            text = gameConfig.displayNameOf(action.setBy),
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .weight(1f)

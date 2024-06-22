@@ -12,7 +12,7 @@ class WeakThrowItemTest : EventGateTest() {
 
     @Test
     fun `weak throw on 5`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, WeakThrow.create()))
         handleAction(BoardMove(user, diceValue = 5))
         assertEquals(expected = 4, positionOf(user))
@@ -20,7 +20,7 @@ class WeakThrowItemTest : EventGateTest() {
 
     @Test
     fun `weak throw on 1`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, WeakThrow.create()))
         handleAction(BoardMove(user, diceValue = 1))
         assertEquals(expected = 1,positionOf(user))

@@ -2,7 +2,7 @@ package com.github.trueddd.items
 
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
@@ -30,7 +30,7 @@ class ForgotMyGame private constructor(override val uid: String) : WheelItem.Pen
         return Parameters.One(rawArguments.getBooleanParameter()!!)
     }
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         val shouldReroll = getParameters(arguments, globalState).parameter1
         return if (shouldReroll) {
             globalState.updatePlayer(usedBy) { playerState ->

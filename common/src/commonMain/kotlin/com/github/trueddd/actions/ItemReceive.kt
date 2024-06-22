@@ -2,7 +2,7 @@ package com.github.trueddd.actions
 
 import com.github.trueddd.core.ItemRoller
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.items.*
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 @SerialName("a${Action.Key.ItemReceive}")
 data class ItemReceive(
     @SerialName("rb")
-    val receivedBy: Participant,
+    val receivedBy: PlayerName,
     @SerialName("wi")
     val item: WheelItem,
 ) : Action(Key.ItemReceive) {
@@ -24,12 +24,12 @@ data class ItemReceive(
 
         override val actionKey = Key.ItemReceive
 
-        override fun generate(participant: Participant, arguments: List<String>): ItemReceive {
+        override fun generate(playerName: PlayerName, arguments: List<String>): ItemReceive {
             val item = arguments.firstOrNull()?.toIntOrNull()?.let { WheelItem.Id(it) }
                 ?.let { itemId -> itemRoller.allItemsFactories.firstOrNull { it.itemId == itemId } }
                 ?.create()
                 ?: itemRoller.pick()
-            return ItemReceive(participant, item)
+            return ItemReceive(playerName, item)
         }
     }
 

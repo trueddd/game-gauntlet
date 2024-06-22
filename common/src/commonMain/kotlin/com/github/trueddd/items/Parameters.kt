@@ -1,7 +1,6 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
 import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.PlayerState
 
@@ -85,10 +84,10 @@ fun List<String>.getParticipantParameter(
     index: Int = 0,
     globalState: GlobalState,
     optional: Boolean = false
-): Participant? {
+): PlayerName? {
     val name = this.getOrNull(index)
     return when {
-        name != null -> globalState.participantByName(name)
+        name != null -> globalState.participantByName(name)?.name
         optional -> null
         else -> throw IllegalArgumentException("Player name must be specified as parameter with index $index")
     }

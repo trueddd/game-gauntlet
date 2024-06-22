@@ -13,7 +13,7 @@ class TeleportItemTest : EventGateTest() {
 
     @Test
     fun `no neighbors`() = runTest {
-        val (user1, user2, user3) = requireParticipants()
+        val (user1, user2, user3) = getPlayerNames()
         val item = Teleport.create()
         handleAction(BoardMove(user1, diceValue = 1))
         handleAction(BoardMove(user2, diceValue = 1))
@@ -27,7 +27,7 @@ class TeleportItemTest : EventGateTest() {
 
     @Test
     fun `1 neighbor`() = runTest {
-        val (user1, user2, user3) = requireParticipants()
+        val (user1, user2, user3) = getPlayerNames()
         val item = Teleport.create()
         handleAction(BoardMove(user1, diceValue = 1))
         handleAction(BoardMove(user2, diceValue = 1))
@@ -41,7 +41,7 @@ class TeleportItemTest : EventGateTest() {
 
     @Test
     fun `2 neighbors - backward`() = runTest {
-        val (user1, user2, user3, user4) = requireParticipants()
+        val (user1, user2, user3, user4) = getPlayerNames()
         val item = Teleport.create()
         handleAction(BoardMove(user1, diceValue = 2))
         handleAction(BoardMove(user2, diceValue = 1))
@@ -56,7 +56,7 @@ class TeleportItemTest : EventGateTest() {
 
     @Test
     fun `2 neighbors - forward`() = runTest {
-        val (user1, user2, user3) = requireParticipants()
+        val (user1, user2, user3) = getPlayerNames()
         val item = Teleport.create()
         handleAction(BoardMove(user1, diceValue = 2))
         handleAction(BoardMove(user2, diceValue = 1))
@@ -70,7 +70,7 @@ class TeleportItemTest : EventGateTest() {
 
     @Test
     fun `mandatory argument`() = runTest {
-        val (user1, user2, user3) = requireParticipants()
+        val (user1, user2, user3) = getPlayerNames()
         val item = Teleport.create()
         handleAction(BoardMove(user1, diceValue = 2))
         handleAction(BoardMove(user2, diceValue = 1))

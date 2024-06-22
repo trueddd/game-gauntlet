@@ -15,7 +15,7 @@ class ConcreteBootsItemTest : EventGateTest() {
 
     @Test
     fun `limit movement - move on 7`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, PowerThrow.create()))
         handleAction(ItemReceive(user, ConcreteBoots.create()))
         handleAction(BoardMove(user, diceValue = 6))
@@ -24,7 +24,7 @@ class ConcreteBootsItemTest : EventGateTest() {
 
     @Test
     fun `limit movement - move on 6`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, ConcreteBoots.create()))
         handleAction(BoardMove(user, diceValue = 6))
         assertEquals(expected = 3, positionOf(user))
@@ -32,7 +32,7 @@ class ConcreteBootsItemTest : EventGateTest() {
 
     @Test
     fun `limit movement - move on 10`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         repeat(4) {
             handleAction(ItemReceive(user, PowerThrow.create()))
         }
@@ -43,7 +43,7 @@ class ConcreteBootsItemTest : EventGateTest() {
 
     @Test
     fun `limit movement - move on 10 with additional modifiers`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         repeat(6) {
             handleAction(ItemReceive(user, PowerThrow.create()))
         }
@@ -54,7 +54,7 @@ class ConcreteBootsItemTest : EventGateTest() {
 
     @Test
     fun `stay on place on earthquake`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, ConcreteBoots.create()))
         handleAction(BoardMove(user, diceValue = 6))
         assertEquals(expected = 3, positionOf(user))
@@ -64,7 +64,7 @@ class ConcreteBootsItemTest : EventGateTest() {
 
     @Test
     fun `stay on place after nuke`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, ConcreteBoots.create()))
         handleAction(BoardMove(user, diceValue = 6))
         assertEquals(expected = 3, positionOf(user))
@@ -74,7 +74,7 @@ class ConcreteBootsItemTest : EventGateTest() {
 
     @Test
     fun `stay on place after tornado`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, ConcreteBoots.create()))
         handleAction(BoardMove(user, diceValue = 6))
         assertEquals(expected = 3, positionOf(user))
@@ -84,7 +84,7 @@ class ConcreteBootsItemTest : EventGateTest() {
 
     @Test
     fun `drop boots after 3 moves`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, ConcreteBoots.create()))
         val diceValue = 6
         repeat(ConcreteBoots.MOVES_COUNT) {

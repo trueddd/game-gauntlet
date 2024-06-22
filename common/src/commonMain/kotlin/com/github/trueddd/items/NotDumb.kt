@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
@@ -41,7 +41,7 @@ class NotDumb private constructor(override val uid: String) : WheelItem.PendingE
         return Parameters.One(rawArguments.getIntParameter())
     }
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         val rightAnswers = getParameters(arguments, globalState).parameter1
         require(rightAnswers in 0..7) {
             "Result should be in range from 0 to 7, but was $rightAnswers"

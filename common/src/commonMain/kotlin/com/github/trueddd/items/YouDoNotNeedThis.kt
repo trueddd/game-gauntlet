@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,8 +20,8 @@ class YouDoNotNeedThis private constructor(override val uid: String) : WheelItem
 
     override val description = "Сбрасывает случайный бафф."
 
-    override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
-        return globalState.updatePlayer(rolledBy) { state ->
+    override suspend fun invoke(globalState: GlobalState, triggeredBy: PlayerName): GlobalState {
+        return globalState.updatePlayer(triggeredBy) { state ->
             val buff = state.effects
                 .filterIsInstance<Effect.Buff>()
                 .randomOrNull()

@@ -2,7 +2,7 @@ package com.github.trueddd.items
 
 import com.github.trueddd.actions.ItemReceive
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.utils.getItemFactoriesSet
 import com.github.trueddd.utils.removeTabs
@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("${WheelItem.Poll}")
 class Poll private constructor(override val uid: String) : WheelItem.PendingEvent(),
-    Parametrized<Parameters.Two<Int, Participant?>> {
+    Parametrized<Parameters.Two<Int, PlayerName?>> {
 
     companion object {
         fun create() = Poll(uid = generateWheelItemUid())
@@ -40,14 +40,14 @@ class Poll private constructor(override val uid: String) : WheelItem.PendingEven
     override fun getParameters(
         rawArguments: List<String>,
         currentState: GlobalState
-    ): Parameters.Two<Int, Participant?> {
+    ): Parameters.Two<Int, PlayerName?> {
         return Parameters.Two(
             rawArguments.getIntParameter(index = 0),
             rawArguments.getParticipantParameter(index = 1, currentState, optional = true)
         )
     }
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         val parameters = getParameters(arguments, globalState)
         val itemId = parameters.parameter1
         val receiver = parameters.parameter2 ?: usedBy

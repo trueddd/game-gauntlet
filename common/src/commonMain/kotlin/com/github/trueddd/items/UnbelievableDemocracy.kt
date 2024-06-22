@@ -1,8 +1,10 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
+import com.github.trueddd.items.UnbelievableDemocracy.Buff
+import com.github.trueddd.items.UnbelievableDemocracy.Debuff
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
@@ -33,8 +35,9 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
         return Parameters.One(rawArguments.getBooleanParameter()!!)
     }
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         val pollSucceeded = getParameters(arguments, globalState).parameter1
+        val userDisplayName = globalState.participantByName(usedBy)?.displayName ?: usedBy
         return globalState.updatePlayers { participant, playerState ->
             playerState.copy(
                 pendingEvents = if (participant == usedBy) {
@@ -42,7 +45,11 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
                 } else {
                     playerState.pendingEvents
                 },
-                effects = playerState.effects + if (pollSucceeded) Buff.create(usedBy) else Debuff.create(usedBy),
+                effects = playerState.effects + if (pollSucceeded) {
+                    Buff.create(userDisplayName)
+                } else {
+                    Debuff.create(userDisplayName)
+                },
             )
         }
     }
@@ -57,10 +64,10 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
     class Buff private constructor(
         override val uid: String,
         override val modifier: Int = 1,
-        val causedByPollFrom: Participant
+        val causedByPollFrom: String
     ) : Effect.Buff(), DiceRollModifier {
         companion object {
-            fun create(causedByPollFrom: Participant) = Buff(
+            fun create(causedByPollFrom: String) = Buff(
                 uid = generateWheelItemUid(),
                 causedByPollFrom = causedByPollFrom
             )
@@ -68,7 +75,7 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
         override val id = Id(UnbelievableDemocracy)
         override val name = "Невероятная демократия"
         override val description = """
-            |`+${modifier.absoluteValue}` к броску кубика на ход. Спасибо чату ${causedByPollFrom.displayName} за это.
+            |`+${modifier.absoluteValue}` к броску кубика на ход. Спасибо чату $causedByPollFrom за это.
         """.removeTabs()
     }
 
@@ -76,10 +83,10 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
     class Debuff private constructor(
         override val uid: String,
         override val modifier: Int = -1,
-        val causedByPollFrom: Participant
+        val causedByPollFrom: String
     ) : Effect.Debuff(), DiceRollModifier {
         companion object {
-            fun create(causedByPollFrom: Participant) = Debuff(
+            fun create(causedByPollFrom: String) = Debuff(
                 uid = generateWheelItemUid(),
                 causedByPollFrom = causedByPollFrom
             )
@@ -87,7 +94,7 @@ class UnbelievableDemocracy private constructor(override val uid: String) : Whee
         override val id = Id(UnbelievableDemocracy)
         override val name = "Невероятная демократия"
         override val description = """
-            |`-${modifier.absoluteValue}` к броску кубика на ход. Спасибо чату ${causedByPollFrom.displayName} за это.
+            |`-${modifier.absoluteValue}` к броску кубика на ход. Спасибо чату $causedByPollFrom за это.
         """.removeTabs()
     }
 }

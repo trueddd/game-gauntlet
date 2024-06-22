@@ -16,7 +16,7 @@ class BoardMoveActionTest : EventGateTest() {
 
     @Test
     fun `10 steps at once`() = runTest {
-        val participant = requireRandomParticipant()
+        val participant = getRandomPlayerName()
         repeat(10) {
             handleAction(BoardMove(participant, rollDice()))
         }
@@ -25,14 +25,14 @@ class BoardMoveActionTest : EventGateTest() {
 
     @Test
     fun `steps not available after board move`() = runTest {
-        val participant = requireRandomParticipant()
+        val participant = getRandomPlayerName()
         handleAction(BoardMove(participant, rollDice()))
         assertEquals(expected = false, stateOf(participant).boardMoveAvailable)
     }
 
     @Test
     fun `step - game - step`() = runTest {
-        val participant = requireRandomParticipant()
+        val participant = getRandomPlayerName()
         handleAction(BoardMove(participant, rollDice()))
         handleAction(GameRoll(participant, Game.Id(1)))
         handleAction(GameStatusChange(participant, Game.Status.Finished))
@@ -43,9 +43,9 @@ class BoardMoveActionTest : EventGateTest() {
 
     @RepeatedTest(10)
     fun `step on passed dice value`() = runTest {
-        val participant = requireRandomParticipant()
+        val participant = getRandomPlayerName()
         val diceValue = 6
-        eventGate.parseAndHandle("${participant.name}:${Action.Key.BoardMove}:$diceValue")
+        eventGate.parseAndHandle("$participant:${Action.Key.BoardMove}:$diceValue")
         assertEquals(expected = diceValue, positionOf(participant))
     }
 }

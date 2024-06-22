@@ -2,7 +2,7 @@ package com.github.trueddd.actions
 
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.items.*
 import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.StateModificationException
@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
 @SerialName("a${Action.Key.GameStatusChange}")
 data class GameStatusChange(
     @SerialName("p")
-    val participant: Participant,
+    val playerName: PlayerName,
     @SerialName("s")
     val gameNewStatus: Game.Status,
 ) : Action(Key.GameStatusChange) {
@@ -26,11 +26,11 @@ data class GameStatusChange(
 
         override val actionKey = Key.GameStatusChange
 
-        override fun generate(participant: Participant, arguments: List<String>): GameStatusChange {
+        override fun generate(playerName: PlayerName, arguments: List<String>): GameStatusChange {
             val newStatus = arguments.firstOrNull()?.toIntOrNull()
                 ?.let { Game.Status.entries.getOrNull(it) }
                 ?: throw ActionCreationException("Couldn't parse new status from arguments: `$arguments`")
-            return GameStatusChange(participant, newStatus)
+            return GameStatusChange(playerName, newStatus)
         }
     }
 
@@ -38,18 +38,17 @@ data class GameStatusChange(
     class Handler : Action.Handler<GameStatusChange> {
 
         override suspend fun handle(action: GameStatusChange, currentState: GlobalState): GlobalState {
-            val currentGame = currentState.stateOf(action.participant).currentActiveGame
+            val currentGame = currentState.stateOf(action.playerName).currentActiveGame
                 ?: throw StateModificationException(action, "No game entries")
-            val nextGame = currentState.gameHistory[action.participant.name]
-                ?.firstOrNull { it.status == Game.Status.Next }
+            val nextGame = currentState.gamesOf(action.playerName).firstOrNull { it.status == Game.Status.Next }
             val isStatusFinished = action.gameNewStatus == Game.Status.Finished
-            val newPendingEvents = currentState.pendingEventsOf(action.participant).mapNotNull { pendingEvent ->
+            val newPendingEvents = currentState.pendingEventsOf(action.playerName).mapNotNull { pendingEvent ->
                 when (pendingEvent) {
                     is FamilyFriendlyStreamer -> pendingEvent.takeUnless { isStatusFinished }
                     else -> pendingEvent
                 }
             }
-            val newEffects = currentState.effectsOf(action.participant).mapNotNull { effect ->
+            val newEffects = currentState.effectsOf(action.playerName).mapNotNull { effect ->
                 when (effect) {
                     is Gamer -> when {
                         !action.gameNewStatus.allowsNextStep -> effect
@@ -68,7 +67,7 @@ data class GameStatusChange(
                     else -> effect
                 }
             }
-            return currentState.updatePlayer(action.participant) { state ->
+            return currentState.updatePlayer(action.playerName) { state ->
                 state.copy(
                     boardMoveAvailable = when {
                         state.effects.any { it is ThereIsGiftAtYourDoor.StayAfterGame } -> false
@@ -78,7 +77,7 @@ data class GameStatusChange(
                     effects = newEffects,
                     pendingEvents = newPendingEvents,
                 )
-            }.updateGameHistory(action.participant) { history ->
+            }.updateGameHistory(action.playerName) { history ->
                 history.map { entry ->
                     when (entry.game) {
                         currentGame.game -> entry.copy(status = action.gameNewStatus)
@@ -86,7 +85,7 @@ data class GameStatusChange(
                         else -> entry
                     }
                 }
-            }.updateCurrentGame(action.participant)
+            }.updateCurrentGame(action.playerName)
         }
     }
 }

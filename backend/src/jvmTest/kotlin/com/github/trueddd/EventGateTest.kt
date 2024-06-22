@@ -2,7 +2,7 @@ package com.github.trueddd
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.core.EventGate
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
@@ -20,32 +20,32 @@ abstract class EventGateTest {
     protected val genreDistribution
         get() = eventGate.stateHolder.current.gameGenreDistribution
 
-    protected fun requireRandomParticipant() = eventGate.stateHolder.participants.random()
-    protected fun requireParticipants() = eventGate.stateHolder.participants.toList()
+    protected fun getRandomPlayerName() = eventGate.stateHolder.participants.random().name
+    protected fun getPlayerNames() = eventGate.stateHolder.participants.toList().map { it.name }
 
-    protected fun stateOf(participant: Participant) = eventGate.stateHolder.current.stateOf(participant)
-    protected fun effectsOf(participant: Participant) = stateOf(participant).effects
-    protected fun pendingEventsOf(participant: Participant) = stateOf(participant).pendingEvents
-    protected fun inventoryOf(participant: Participant) = stateOf(participant).inventory
-    protected fun positionOf(participant: Participant) = stateOf(participant).position
-    protected fun stintOf(participant: Participant) = stateOf(participant).stintIndex
-    protected fun gamesOf(participant: Participant) = eventGate.stateHolder.current.gamesOf(participant)
-    protected fun lastGameOf(participant: Participant) = stateOf(participant).currentGame
-    protected fun historyOf(participant: Participant) = eventGate.stateHolder.currentPlayersHistory[participant.name]!!
+    protected fun stateOf(playerName: PlayerName) = eventGate.stateHolder.current.stateOf(playerName)
+    protected fun effectsOf(playerName: PlayerName) = stateOf(playerName).effects
+    protected fun pendingEventsOf(playerName: PlayerName) = stateOf(playerName).pendingEvents
+    protected fun inventoryOf(playerName: PlayerName) = stateOf(playerName).inventory
+    protected fun positionOf(playerName: PlayerName) = stateOf(playerName).position
+    protected fun stintOf(playerName: PlayerName) = stateOf(playerName).stintIndex
+    protected fun gamesOf(playerName: PlayerName) = eventGate.stateHolder.current.gamesOf(playerName)
+    protected fun lastGameOf(playerName: PlayerName) = stateOf(playerName).currentGame
+    protected fun historyOf(playerName: PlayerName) = eventGate.stateHolder.currentPlayersHistory[playerName]!!
 
     protected suspend fun handleAction(action: Action) = eventGate.eventManager.consumeAction(action)
 
-    protected suspend fun makeMove(participant: Participant) {
-        eventGate.parseAndHandle("${participant.name}:${Action.Key.BoardMove}")
-        eventGate.parseAndHandle("${participant.name}:${Action.Key.GameRoll}")
-        eventGate.parseAndHandle("${participant.name}:${Action.Key.GameStatusChange}:1")
+    protected suspend fun makeMove(playerName: PlayerName) {
+        eventGate.parseAndHandle("$playerName:${Action.Key.BoardMove}")
+        eventGate.parseAndHandle("$playerName:${Action.Key.GameRoll}")
+        eventGate.parseAndHandle("$playerName:${Action.Key.GameStatusChange}:1")
     }
 
-    protected suspend fun makeMovesUntilFinish(player: Participant) {
+    protected suspend fun makeMovesUntilFinish(playerName: PlayerName) {
         flow {
             while (currentCoroutineContext().isActive) {
-                makeMove(player)
-                emit(positionOf(player))
+                makeMove(playerName)
+                emit(positionOf(playerName))
             }
         }
             .filterNotNull()

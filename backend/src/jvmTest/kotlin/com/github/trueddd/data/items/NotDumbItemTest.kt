@@ -13,14 +13,14 @@ class NotDumbItemTest : EventGateTest() {
 
     @Test
     fun `get item`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, NotDumb.create()))
         assertEquals(expected = 1, pendingEventsOf(user).size)
     }
 
     @Test
     fun `result - 0 out of 7`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = NotDumb.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("0")))
@@ -29,7 +29,7 @@ class NotDumbItemTest : EventGateTest() {
 
     @Test
     fun `result - 2 out of 7`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = NotDumb.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("2")))
@@ -38,7 +38,7 @@ class NotDumbItemTest : EventGateTest() {
 
     @Test
     fun `result - 3 out of 7`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = NotDumb.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("3")))
@@ -47,7 +47,7 @@ class NotDumbItemTest : EventGateTest() {
 
     @Test
     fun `result - 4 out of 7`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = NotDumb.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("4")))
@@ -56,7 +56,7 @@ class NotDumbItemTest : EventGateTest() {
 
     @Test
     fun `result - 5 out of 7`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = NotDumb.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("5")))
@@ -65,7 +65,7 @@ class NotDumbItemTest : EventGateTest() {
 
     @Test
     fun `result - 6 out of 7`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = NotDumb.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("6")))
@@ -74,7 +74,7 @@ class NotDumbItemTest : EventGateTest() {
 
     @Test
     fun `result - 7 out of 7`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = NotDumb.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("7")))
@@ -83,7 +83,7 @@ class NotDumbItemTest : EventGateTest() {
 
     @Test
     fun `make a move after result`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = NotDumb.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("7")))

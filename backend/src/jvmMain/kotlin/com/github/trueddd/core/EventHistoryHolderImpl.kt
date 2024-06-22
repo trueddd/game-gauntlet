@@ -19,7 +19,7 @@ import java.util.*
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-abstract class BaseEventHistoryHolder(
+class EventHistoryHolderImpl(
     private val actionHandlerRegistry: ActionHandlerRegistry,
     private val gameStateRepository: GameStateRepository,
 ) : EventHistoryHolder {

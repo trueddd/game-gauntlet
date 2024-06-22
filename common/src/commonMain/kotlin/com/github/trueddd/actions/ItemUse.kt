@@ -2,8 +2,9 @@ package com.github.trueddd.actions
 
 import com.github.trueddd.core.ItemRoller
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
-import com.github.trueddd.items.*
+import com.github.trueddd.data.PlayerName
+import com.github.trueddd.items.Plasticine
+import com.github.trueddd.items.WheelItem
 import com.github.trueddd.utils.ActionCreationException
 import com.github.trueddd.utils.StateModificationException
 import com.trueddd.github.annotations.ActionGenerator
@@ -15,17 +16,17 @@ import kotlinx.serialization.Serializable
 @SerialName("a${Action.Key.ItemUse}")
 data class ItemUse(
     @SerialName("ub")
-    val usedBy: Participant,
+    val usedBy: PlayerName,
     @SerialName("iu")
     val itemUid: String,
     @SerialName("ar")
     val arguments: List<String> = emptyList(),
 ) : Action(Key.ItemUse) {
 
-    constructor(usedBy: Participant, itemUid: String, vararg arguments: String)
+    constructor(usedBy: PlayerName, itemUid: String, vararg arguments: String)
             : this(usedBy, itemUid, arguments.asList())
 
-    constructor(usedBy: Participant, item: WheelItem, vararg arguments: String)
+    constructor(usedBy: PlayerName, item: WheelItem, vararg arguments: String)
             : this(usedBy, item.uid, arguments.asList())
 
     @ActionGenerator
@@ -33,10 +34,10 @@ data class ItemUse(
 
         override val actionKey = Key.ItemUse
 
-        override fun generate(participant: Participant, arguments: List<String>): ItemUse {
+        override fun generate(playerName: PlayerName, arguments: List<String>): ItemUse {
             val itemUid = arguments.firstOrNull()
                 ?: throw ActionCreationException("Couldn't parse itemUid from arguments: `$arguments`")
-            return ItemUse(participant, itemUid, arguments.drop(1))
+            return ItemUse(playerName, itemUid, arguments.drop(1))
         }
     }
 
@@ -51,7 +52,7 @@ data class ItemUse(
                 ?: return currentState
             return when (item) {
                 is Plasticine -> item.transform(
-                    user = action.usedBy,
+                    playerName = action.usedBy,
                     globalState = currentState,
                     arguments = action.arguments,
                     factories = itemRoller.allItemsFactories

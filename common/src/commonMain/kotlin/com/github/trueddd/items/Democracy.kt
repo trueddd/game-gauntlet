@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.items.Democracy.Buff
 import com.github.trueddd.items.Democracy.Debuff
@@ -35,7 +35,7 @@ class Democracy private constructor(override val uid: String) : WheelItem.Pendin
         return Parameters.One(rawArguments.getBooleanParameter()!!)
     }
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         val pollSucceeded = getParameters(arguments, globalState).parameter1
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(

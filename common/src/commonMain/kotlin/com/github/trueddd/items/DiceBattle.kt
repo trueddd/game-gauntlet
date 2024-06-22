@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.items.DiceBattle.Buff
 import com.github.trueddd.items.DiceBattle.Debuff
@@ -15,7 +15,7 @@ import kotlin.math.absoluteValue
 @Serializable
 @SerialName("${WheelItem.DiceBattle}")
 class DiceBattle private constructor(override val uid: String) : WheelItem.PendingEvent(),
-    Parametrized<Parameters.Three<Participant, Int, Int>> {
+    Parametrized<Parameters.Three<PlayerName, Int, Int>> {
 
     companion object {
         fun create() = DiceBattle(uid = generateWheelItemUid())
@@ -43,7 +43,7 @@ class DiceBattle private constructor(override val uid: String) : WheelItem.Pendi
     override fun getParameters(
         rawArguments: List<String>,
         currentState: GlobalState
-    ): Parameters.Three<Participant, Int, Int> {
+    ): Parameters.Three<PlayerName, Int, Int> {
         return Parameters.Three(
             rawArguments.getParticipantParameter(index = 0, currentState)!!,
             rawArguments.getIntParameter(index = 1),
@@ -51,7 +51,7 @@ class DiceBattle private constructor(override val uid: String) : WheelItem.Pendi
         )
     }
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         val parameters = getParameters(arguments, globalState)
         val opponent = parameters.parameter1
         val myDice = parameters.parameter2.takeIf { it in d6Range }
@@ -63,13 +63,13 @@ class DiceBattle private constructor(override val uid: String) : WheelItem.Pendi
         }
         val myEffect = if (myDice > opponentDice) Buff.create(myDice) else Debuff.create(-myDice)
         val opponentEffect = if (opponentDice > myDice) Buff.create(opponentDice) else Debuff.create(-opponentDice)
-        return globalState.updatePlayers { participant, playerState ->
-            when (participant.name) {
-                usedBy.name -> playerState.copy(
+        return globalState.updatePlayers { playerName, playerState ->
+            when (playerName) {
+                usedBy -> playerState.copy(
                     pendingEvents = playerState.pendingEvents.without(uid),
                     effects = playerState.effects + myEffect,
                 )
-                opponent.name -> playerState.copy(
+                opponent -> playerState.copy(
                     effects = playerState.effects + opponentEffect,
                 )
                 else -> playerState

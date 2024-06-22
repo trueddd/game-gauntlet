@@ -12,11 +12,11 @@ class ThereIsGiftAtYourDoorItemTest : EventGateTest() {
 
     @Test
     fun `leave a gift for myself`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = ThereIsGiftAtYourDoor.create()
         handleAction(BoardMove(user, diceValue = 3))
         handleAction(ItemReceive(user, item))
-        handleAction(ItemUse(user, item, user.name))
+        handleAction(ItemUse(user, item, user))
         assertEquals(expected = 1, effectsOf(user).size)
         assertEquals(expected = 0, pendingEventsOf(user).size)
         handleAction(GameRoll(user, Game.Id(2)))
@@ -28,10 +28,10 @@ class ThereIsGiftAtYourDoorItemTest : EventGateTest() {
 
     @Test
     fun `throw a gift at opponent`() = runTest {
-        val (user1, user2) = requireParticipants()
+        val (user1, user2) = getPlayerNames()
         val item = ThereIsGiftAtYourDoor.create()
         handleAction(ItemReceive(user1, item))
-        handleAction(ItemUse(user1, item, user2.name))
+        handleAction(ItemUse(user1, item, user2))
         assertEquals(expected = 1, effectsOf(user2).size)
         assertEquals(expected = -2, stateOf(user1).modifiersSum)
         assertEquals(expected = 0, pendingEventsOf(user1).size)

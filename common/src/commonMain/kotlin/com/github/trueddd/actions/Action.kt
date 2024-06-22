@@ -1,7 +1,7 @@
 package com.github.trueddd.actions
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import kotlinx.datetime.Clock
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -36,7 +36,7 @@ sealed class Action(
      */
     interface Generator<out A : Action> {
         val actionKey: Int
-        fun generate(participant: Participant, arguments: List<String>): A
+        fun generate(playerName: PlayerName, arguments: List<String>): A
     }
 
     /**

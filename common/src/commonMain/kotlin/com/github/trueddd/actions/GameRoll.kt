@@ -1,10 +1,7 @@
 package com.github.trueddd.actions
 
 import com.github.trueddd.core.GamesProvider
-import com.github.trueddd.data.Game
-import com.github.trueddd.data.GameHistoryEntry
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.*
 import com.github.trueddd.items.FewLetters
 import com.github.trueddd.items.IWouldBeatIt
 import com.github.trueddd.items.YourStream
@@ -18,7 +15,7 @@ import kotlinx.serialization.Serializable
 @SerialName("a${Action.Key.GameRoll}")
 data class GameRoll(
     @SerialName("rb")
-    val participant: Participant,
+    val playerName: PlayerName,
     @SerialName("gi")
     val gameId: Game.Id,
 ) : Action(Key.GameRoll) {
@@ -28,11 +25,11 @@ data class GameRoll(
 
         override val actionKey = Key.GameRoll
 
-        override fun generate(participant: Participant, arguments: List<String>): GameRoll {
+        override fun generate(playerName: PlayerName, arguments: List<String>): GameRoll {
             val game = arguments.firstOrNull()?.toIntOrNull()
                 ?.let { gamesProvider.getById(Game.Id(it)) }
                 ?: gamesProvider.roll()
-            return GameRoll(participant, game.id)
+            return GameRoll(playerName, game.id)
         }
     }
 
@@ -40,8 +37,8 @@ data class GameRoll(
     class Handler(private val gamesProvider: GamesProvider) : Action.Handler<GameRoll> {
 
         override suspend fun handle(action: GameRoll, currentState: GlobalState): GlobalState {
-            val currentGame = currentState.stateOf(action.participant).currentGame
-            if (currentState.positionOf(action.participant) == 0) {
+            val currentGame = currentState.stateOf(action.playerName).currentGame
+            if (currentState.positionOf(action.playerName) == 0) {
                 throw StateModificationException(action, "Cannot roll games on Start position")
             }
             if (currentGame != null && !currentGame.status.isComplete) {
@@ -49,17 +46,17 @@ data class GameRoll(
             }
             val newGame = gamesProvider.getById(action.gameId)
                 ?: throw StateModificationException(action, "Game with id (${action.gameId.value}) not found")
-            if (currentState.effectsOf(action.participant).any { it is IWouldBeatIt }
+            if (currentState.effectsOf(action.playerName).any { it is IWouldBeatIt }
                 && action.gameId !in currentState.getDroppedGames()
                 && currentState.getDroppedGames().isNotEmpty()) {
                 throw StateModificationException(action, "Player has to roll next game from the dropped ones")
             }
-            if (currentState.effectsOf(action.participant).any { it is FewLetters }
+            if (currentState.effectsOf(action.playerName).any { it is FewLetters }
                 && newGame.name.count { it.isLetterOrDigit() } > FewLetters.SYMBOLS_LIMIT) {
                 throw StateModificationException(action, "Cannot have this game while FewLetters debuff is applied")
             }
             val newGameHistory = GameHistoryEntry(newGame, Game.Status.InProgress)
-            return currentState.updatePlayer(action.participant) { state ->
+            return currentState.updatePlayer(action.playerName) { state ->
                 val indexOfYourStreamBuff = state.effects.indexOfFirst { it is YourStream }
                 val indexOfFewLettersDebuff = state.effects.indexOfFirst { it is FewLetters }
                 val newEffects = state.effects.filterIndexed { index, _ ->
@@ -69,7 +66,7 @@ data class GameRoll(
                     currentGame = newGameHistory,
                     effects = newEffects
                 )
-            }.updateGameHistory(action.participant) { it + newGameHistory }
+            }.updateGameHistory(action.playerName) { it + newGameHistory }
         }
     }
 }

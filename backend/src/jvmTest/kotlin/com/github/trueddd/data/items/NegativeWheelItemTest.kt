@@ -11,7 +11,7 @@ class NegativeWheelItemTest : EventGateTest() {
 
     @Test
     fun `basic test`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, NegativeWheel.create()))
         assertTrue(effectsOf(user).isEmpty())
         assertTrue(inventoryOf(user).isEmpty())

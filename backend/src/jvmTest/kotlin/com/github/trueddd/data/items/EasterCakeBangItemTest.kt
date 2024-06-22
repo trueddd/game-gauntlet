@@ -17,7 +17,7 @@ class EasterCakeBangItemTest : EventGateTest() {
 
     @Test
     fun `drop attempt`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, EasterCakeBang.create()))
         handleAction(BoardMove(user, diceValue = 4))
         handleAction(GameRoll(user, Game.Id(2)))
@@ -28,7 +28,7 @@ class EasterCakeBangItemTest : EventGateTest() {
 
     @Test
     fun `remove effect after game complete`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, EasterCakeBang.create()))
         handleAction(BoardMove(user, diceValue = 4))
         handleAction(GameRoll(user, Game.Id(2)))
@@ -38,7 +38,7 @@ class EasterCakeBangItemTest : EventGateTest() {
 
     @Test
     fun `effect removal attempt - holey pockets`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, EasterCakeBang.create()))
         handleAction(ItemReceive(user, HoleyPockets.create()))
         assertIs<EasterCakeBang>(effectsOf(user).first())
@@ -46,7 +46,7 @@ class EasterCakeBangItemTest : EventGateTest() {
 
     @Test
     fun `effect removal attempt - loyal moderator`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val bangItem = EasterCakeBang.create()
         val moderatorItem = LoyalModerator.create()
         handleAction(ItemReceive(user, bangItem))
@@ -58,11 +58,11 @@ class EasterCakeBangItemTest : EventGateTest() {
 
     @Test
     fun `effect removal attempt - rat move`() = runTest {
-        val (user1, user2) = requireParticipants()
+        val (user1, user2) = getPlayerNames()
         handleAction(ItemReceive(user1, EasterCakeBang.create()))
         val item = RatMove.create()
         handleAction(ItemReceive(user2, item))
-        handleAction(ItemUse(user2, item.uid, listOf(user1.name)))
+        handleAction(ItemUse(user2, item.uid, listOf(user1)))
         assertIs<EasterCakeBang>(effectsOf(user1).first())
         assertTrue(pendingEventsOf(user2).isEmpty())
     }

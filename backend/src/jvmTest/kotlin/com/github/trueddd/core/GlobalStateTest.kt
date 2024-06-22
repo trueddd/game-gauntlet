@@ -11,9 +11,9 @@ class GlobalStateTest {
     fun `update player state`() = runTest {
         val state = globalState()
         val user = state.players.first()
-        val result = state.updatePlayer(user) {
+        val result = state.updatePlayer(user.name) {
             it.copy(position = 10)
         }
-        assertEquals(expected = 10, result.positionOf(user))
+        assertEquals(expected = 10, result.positionOf(user.name))
     }
 }

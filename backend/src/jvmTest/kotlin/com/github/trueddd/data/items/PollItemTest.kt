@@ -17,24 +17,24 @@ class PollItemTest : EventGateTest() {
 
     @Test
     fun `take item for themselves`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val poll = Poll.create()
         handleAction(ItemReceive(user, poll))
         val factory = getItemFactoriesSet().first { it.itemId == WheelItem.Id(WheelItem.ClimbingRope) }
-        handleAction(ItemUse(user, poll, factory.itemId.asString(), user.name))
+        handleAction(ItemUse(user, poll, factory.itemId.asString(), user))
         assertEquals(factory.itemId, inventoryOf(user).first().id)
         assertEquals(expected = 0, pendingEventsOf(user).size)
     }
 
     @Test
     fun `pass item to another player`() = runTest {
-        val (user1, user2) = requireParticipants()
+        val (user1, user2) = getPlayerNames()
         val poll = Poll.create()
         handleAction(ItemReceive(user1, poll))
         handleAction(ItemReceive(user2, PowerThrow.create()))
         handleAction(ItemReceive(user2, ClimbingRope.create()))
         val factory = getItemFactoriesSet().first { it.itemId == WheelItem.Id(WheelItem.HoleyPockets) }
-        handleAction(ItemUse(user1, poll, factory.itemId.asString(), user2.name))
+        handleAction(ItemUse(user1, poll, factory.itemId.asString(), user2))
         assertEquals(expected = 0, pendingEventsOf(user1).size)
         assertTrue(inventoryOf(user2).isEmpty())
         assertTrue(effectsOf(user2).isEmpty())
