@@ -81,11 +81,24 @@ class AppClient(
     private suspend fun loadActions(): List<Action> =
         getJsonData(router.http(Router.ACTIONS), sendBearerToken = true) ?: emptyList()
 
+    suspend fun loadPlayerBackground(participant: Participant): ByteArray? {
+        return withContext(coroutineContext) {
+            try {
+                httpClient.get(router.http(Router.REMOTE)) {
+                    parameter("player", participant.name)
+                }.bodyAsChannel().toByteArray()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
     suspend fun loadImage(url: String): ByteArray? {
         return withContext(coroutineContext) {
             try {
                 httpClient.get(url) {
-                    contentType(ContentType.Image.PNG)
+                    accept(ContentType.Image.Any)
                 }.bodyAsChannel().toByteArray()
             } catch (e: Exception) {
                 e.printStackTrace()
