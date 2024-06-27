@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
@@ -24,7 +24,7 @@ class HaveATry private constructor(override val uid: String) : WheelItem.Invento
         |При использовании можете воспользоваться гайдом, видеопрохождением или спидраном игры. Имеет 1 заряд.
     """.removeTabs()
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(inventory = playerState.inventory.without(uid))
         }

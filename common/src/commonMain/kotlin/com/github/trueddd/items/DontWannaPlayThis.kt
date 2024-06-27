@@ -2,7 +2,7 @@ package com.github.trueddd.items
 
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
@@ -25,7 +25,7 @@ class DontWannaPlayThis private constructor(override val uid: String) : WheelIte
         |Позволяет реролльнуть игру. Имеет 1 заряд.
     """.removeTabs()
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         if (globalState.stateOf(usedBy).currentGame?.status != Game.Status.InProgress) {
             throw IllegalStateException("Can't reroll game that is not in progress")
         }

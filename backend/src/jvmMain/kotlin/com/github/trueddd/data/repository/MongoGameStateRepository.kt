@@ -17,7 +17,7 @@ import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 
 @Named(MongoGameStateRepository.TAG)
-@Single(binds = [GameStateRepository::class])
+@Single
 class MongoGameStateRepository(
     private val mongoDb: MongoDatabase,
 ) : GameStateRepository {

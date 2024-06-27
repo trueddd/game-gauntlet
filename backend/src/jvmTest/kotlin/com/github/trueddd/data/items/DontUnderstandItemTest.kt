@@ -14,7 +14,7 @@ class DontUnderstandItemTest : EventGateTest() {
 
     @Test
     fun `get game with item`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, DontUnderstand.create()))
         assertTrue(effectsOf(user).isNotEmpty())
         handleAction(GameSet(user, Game.Id(3)))

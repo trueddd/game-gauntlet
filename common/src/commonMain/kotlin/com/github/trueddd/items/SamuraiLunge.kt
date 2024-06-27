@@ -1,8 +1,9 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
+import com.github.trueddd.items.SamuraiLunge.Buff
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
@@ -25,7 +26,7 @@ class SamuraiLunge private constructor(override val uid: String) : WheelItem.Inv
         |а походить вперед. Для этого предмет необходимо использовать.
     """.removeTabs()
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         return globalState.updatePlayer(usedBy) { state ->
             state.copy(
                 effects = state.effects + Buff.create(),

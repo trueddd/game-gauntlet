@@ -13,7 +13,7 @@ class GlobalEventActionTest : EventGateTest() {
 
     @Test
     fun `nuke - stage 1`() = runTest {
-        val (user1, user2, user3, user4) = requireParticipants()
+        val (user1, user2, user3, user4) = getPlayerNames()
         // user 1 moves
         handleAction(BoardMove(user1, diceValue = 6))
         handleAction(GameRoll(user1, Game.Id(1)))
@@ -53,7 +53,7 @@ class GlobalEventActionTest : EventGateTest() {
 
     @Test
     fun `tornado - stage 1`() = runTest {
-        val (user1, user2, user3, user4) = requireParticipants()
+        val (user1, user2, user3, user4) = getPlayerNames()
         // user 1 moves
         handleAction(BoardMove(user1, diceValue = 6))
         handleAction(GameRoll(user1, Game.Id(1)))
@@ -93,7 +93,7 @@ class GlobalEventActionTest : EventGateTest() {
 
     @Test
     fun `most populated stint - 1`() = runTest {
-        val (user1, user2, user3, user4) = requireParticipants()
+        val (user1, user2, user3, user4) = getPlayerNames()
         // user 1 moves
         handleAction(BoardMove(user1, diceValue = 6))
         handleAction(GameRoll(user1, Game.Id(1)))
@@ -128,7 +128,7 @@ class GlobalEventActionTest : EventGateTest() {
 
     @Test
     fun `most populated stint - 2`() = runTest {
-        val (user1, user2, user3, user4) = requireParticipants()
+        val (user1, user2, user3, user4) = getPlayerNames()
         // user 1 moves
         handleAction(BoardMove(user1, diceValue = 6))
         handleAction(GameRoll(user1, Game.Id(1)))

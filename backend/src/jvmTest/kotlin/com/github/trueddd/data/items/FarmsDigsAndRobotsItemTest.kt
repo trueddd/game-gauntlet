@@ -12,7 +12,7 @@ class FarmsDigsAndRobotsItemTest : EventGateTest() {
 
     @Test
     fun `use item`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = FarmsDigsAndRobots.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid))

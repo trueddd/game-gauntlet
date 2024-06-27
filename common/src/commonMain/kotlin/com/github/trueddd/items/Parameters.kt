@@ -1,7 +1,8 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
+import com.github.trueddd.data.PlayerState
 
 sealed interface Parameters {
     data class One<T1>(
@@ -33,7 +34,7 @@ sealed class ParameterType {
     class Int(override val name: String) : ParameterType()
     class Player(
         override val name: String,
-        val predicate: (Participant) -> Boolean = { true },
+        val predicate: (PlayerName, PlayerState) -> Boolean = { _, _ -> true },
         override val description: String? = null
     ) : ParameterType()
     class MyItem(
@@ -83,10 +84,10 @@ fun List<String>.getParticipantParameter(
     index: Int = 0,
     globalState: GlobalState,
     optional: Boolean = false
-): Participant? {
+): PlayerName? {
     val name = this.getOrNull(index)
     return when {
-        name != null -> globalState.participantByName(name)
+        name != null -> globalState.participantByName(name)?.name
         optional -> null
         else -> throw IllegalArgumentException("Player name must be specified as parameter with index $index")
     }

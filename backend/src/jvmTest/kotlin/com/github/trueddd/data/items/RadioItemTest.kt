@@ -17,7 +17,7 @@ class RadioItemTest : EventGateTest() {
 
     @Test
     fun `receive test`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Radio.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, effectsOf(user).size)
@@ -26,7 +26,7 @@ class RadioItemTest : EventGateTest() {
 
     @Test
     fun `two game test`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Radio.create()
         handleAction(ItemReceive(user, item))
         handleAction(BoardMove(user, diceValue = 1))
@@ -41,7 +41,7 @@ class RadioItemTest : EventGateTest() {
 
     @Test
     fun `one game test`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Radio.create()
         handleAction(BoardMove(user, diceValue = 3))
         handleAction(GameRoll(user, Game.Id(1)))

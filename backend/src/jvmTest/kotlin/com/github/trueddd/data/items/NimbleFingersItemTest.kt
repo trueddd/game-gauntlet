@@ -13,7 +13,7 @@ class NimbleFingersItemTest : EventGateTest() {
 
     @Test
     fun `nothing to steal`() = runTest {
-        val (user1) = requireParticipants()
+        val (user1) = getPlayerNames()
         val nimbleFingers = NimbleFingers.create()
         handleAction(ItemReceive(user1, nimbleFingers))
         assertEquals(expected = 0, pendingEventsOf(user1).size)
@@ -21,7 +21,7 @@ class NimbleFingersItemTest : EventGateTest() {
 
     @Test
     fun `steal - success`() = runTest {
-        val (user1, user2) = requireParticipants()
+        val (user1, user2) = getPlayerNames()
         val nimbleFingers = NimbleFingers.create()
         val plasticine = Plasticine.create()
         handleAction(ItemReceive(user2, plasticine))

@@ -1,7 +1,9 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
+import com.github.trueddd.items.WillOfChance.Buff
+import com.github.trueddd.items.WillOfChance.Debuff
 import com.github.trueddd.utils.isEven
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
@@ -25,8 +27,8 @@ class WillOfChance private constructor(override val uid: String) : WheelItem.Eve
         |для перехода по секторам. Если нечетный - `-2`.
     """.removeTabs()
 
-    override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
-        return globalState.updatePlayer(rolledBy) { playerState ->
+    override suspend fun invoke(globalState: GlobalState, triggeredBy: PlayerName): GlobalState {
+        return globalState.updatePlayer(triggeredBy) { playerState ->
             val effect = if (playerState.position.isEven) {
                 Buff.create()
             } else {

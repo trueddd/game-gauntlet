@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,7 +20,7 @@ class Reroll private constructor(override val uid: String) : WheelItem.Event() {
 
     override val description = "Произведите реролл колеса приколов."
 
-    override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
+    override suspend fun invoke(globalState: GlobalState, triggeredBy: PlayerName): GlobalState {
         return globalState
     }
 

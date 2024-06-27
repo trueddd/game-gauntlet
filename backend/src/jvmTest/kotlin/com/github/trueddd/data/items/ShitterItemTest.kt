@@ -12,7 +12,7 @@ class ShitterItemTest : EventGateTest() {
 
     @Test
     fun `got by leader`() = runTest {
-        val (user1, user2, user3) = requireParticipants()
+        val (user1, user2, user3) = getPlayerNames()
         handleAction(BoardMove(user1, diceValue = 1))
         handleAction(BoardMove(user2, diceValue = 2))
         handleAction(BoardMove(user3, diceValue = 3))
@@ -22,7 +22,7 @@ class ShitterItemTest : EventGateTest() {
 
     @Test
     fun `got by 2nd placer`() = runTest {
-        val (user1, user2, user3) = requireParticipants()
+        val (user1, user2, user3) = getPlayerNames()
         handleAction(BoardMove(user1, diceValue = 1))
         handleAction(BoardMove(user2, diceValue = 2))
         handleAction(BoardMove(user3, diceValue = 3))
@@ -32,7 +32,7 @@ class ShitterItemTest : EventGateTest() {
 
     @Test
     fun `got by 3rd placer`() = runTest {
-        val (user1, user2, user3) = requireParticipants()
+        val (user1, user2, user3) = getPlayerNames()
         handleAction(BoardMove(user1, diceValue = 1))
         handleAction(BoardMove(user2, diceValue = 2))
         handleAction(BoardMove(user3, diceValue = 3))
@@ -42,7 +42,7 @@ class ShitterItemTest : EventGateTest() {
 
     @Test
     fun `got by 4th placer`() = runTest {
-        val (user1, user2, user3, user4) = requireParticipants()
+        val (user1, user2, user3, user4) = getPlayerNames()
         handleAction(BoardMove(user1, diceValue = 1))
         handleAction(BoardMove(user2, diceValue = 2))
         handleAction(BoardMove(user3, diceValue = 3))
@@ -53,7 +53,7 @@ class ShitterItemTest : EventGateTest() {
 
     @Test
     fun `got when all equalized`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, Shitter.create()))
         assertEquals(expected = 0, stateOf(user).modifiersSum)
     }

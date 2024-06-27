@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.items.AwfulEvent.Debuff
 import com.github.trueddd.utils.removeTabs
@@ -35,7 +35,7 @@ class AwfulEvent private constructor(override val uid: String) : WheelItem.Pendi
         return Parameters.One(rawArguments.getIntParameter())
     }
 
-    override suspend fun use(usedBy: Participant, globalState: GlobalState, arguments: List<String>): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         val online = getParameters(arguments, globalState).parameter1
         require(online in 0..globalState.players.size)
         return globalState.updatePlayer(usedBy) { playerState ->

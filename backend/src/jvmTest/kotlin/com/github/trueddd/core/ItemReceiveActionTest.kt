@@ -11,15 +11,15 @@ class ItemReceiveActionTest : EventGateTest() {
 
     @Test
     fun `roll plasticine`() = runTest {
-        val participant = requireRandomParticipant()
-        eventGate.parseAndHandle("${participant.name}:${Action.Key.ItemReceive}:${WheelItem.Plasticine}")
+        val participant = getRandomPlayerName()
+        eventGate.parseAndHandle("$participant:${Action.Key.ItemReceive}:${WheelItem.Plasticine}")
         assertEquals(expected = WheelItem.Id(WheelItem.Plasticine), inventoryOf(participant).firstOrNull()?.id)
     }
 
     @Test
     fun `roll pending event`() = runTest {
-        val participant = requireRandomParticipant()
-        eventGate.parseAndHandle("${participant.name}:${Action.Key.ItemReceive}:${WheelItem.AwfulEvent}")
+        val participant = getRandomPlayerName()
+        eventGate.parseAndHandle("$participant:${Action.Key.ItemReceive}:${WheelItem.AwfulEvent}")
         assertEquals(expected = 0, inventoryOf(participant).size)
         assertEquals(expected = WheelItem.Id(WheelItem.AwfulEvent), pendingEventsOf(participant).firstOrNull()?.id)
     }

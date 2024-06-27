@@ -15,7 +15,7 @@ class YouDoNotNeedThisItemTest : EventGateTest() {
 
     @Test
     fun `drop buff`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, PowerThrow.create()))
         handleAction(ItemReceive(user, WeakThrow.create()))
         handleAction(ItemReceive(user, YouDoNotNeedThis.create()))
@@ -25,7 +25,7 @@ class YouDoNotNeedThisItemTest : EventGateTest() {
 
     @Test
     fun `non-drop buff`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, WeakThrow.create()))
         handleAction(ItemReceive(user, YouDoNotNeedThis.create()))
         assertEquals(expected = 1, effectsOf(user).size)
@@ -34,7 +34,7 @@ class YouDoNotNeedThisItemTest : EventGateTest() {
 
     @Test
     fun `drop single buff`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, PowerThrow.create()))
         handleAction(ItemReceive(user, PowerThrow.create()))
         handleAction(ItemReceive(user, WeakThrow.create()))

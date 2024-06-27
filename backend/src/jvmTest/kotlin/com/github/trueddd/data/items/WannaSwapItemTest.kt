@@ -16,14 +16,14 @@ class WannaSwapItemTest : EventGateTest() {
 
     @Test
     fun `games swap approved`() = runTest {
-        val (user1, user2) = requireParticipants()
+        val (user1, user2) = getPlayerNames()
         handleAction(BoardMove(user1, diceValue = 2))
         handleAction(BoardMove(user2, diceValue = 3))
         handleAction(GameRoll(user1, Game.Id(0)))
         handleAction(GameRoll(user2, Game.Id(1)))
         val item = WannaSwap.create()
         handleAction(ItemReceive(user1, item))
-        handleAction(ItemUse(user1, item.uid, listOf(user2.name)))
+        handleAction(ItemUse(user1, item.uid, listOf(user2)))
         assertEquals(Game.Id(1), lastGameOf(user1)?.game?.id)
         assertEquals(Game.Id(0), lastGameOf(user2)?.game?.id)
         assertTrue(pendingEventsOf(user1).isEmpty())
@@ -31,14 +31,14 @@ class WannaSwapItemTest : EventGateTest() {
 
     @Test
     fun `games swap rejected`() = runTest {
-        val (user1, user2) = requireParticipants()
+        val (user1, user2) = getPlayerNames()
         handleAction(BoardMove(user1, diceValue = 2))
         handleAction(BoardMove(user2, diceValue = 3))
         handleAction(GameRoll(user1, Game.Id(0)))
         handleAction(GameRoll(user2, Game.Id(1)))
         val item = WannaSwap.create()
         handleAction(ItemReceive(user1, item))
-        handleAction(ItemUse(user1, item.uid, listOf(user1.name)))
+        handleAction(ItemUse(user1, item.uid, listOf(user1)))
         assertEquals(Game.Id(0), lastGameOf(user1)?.game?.id)
         assertEquals(Game.Id(1), lastGameOf(user2)?.game?.id)
         assertTrue(pendingEventsOf(user1).isEmpty())
@@ -46,7 +46,7 @@ class WannaSwapItemTest : EventGateTest() {
 
     @Test
     fun `games swap used wrong`() = runTest {
-        val (user1, user2) = requireParticipants()
+        val (user1, user2) = getPlayerNames()
         handleAction(BoardMove(user1, diceValue = 2))
         handleAction(BoardMove(user2, diceValue = 3))
         handleAction(GameRoll(user1, Game.Id(0)))

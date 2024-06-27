@@ -2,7 +2,8 @@ package com.github.trueddd.items
 
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
+import com.github.trueddd.items.Classic.Buff
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
@@ -13,8 +14,17 @@ import kotlinx.serialization.Serializable
 class Classic private constructor(override val uid: String) : WheelItem.Event() {
 
     companion object {
+
         fun create() = Classic(uid = generateWheelItemUid())
-        val TargetGameIds = listOf(Game.Id(5)) // TODO: replace with actual games
+
+        // IDs are coming from `games` files from resources
+        const val SUPER_COW_ID = 1128
+        val FARM_FRENZY_ID_RANGE = 866..876
+
+        private val TargetGameIds: List<Game.Id> = buildList {
+            add(SUPER_COW_ID)
+            addAll(FARM_FRENZY_ID_RANGE)
+        }.map { Game.Id(it) }
     }
 
     override val id = Id(Classic)
@@ -26,7 +36,7 @@ class Classic private constructor(override val uid: String) : WheelItem.Event() 
         |то все участники получают `+1` к следующему броску кубика, иначе ничего не проиходит.
     """.removeTabs()
 
-    override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
+    override suspend fun invoke(globalState: GlobalState, triggeredBy: PlayerName): GlobalState {
         return if (globalState.getAllEverRolledGames().any { it.id in TargetGameIds }) {
             globalState.updatePlayers { _, playerState ->
                 playerState.copy(

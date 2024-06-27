@@ -12,7 +12,7 @@ class ClimbingRopeItemTest : EventGateTest() {
 
     @Test
     fun `drop game with item`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = ClimbingRope.create()
         handleAction(BoardMove(user, diceValue = 5))
         handleAction(ItemReceive(user, item))
@@ -29,7 +29,7 @@ class ClimbingRopeItemTest : EventGateTest() {
 
     @Test
     fun `drop game with no item`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(BoardMove(user, diceValue = 5))
         assertEquals(expected = 0, effectsOf(user).size)
         handleAction(GameRoll(user, Game.Id(1)))
@@ -40,7 +40,7 @@ class ClimbingRopeItemTest : EventGateTest() {
 
     @Test
     fun `use item and do not drop`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = ClimbingRope.create()
         handleAction(BoardMove(user, diceValue = 5))
         handleAction(ItemReceive(user, item))

@@ -14,10 +14,10 @@ fun globalState(
 ): GlobalState {
     val startDateTimeInstant = startDateTime.toInstant(DefaultTimeZone)
     val players = listOf(
-        Participant("truetripled"),
-        Participant("shizov"),
-        Participant("adash"),
-        Participant("superangerfetus"),
+        Participant.Truetripled,
+        Participant.Shizov,
+        Participant.Adash,
+        Participant.ChilloutLatte,
     )
     return GlobalState(
         startDate = startDateTimeInstant.toEpochMilliseconds(),

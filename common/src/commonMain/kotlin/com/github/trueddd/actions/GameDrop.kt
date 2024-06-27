@@ -2,7 +2,7 @@ package com.github.trueddd.actions
 
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.items.ClimbingRope
 import com.github.trueddd.items.EasterCakeBang
@@ -18,7 +18,7 @@ import kotlinx.serialization.Serializable
 @SerialName("a${Action.Key.GameDrop}")
 data class GameDrop(
     @SerialName("rb")
-    val rolledBy: Participant,
+    val rolledBy: PlayerName,
     @SerialName("dv")
     val diceValue: Int,
 ) : Action(Key.GameDrop) {
@@ -28,9 +28,9 @@ data class GameDrop(
 
         override val actionKey = Key.GameDrop
 
-        override fun generate(participant: Participant, arguments: List<String>): GameDrop {
+        override fun generate(playerName: PlayerName, arguments: List<String>): GameDrop {
             val dice = arguments.firstOrNull()?.toIntOrNull() ?: rollDice()
-            return GameDrop(participant, dice)
+            return GameDrop(playerName, dice)
         }
     }
 

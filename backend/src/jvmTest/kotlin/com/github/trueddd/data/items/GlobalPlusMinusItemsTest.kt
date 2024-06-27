@@ -19,7 +19,7 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
         eventGate.stateHolder.current.stateSnapshot.playersState.values.forEach { player ->
             assertEquals(expected = 0, player.modifiersSum)
         }
-        handleAction(ItemReceive(requireRandomParticipant(), PlusToEveryone.create()))
+        handleAction(ItemReceive(getRandomPlayerName(), PlusToEveryone.create()))
         eventGate.stateHolder.current.stateSnapshot.playersState.values.forEach { player ->
             assertEquals(expected = 1, player.modifiersSum)
         }
@@ -27,12 +27,12 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
 
     @Test
     fun `plus to everyone - ensure one move only`() = runTest {
-        handleAction(ItemReceive(requireRandomParticipant(), PlusToEveryone.create()))
+        handleAction(ItemReceive(getRandomPlayerName(), PlusToEveryone.create()))
         eventGate.stateHolder.current.stateSnapshot.playersState.values.forEach { player ->
             assertEquals(expected = 1, player.modifiersSum)
         }
         eventGate.stateHolder.current.players.forEach {
-            handleAction(BoardMove(it, rollDice()))
+            handleAction(BoardMove(it.name, rollDice()))
         }
         eventGate.stateHolder.current.stateSnapshot.playersState.values.forEach { player ->
             assertEquals(expected = 0, player.modifiersSum)
@@ -44,7 +44,7 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
         eventGate.stateHolder.current.stateSnapshot.playersState.values.forEach { player ->
             assertEquals(expected = 0, player.modifiersSum)
         }
-        handleAction(ItemReceive(requireRandomParticipant(), MinusToEveryone.create()))
+        handleAction(ItemReceive(getRandomPlayerName(), MinusToEveryone.create()))
         eventGate.stateHolder.current.stateSnapshot.playersState.values.forEach { player ->
             assertEquals(expected = -1, player.modifiersSum)
         }
@@ -52,12 +52,12 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
 
     @Test
     fun `minus to everyone - ensure one move only`() = runTest {
-        handleAction(ItemReceive(requireRandomParticipant(), MinusToEveryone.create()))
+        handleAction(ItemReceive(getRandomPlayerName(), MinusToEveryone.create()))
         eventGate.stateHolder.current.stateSnapshot.playersState.values.forEach { player ->
             assertEquals(expected = -1, player.modifiersSum)
         }
         eventGate.stateHolder.current.players.forEachIndexed { index, player ->
-            handleAction(BoardMove(player, diceValue = if (index == 0) 1 else 3))
+            handleAction(BoardMove(player.name, diceValue = if (index == 0) 1 else 3))
         }
         eventGate.stateHolder.current.stateSnapshot.playersState.values.forEach { player ->
             if (player.position == 1) {
@@ -70,13 +70,13 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
 
     @Test
     fun `minus to everyone but you`() = runTest {
-        val player = requireRandomParticipant()
+        val player = getRandomPlayerName()
         eventGate.stateHolder.current.stateSnapshot.playersState.values.forEach {
             assertEquals(expected = 0, it.modifiersSum)
         }
         handleAction(ItemReceive(player, MinusToEveryoneButYou.create()))
         eventGate.stateHolder.current.stateSnapshot.playersState.forEach { (participant, state) ->
-            if (player.name == participant) {
+            if (player == participant) {
                 assertEquals(expected = 1, state.modifiersSum)
             } else {
                 assertEquals(expected = -1, state.modifiersSum)
@@ -86,13 +86,13 @@ class GlobalPlusMinusItemsTest : EventGateTest() {
 
     @Test
     fun `plus to everyone but you`() = runTest {
-        val player = requireRandomParticipant()
+        val player = getRandomPlayerName()
         eventGate.stateHolder.current.stateSnapshot.playersState.values.forEach {
             assertEquals(expected = 0, it.modifiersSum)
         }
         handleAction(ItemReceive(player, PlusToEveryoneButYou.create()))
         eventGate.stateHolder.current.stateSnapshot.playersState.forEach { (participant, state) ->
-            if (player.name == participant) {
+            if (player == participant) {
                 assertEquals(expected = -1, state.modifiersSum)
             } else {
                 assertEquals(expected = 1, state.modifiersSum)

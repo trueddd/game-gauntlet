@@ -12,7 +12,7 @@ class HaveATryItemTest : EventGateTest() {
 
     @Test
     fun `using item`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = HaveATry.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, inventoryOf(user).count { it is HaveATry })

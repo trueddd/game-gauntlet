@@ -25,7 +25,7 @@ class ActionTimeRangeTest : EventGateTest() {
         eventGate.startNoLoad(globalState(
             startDateTime = (Clock.System.now() + 2.hours).toLocalDateTime(DefaultTimeZone)
         ))
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(BoardMove(user, diceValue = 5))
         assertEquals(expected = 0, positionOf(user))
     }
@@ -36,7 +36,7 @@ class ActionTimeRangeTest : EventGateTest() {
             startDateTime = (Clock.System.now() - 1.hours).toLocalDateTime(DefaultTimeZone),
             activePeriod = 5.minutes,
         ))
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(BoardMove(user, diceValue = 4))
         assertEquals(expected = 0, positionOf(user))
     }
@@ -48,7 +48,7 @@ class ActionTimeRangeTest : EventGateTest() {
         ))
         println(eventGate.stateHolder.current.startDate)
         println(eventGate.stateHolder.current.endDate)
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(BoardMove(user, diceValue = 4).also { println(it.toString()) })
         println(stateOf(user).toString())
         assertEquals(expected = 4, positionOf(user))

@@ -1,8 +1,9 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
+import com.github.trueddd.items.ThereIsGiftAtYourDoor.Debuff
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
@@ -11,7 +12,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("${WheelItem.ThereIsGiftAtYourDoor}")
 class ThereIsGiftAtYourDoor private constructor(override val uid: String) : WheelItem.PendingEvent(),
-    Parametrized<Parameters.One<Participant>> {
+    Parametrized<Parameters.One<PlayerName>> {
 
     companion object {
         fun create() = ThereIsGiftAtYourDoor(uid = generateWheelItemUid())
@@ -30,15 +31,11 @@ class ThereIsGiftAtYourDoor private constructor(override val uid: String) : Whee
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Player(name = "Кто получает дебафф?"))
 
-    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Participant> {
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<PlayerName> {
         return Parameters.One(rawArguments.getParticipantParameter(index = 0, currentState)!!)
     }
 
-    override suspend fun use(
-        usedBy: Participant,
-        globalState: GlobalState,
-        arguments: List<String>
-    ): GlobalState {
+    override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         return when (val target = getParameters(arguments, globalState).parameter1) {
             usedBy -> globalState.updatePlayer(usedBy) { playerState ->
                 playerState.copy(

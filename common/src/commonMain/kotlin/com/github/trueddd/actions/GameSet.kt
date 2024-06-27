@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
 @SerialName("a${Action.Key.GameSet}")
 data class GameSet(
     @SerialName("sb")
-    val setBy: Participant,
+    val setBy: PlayerName,
     @SerialName("gi")
     val gameId: Game.Id,
 ) : Action(Key.GameSet) {
@@ -25,11 +25,11 @@ data class GameSet(
 
         override val actionKey = Key.GameSet
 
-        override fun generate(participant: Participant, arguments: List<String>): GameSet {
+        override fun generate(playerName: PlayerName, arguments: List<String>): GameSet {
             val gameId = arguments.firstOrNull()?.toIntOrNull()
                 ?.let { gamesProvider.getById(Game.Id(it)) }?.id
                 ?: throw ActionCreationException("Game Id was specified with error or game is not present")
-            return GameSet(participant, gameId)
+            return GameSet(playerName, gameId)
         }
     }
 
@@ -55,7 +55,7 @@ data class GameSet(
                             currentGame = if (playerState.hasCurrentActiveGame) playerState.currentGame else entry,
                         )
                     }.copy(gameHistory = currentState.gameHistory.mapValues { (player, history) ->
-                        if (player == action.setBy.name) {
+                        if (player == action.setBy) {
                             history + entry
                         } else {
                             history
@@ -77,7 +77,7 @@ data class GameSet(
                             currentGame = if (playerState.hasCurrentActiveGame) playerState.currentGame else entry,
                         )
                     }.copy(gameHistory = currentState.gameHistory.mapValues { (player, history) ->
-                        if (player == action.setBy.name) {
+                        if (player == action.setBy) {
                             history + entry
                         } else {
                             history

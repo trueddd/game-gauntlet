@@ -13,6 +13,7 @@ kotlin {
         freeCompilerArgs = listOf("-Xcontext-receivers", "-Xexpect-actual-classes")
     }
     jvm()
+    jvmToolchain(18)
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
@@ -30,6 +31,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
+                implementation(libs.test.kotlin)
             }
         }
         val jvmMain by getting {

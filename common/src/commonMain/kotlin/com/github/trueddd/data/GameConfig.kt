@@ -15,4 +15,9 @@ data class GameConfig(
     val endDate: Long,
     @SerialName("rc")
     val radioCoverage: RadioCoverage,
-)
+) {
+
+    fun displayNameOf(playerName: PlayerName): String {
+        return players.first { it.name == playerName }.displayName
+    }
+}

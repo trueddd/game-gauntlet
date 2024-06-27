@@ -21,7 +21,8 @@ class GamesProviderImpl : GamesProvider {
     }
 
     private val games = run {
-        val fileContent = Thread.currentThread().contextClassLoader.getResourceAsStream("games")
+        val fileContent = Thread.currentThread().contextClassLoader
+            .getResourceAsStream("games")
             ?.bufferedReader()?.readLines()
             ?: throw IllegalStateException("No `games` file was found")
         var parsedGamesCount = 0

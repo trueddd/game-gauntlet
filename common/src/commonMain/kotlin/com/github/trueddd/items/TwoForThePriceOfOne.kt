@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
@@ -24,7 +24,7 @@ class TwoForThePriceOfOne private constructor(override val uid: String) : WheelI
         |Произведите реролл колеса. Выполните два соседних пункта от выпавшего. Порядок: сначала верх, потом низ.
     """.removeTabs()
 
-    override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
+    override suspend fun invoke(globalState: GlobalState, triggeredBy: PlayerName): GlobalState {
         return globalState
     }
 

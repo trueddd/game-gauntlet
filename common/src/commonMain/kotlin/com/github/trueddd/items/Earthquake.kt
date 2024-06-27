@@ -1,7 +1,7 @@
 package com.github.trueddd.items
 
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.utils.isEven
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
@@ -25,12 +25,13 @@ class Earthquake private constructor(override val uid: String) : WheelItem.Event
         |Игроки, стоящие на четных клетках, перемещаются на одну клетку вперед.
     """.removeTabs()
 
-    override suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState {
+    override suspend fun invoke(globalState: GlobalState, triggeredBy: PlayerName): GlobalState {
         return globalState.updatePlayers { _, playerState ->
             playerState.copy(
-                position = when (playerState.position.isEven) {
-                    true -> playerState.position + 1
-                    false -> playerState.position - 1
+                position = when {
+                    playerState.effects.any { it is ConcreteBoots } -> playerState.position
+                    playerState.position.isEven -> playerState.position + 1
+                    else -> playerState.position - 1
                 }.coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
             )
         }

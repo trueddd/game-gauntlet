@@ -59,6 +59,22 @@ fun Application.configureRouting() {
             call.respond(HttpStatusCode.OK, AuthResponse(participant, token))
         }
 
+        get(Router.REMOTE) {
+            cache()
+            val player = call.parameters["player"]?.let { name ->
+                eventGate.stateHolder.participants.firstOrNull { it.name == name }
+            } ?: run {
+                call.respond(HttpStatusCode.BadRequest, "No player name passed")
+                return@get
+            }
+            val data = httpClient.proxyImageLoading(player.backgroundUrl)
+            if (data.isSuccess) {
+                call.respondBytes(data.getOrThrow(), ContentType.Image.Any)
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
+
         authenticate {
             get(Router.ACTIONS) {
                 call.respond(eventGate.historyHolder.getActions())

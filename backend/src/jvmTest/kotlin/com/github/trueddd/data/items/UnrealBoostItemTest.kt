@@ -12,7 +12,7 @@ class UnrealBoostItemTest : EventGateTest() {
 
     @Test
     fun `successful use`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = UnrealBoost.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, pendingEventsOf(user).size)
@@ -29,7 +29,7 @@ class UnrealBoostItemTest : EventGateTest() {
 
     @Test
     fun `unsuccessful use`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = UnrealBoost.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, pendingEventsOf(user).size)
@@ -41,7 +41,7 @@ class UnrealBoostItemTest : EventGateTest() {
 
     @Test
     fun `parsing failure`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = UnrealBoost.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, pendingEventsOf(user).size)

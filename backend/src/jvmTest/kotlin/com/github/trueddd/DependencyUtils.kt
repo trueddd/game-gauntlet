@@ -9,7 +9,7 @@ import java.io.File
 
 internal fun provideEventGate(): EventGate {
     val stateHolder = StateHolderImpl()
-    val gamesProvider = MockedGamesProvider()
+    val gamesProvider = GamesProviderImpl()
     val itemRoller = ItemRollerImpl(getItemFactoriesSet())
     val actionHandlerRegistry = provideActionHandlerRegistry(gamesProvider, itemRoller)
     val inputParser = provideInputParser(stateHolder, gamesProvider, itemRoller)
@@ -36,5 +36,5 @@ private fun provideActionHandlerRegistry(
 
 private fun provideHistoryHolder(actionHandlerRegistry: ActionHandlerRegistry): EventHistoryHolder {
     val file = File(".\\src\\jvmTest\\resources\\history")
-    return LocalEventHistoryHolder(actionHandlerRegistry, FileGameStateRepository(file))
+    return EventHistoryHolderImpl(actionHandlerRegistry, FileGameStateRepository(file))
 }

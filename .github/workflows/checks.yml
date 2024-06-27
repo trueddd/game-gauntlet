@@ -5,6 +5,12 @@ on:
     branches: [ "master" ]
 
 jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Validate Gradle wrapper
+      uses: gradle/actions/wrapper-validation@v3
   build:
     runs-on: ubuntu-latest
     steps:
@@ -12,22 +18,36 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '18'
         distribution: 'temurin'
-        cache: gradle
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Validate Gradle wrapper
-      uses: gradle/wrapper-validation-action@v2
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
-    - name: Build with Gradle
+      with:
+        build-scan-publish: true
+        build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
+        build-scan-terms-of-use-agree: "yes"
+    - name: Build sources
       run: ./gradlew assemble
-    - name: Run tests
-      run: ./gradlew test --info
-    - name: Test report
-      if: success() || failure()
+    - name: Run common module tests on JVM target
+      run: ./gradlew :common:jvmTest --info
+    - name: Upload common-jvm test report
       uses: actions/upload-artifact@v4
       with:
-        name: test-report
+        name: common-jvm-report
+        path: ./common/build/reports/tests/jvmTest
+    - name: Run common module tests on WasmJS target
+      run: ./gradlew :common:wasmJsTest --info
+    - name: Upload common-wasm-js test report
+      uses: actions/upload-artifact@v4
+      with:
+        name: common-wasm-js-report
+        path: ./common/build/reports/tests/wasmJsTest
+    - name: Run backend tests
+      run: ./gradlew :backend:test
+    - name: Upload backend test report
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-report
         path: ./backend/build/reports/tests/jvmTest

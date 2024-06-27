@@ -13,7 +13,7 @@ class FamilyFriendlyStreamerItemTest : EventGateTest() {
 
     @Test
     fun `get item - complete game successfully`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = FamilyFriendlyStreamer.create()
         handleAction(ItemReceive(user, item))
         assertTrue(pendingEventsOf(user).isNotEmpty())
@@ -26,7 +26,7 @@ class FamilyFriendlyStreamerItemTest : EventGateTest() {
 
     @Test
     fun `get item - use item`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = FamilyFriendlyStreamer.create()
         handleAction(ItemReceive(user, item))
         assertTrue(pendingEventsOf(user).isNotEmpty())

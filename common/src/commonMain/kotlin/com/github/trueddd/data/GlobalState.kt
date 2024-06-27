@@ -9,7 +9,6 @@ import kotlin.math.roundToInt
  * Contains all information about current game state.
  * But not everything should be delivered to frontend as single package.
  */
-// TODO: make GameConfig and StateSnapshot interfaces and implement them here
 @Serializable
 data class GlobalState(
     @SerialName("ac")
@@ -44,12 +43,12 @@ data class GlobalState(
     val gameConfig: GameConfig
         get() = GameConfig(players, gameGenreDistribution, startDate, endDate, radioCoverage)
 
-    fun stateOf(participant: Participant) = stateSnapshot.playersState[participant.name]!!
-    fun effectsOf(participant: Participant) = stateOf(participant).effects
-    fun pendingEventsOf(participant: Participant) = stateOf(participant).pendingEvents
-    fun inventoryOf(participant: Participant) = stateOf(participant).inventory
-    fun positionOf(participant: Participant) = stateOf(participant).position
-    fun gamesOf(participant: Participant) = gameHistory[participant.name]!!
+    fun stateOf(playerName: PlayerName) = stateSnapshot.playersState[playerName]!!
+    fun effectsOf(playerName: PlayerName) = stateOf(playerName).effects
+    fun pendingEventsOf(playerName: PlayerName) = stateOf(playerName).pendingEvents
+    fun inventoryOf(playerName: PlayerName) = stateOf(playerName).inventory
+    fun positionOf(playerName: PlayerName) = stateOf(playerName).position
+    fun gamesOf(playerName: PlayerName) = gameHistory[playerName]!!
 
     fun getAllEverRolledGames(): List<Game> {
         return gameHistory.flatMap { (_, games) -> games.map(GameHistoryEntry::game) }
@@ -66,25 +65,25 @@ data class GlobalState(
         return players.firstOrNull { it.name == name }
     }
 
-    fun positionAmongPlayers(player: Participant): Int {
+    fun positionAmongPlayers(playerName: PlayerName): Int {
         val positions = stateSnapshot.playersState.values.map { it.position }.distinct().sortedDescending()
-        return positions.indexOf(positionOf(player))
+        return positions.indexOf(positionOf(playerName))
     }
 
-    fun updateCurrentGame(participant: Participant): GlobalState {
-        return updatePlayer(participant) { state ->
+    fun updateCurrentGame(playerName: PlayerName): GlobalState {
+        return updatePlayer(playerName) { state ->
             state.copy(
-                currentGame = gameHistory[participant.name]?.lastOrNull { it.status != Game.Status.Next }
+                currentGame = gamesOf(playerName).lastOrNull { it.status != Game.Status.Next }
             )
         }
     }
 
     fun updateGameHistory(
-        participant: Participant,
+        playerName: PlayerName,
         block: (List<GameHistoryEntry>) -> List<GameHistoryEntry>
     ): GlobalState {
-        return this.copy(gameHistory = gameHistory.mapValues { (playerName, history) ->
-            if (playerName == participant.name) {
+        return this.copy(gameHistory = gameHistory.mapValues { (player, history) ->
+            if (player == playerName) {
                 block(history)
             } else {
                 history
@@ -92,10 +91,10 @@ data class GlobalState(
         })
     }
 
-    fun updatePlayer(participant: Participant, block: (PlayerState) -> PlayerState): GlobalState {
+    fun updatePlayer(playerName: PlayerName, block: (PlayerState) -> PlayerState): GlobalState {
         return this.copy(stateSnapshot = stateSnapshot.copy(
             playersState = stateSnapshot.playersState.mapValues { (player, playerState) ->
-                if (player == participant.name) {
+                if (player == playerName) {
                     block(playerState)
                 } else {
                     playerState
@@ -104,10 +103,10 @@ data class GlobalState(
         ))
     }
 
-    fun updatePlayers(block: (Participant, PlayerState) -> PlayerState): GlobalState {
+    fun updatePlayers(block: (PlayerName, PlayerState) -> PlayerState): GlobalState {
         return this.copy(stateSnapshot = stateSnapshot.copy(
             playersState = stateSnapshot.playersState.mapValues { (playerName, state) ->
-                block(participantByName(playerName)!!, state)
+                block(playerName, state)
             }
         ))
     }

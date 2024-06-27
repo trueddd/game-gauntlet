@@ -12,7 +12,7 @@ class DontCareItemTest : EventGateTest() {
 
     @Test
     fun `set game successfully - 1`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, DontCare.create()))
         handleAction(GameSet(user, Game.Id(1)))
         assertEquals(expected = Game.Id(1), stateOf(user).currentActiveGame?.game?.id)
@@ -20,7 +20,7 @@ class DontCareItemTest : EventGateTest() {
 
     @Test
     fun `set game successfully - 2`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(BoardMove(user, diceValue = 3))
         handleAction(GameRoll(user, Game.Id(2)))
         handleAction(ItemReceive(user, DontCare.create()))
@@ -33,7 +33,7 @@ class DontCareItemTest : EventGateTest() {
 
     @Test
     fun `set game with failure - 1`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(BoardMove(user, diceValue = 3))
         handleAction(GameRoll(user, Game.Id(2)))
         handleAction(GameSet(user, Game.Id(1)))

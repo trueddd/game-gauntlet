@@ -1,9 +1,6 @@
 package com.github.trueddd.actions
 
-import com.github.trueddd.data.Game
-import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
-import com.github.trueddd.data.PlayerState
+import com.github.trueddd.data.*
 import com.github.trueddd.items.*
 import com.github.trueddd.utils.*
 import com.trueddd.github.annotations.ActionGenerator
@@ -15,7 +12,7 @@ import kotlinx.serialization.Serializable
 @SerialName("a${Action.Key.BoardMove}")
 data class BoardMove(
     @SerialName("rb")
-    val rolledBy: Participant,
+    val rolledBy: PlayerName,
     @SerialName("dv")
     val diceValue: Int,
 ) : Action(Key.BoardMove) {
@@ -29,9 +26,9 @@ data class BoardMove(
 
         override val actionKey = Key.BoardMove
 
-        override fun generate(participant: Participant, arguments: List<String>): BoardMove {
+        override fun generate(playerName: PlayerName, arguments: List<String>): BoardMove {
             val dice = arguments.firstOrNull()?.toIntOrNull() ?: rollDice()
-            return BoardMove(participant, dice)
+            return BoardMove(playerName, dice)
         }
     }
 
@@ -52,7 +49,15 @@ data class BoardMove(
                     .maxBy { it.size }
                 val moveValue = (modifiers.sumOf { it.modifier } + action.diceValue)
                     .let { value -> if (playerState.effects.any { it is ChargedDice }) -value else value }
-                val finalPosition = (playerState.position + moveValue).coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
+                val finalPosition = (playerState.position + moveValue)
+                    .let { position ->
+                        if (playerState.effects.any { it is ConcreteBoots }) {
+                            position / ConcreteBoots.MOVE_DIVISOR
+                        } else {
+                            position
+                        }
+                    }
+                    .coerceIn(GlobalState.PLAYABLE_BOARD_RANGE)
                     .let {
                         when {
                             currentState.stateSnapshot.boardTraps[it] is BananaSkin.Trap -> {
@@ -76,6 +81,7 @@ data class BoardMove(
                             effect is LuckyThrow.Buff -> null
                             effect is ChargedDice -> null
                             effect is NoClownery -> if (previousStintIndex + 1 == newStintIndex) null else effect
+                            effect is ConcreteBoots -> effect.charge()
                             effect !is DiceRollModifier -> effect
                             modifiersToDiscard.none { it == effect.uid } -> effect
                             effect is BabySupport -> effect.charge()

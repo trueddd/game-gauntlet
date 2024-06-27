@@ -13,7 +13,7 @@ class DemocracyItemTest : EventGateTest() {
 
     @Test
     fun `get buff after poll`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Democracy.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("1")))
@@ -23,7 +23,7 @@ class DemocracyItemTest : EventGateTest() {
 
     @Test
     fun `get debuff after poll`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Democracy.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("0")))
@@ -33,7 +33,7 @@ class DemocracyItemTest : EventGateTest() {
 
     @Test
     fun `validation fail - 1`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Democracy.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid))
@@ -43,7 +43,7 @@ class DemocracyItemTest : EventGateTest() {
 
     @Test
     fun `validation fail - 2`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Democracy.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("q")))

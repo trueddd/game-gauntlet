@@ -20,7 +20,7 @@ class LuckyThrowItemTest : EventGateTest() {
 
     @Test
     fun `acquire item`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = LuckyThrow.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, pendingEventsOf(user).size)
@@ -29,7 +29,7 @@ class LuckyThrowItemTest : EventGateTest() {
 
     @Test
     fun `get and use item`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = LuckyThrow.create()
         val diceValue = rollDice()
         val genre = eventGate.stateHolder.current.gameGenreDistribution.genreAtPosition(diceValue)
@@ -42,7 +42,7 @@ class LuckyThrowItemTest : EventGateTest() {
 
     @Test
     fun `get and use item - successfully`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = LuckyThrow.create()
         val diceValue = rollDice()
         val genre = eventGate.stateHolder.current.gameGenreDistribution.genreAtPosition(diceValue)
@@ -59,7 +59,7 @@ class LuckyThrowItemTest : EventGateTest() {
 
     @Test
     fun `get and use item - unlucky`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = LuckyThrow.create()
         val diceValue = 3
         val genre = eventGate.stateHolder.current.gameGenreDistribution.genreAtPosition(2)

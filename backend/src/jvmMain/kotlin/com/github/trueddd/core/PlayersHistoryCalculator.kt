@@ -7,7 +7,7 @@ import com.github.trueddd.items.DontWannaPlayThis
 object PlayersHistoryCalculator {
 
     private fun PlayersHistory.update(
-        playerName: String,
+        playerName: PlayerName,
         block: (PlayerTurnsHistory) -> PlayerTurnsHistory
     ): PlayersHistory {
         return mapValues { (key, value) ->
@@ -27,7 +27,7 @@ object PlayersHistoryCalculator {
     ): PlayersHistory {
         return when (action) {
             is BoardMove -> {
-                currentHistory.update(action.rolledBy.name) { history ->
+                currentHistory.update(action.rolledBy) { history ->
                     val turn = Turn(
                         moveDate = action.issuedAt,
                         moveRange = oldState.positionOf(action.rolledBy) .. newState.positionOf(action.rolledBy),
@@ -42,7 +42,7 @@ object PlayersHistoryCalculator {
                 }
             }
             is GameDrop -> {
-                currentHistory.update(action.rolledBy.name) { history ->
+                currentHistory.update(action.rolledBy) { history ->
                     val turn = history.turns.last().copy(
                         moveRange = history.turns.last().moveRange?.first
                             ?.let { it .. newState.positionOf(action.rolledBy) }
@@ -58,24 +58,24 @@ object PlayersHistoryCalculator {
                 }
             }
             is GameRoll -> {
-                currentHistory.update(action.participant.name) { history ->
+                currentHistory.update(action.playerName) { history ->
                     if (history.turns.lastOrNull()?.game?.status == Game.Status.Dropped) {
                         val turn = history.turns.last().copy(
                             moveDate = action.issuedAt,
                             moveRange = null,
-                            game = newState.stateOf(action.participant).currentGame,
+                            game = newState.stateOf(action.playerName).currentGame,
                         )
                         history.copy(turns = history.turns + turn)
                     } else {
                         val turn = history.turns.last().copy(
-                            game = newState.stateOf(action.participant).currentGame,
+                            game = newState.stateOf(action.playerName).currentGame,
                         )
                         history.copy(turns = history.turns.dropLast(1) + turn)
                     }
                 }
             }
             is GameSet -> {
-                currentHistory.update(action.setBy.name) { history ->
+                currentHistory.update(action.setBy) { history ->
                     if (oldState.stateOf(action.setBy).hasCurrentActiveGame) {
                         val turn = Turn(
                             moveDate = action.issuedAt,
@@ -96,9 +96,9 @@ object PlayersHistoryCalculator {
                 }
             }
             is GameStatusChange -> {
-                currentHistory.update(action.participant.name) { history ->
+                currentHistory.update(action.playerName) { history ->
                     val turn = history.turns.last().copy(
-                        game = newState.stateOf(action.participant).currentGame,
+                        game = newState.stateOf(action.playerName).currentGame,
                     )
                     history.copy(
                         turns = history.turns.dropLast(1) + turn,
@@ -120,7 +120,7 @@ object PlayersHistoryCalculator {
                 val usedItem = oldState.stateOf(action.usedBy).wheelItems.firstOrNull { it.uid == action.itemUid }
                     ?: return currentHistory
                 when (usedItem) {
-                    is DontWannaPlayThis -> currentHistory.update(action.usedBy.name) { history ->
+                    is DontWannaPlayThis -> currentHistory.update(action.usedBy) { history ->
                         history.copy(
                             statistics = history.statistics.copy(
                                 rerolledGames = history.statistics.rerolledGames + 1

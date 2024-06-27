@@ -15,14 +15,14 @@ class GameRollActionTest : EventGateTest() {
 
     @Test
     fun `roll game on start`() = runTest {
-        val participant = requireRandomParticipant()
-        eventGate.parseAndHandle("${participant.name}:${Action.Key.GameRoll}")
+        val participant = getRandomPlayerName()
+        eventGate.parseAndHandle("$participant:${Action.Key.GameRoll}")
         assertEquals(expected = null, lastGameOf(participant))
     }
 
     @Test
     fun `roll game once`() = runTest {
-        val participant = requireRandomParticipant()
+        val participant = getRandomPlayerName()
         handleAction(BoardMove(participant, diceValue = 3))
         handleAction(GameRoll(participant, Game.Id(1)))
         assertNotEquals(illegal = null, lastGameOf(participant))
@@ -30,15 +30,15 @@ class GameRollActionTest : EventGateTest() {
 
     @Test
     fun `roll game - given id`() = runTest {
-        val participant = requireRandomParticipant()
+        val participant = getRandomPlayerName()
         handleAction(BoardMove(participant, diceValue = 3))
-        eventGate.parseAndHandle("${participant.name}:${Action.Key.GameRoll}:1")
+        eventGate.parseAndHandle("$participant:${Action.Key.GameRoll}:1")
         assertEquals(expected = Game.Id(1), lastGameOf(participant)?.game?.id)
     }
 
     @Test
     fun `roll game twice`() = runTest {
-        val participant = requireRandomParticipant()
+        val participant = getRandomPlayerName()
         handleAction(BoardMove(participant, diceValue = 2))
         handleAction(GameRoll(participant, Game.Id(0)))
         val currentGame = stateOf(participant).currentGame
@@ -49,7 +49,7 @@ class GameRollActionTest : EventGateTest() {
 
     @Test
     fun `roll game - complete - move & roll game`() = runTest {
-        val participant = requireRandomParticipant()
+        val participant = getRandomPlayerName()
         handleAction(BoardMove(participant, diceValue = 5))
         handleAction(GameRoll(participant, Game.Id(0)))
         val firstGame = stateOf(participant).currentGame

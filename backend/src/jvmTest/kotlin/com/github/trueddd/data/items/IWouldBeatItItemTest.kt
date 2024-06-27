@@ -16,7 +16,7 @@ class IWouldBeatItItemTest : EventGateTest() {
 
     @Test
     fun `empty drop list`() = runTest {
-        val user1 = requireRandomParticipant()
+        val user1 = getRandomPlayerName()
         handleAction(ItemReceive(user1, IWouldBeatIt.create()))
         handleAction(BoardMove(user1, diceValue = 3))
         handleAction(GameRoll(user1, Game.Id(1)))
@@ -26,7 +26,7 @@ class IWouldBeatItItemTest : EventGateTest() {
 
     @Test
     fun `get game from drop list`() = runTest {
-        val (user1, user2, user3) = requireParticipants()
+        val (user1, user2, user3) = getPlayerNames()
         handleAction(BoardMove(user1, diceValue = 3))
         handleAction(BoardMove(user2, diceValue = 3))
         handleAction(BoardMove(user3, diceValue = 4))
@@ -44,7 +44,7 @@ class IWouldBeatItItemTest : EventGateTest() {
 
     @Test
     fun `get game not from drop list`() = runTest {
-        val (user1, user2, user3) = requireParticipants()
+        val (user1, user2, user3) = getPlayerNames()
         handleAction(BoardMove(user1, diceValue = 3))
         handleAction(BoardMove(user2, diceValue = 3))
         handleAction(BoardMove(user3, diceValue = 4))

@@ -12,10 +12,10 @@ class ImportSubstitutionItemTest : EventGateTest() {
 
     @Test
     fun `debuff active till the end`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, ImportSubstitution.create()))
         makeMovesUntilFinish(user)
-        assertEquals(user.name, eventGate.stateHolder.current.stateSnapshot.winner)
+        assertEquals(user, eventGate.stateHolder.current.stateSnapshot.winner)
         assertIs<ImportSubstitution>(effectsOf(user).first())
     }
 }

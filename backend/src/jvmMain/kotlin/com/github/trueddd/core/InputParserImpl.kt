@@ -44,7 +44,7 @@ class InputParserImpl(
             return null
         }
         val action = try {
-            generator.generate(user, arguments)
+            generator.generate(user.name, arguments)
         } catch (error: ActionCreationException) {
             error.printStackTrace()
             return null

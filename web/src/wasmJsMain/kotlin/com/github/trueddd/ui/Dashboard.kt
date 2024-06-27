@@ -68,6 +68,7 @@ fun Dashboard(
             )
             ActionsLog(
                 actions = actions,
+                gameConfig = gameConfig,
                 modifier = Modifier
             )
         }

@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
@@ -38,6 +39,7 @@ import com.github.trueddd.items.Usable
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.ui.widget.AsyncImage
+import com.github.trueddd.ui.widget.AsyncProfileBackgroundImage
 import com.github.trueddd.util.*
 import com.github.trueddd.utils.DefaultTimeZone
 import com.github.trueddd.utils.Log
@@ -188,7 +190,9 @@ private fun WheelItemView(
                         onClick = {
                             onUse()
                             tooltipState.dismiss()
-                        }
+                        },
+                        modifier = Modifier
+                            .pointerHoverIcon(PointerIcon.Hand)
                     ) {
                         Text("Использовать")
                     }
@@ -273,7 +277,9 @@ private fun Profile(
                 .fillMaxSize()
         ) {
             item(contentType = ProfileContentType.Background) {
-                Box(
+                AsyncProfileBackgroundImage(
+                    participant = selectedPlayer,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(160.dp)

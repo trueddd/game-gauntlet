@@ -2,6 +2,7 @@ package com.github.trueddd.actions
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.PlayerState
+import com.github.trueddd.items.ConcreteBoots
 import com.github.trueddd.items.LostFoot
 import com.github.trueddd.items.LostLeg
 import com.trueddd.github.annotations.ActionHandler
@@ -98,20 +99,24 @@ data class GlobalEvent(
                     when (playerEventInfo.damageType) {
                         DamageType.None -> state
                         DamageType.Light -> state.copy(
-                            position = if (playerEventInfo.isEpicenterForward) {
-                                state.position + Tornado.LIGHT_DAMAGE_SHIFT
-                            } else {
-                                state.position - Tornado.LIGHT_DAMAGE_SHIFT
+                            position = when {
+                                state.effects.any { it is ConcreteBoots } -> state.position
+                                playerEventInfo.isEpicenterForward -> state.position + Tornado.LIGHT_DAMAGE_SHIFT
+                                else -> state.position - Tornado.LIGHT_DAMAGE_SHIFT
                             }.coerceIn(GlobalState.BOARD_RANGE),
                             effects = state.effects + LostFoot.create(),
                         )
                         DamageType.Heavy -> state.copy(
-                            position = if (playerEventInfo.isEpicenterForward) {
-                                val diff = abs(state.position - playerEventInfo.epicenterRange.first)
-                                playerEventInfo.epicenterRange.last + diff
-                            } else {
-                                val diff = abs(state.position - playerEventInfo.epicenterRange.last)
-                                playerEventInfo.epicenterRange.first - diff
+                            position = when {
+                                state.effects.any { it is ConcreteBoots } -> state.position
+                                playerEventInfo.isEpicenterForward -> {
+                                    val diff = abs(state.position - playerEventInfo.epicenterRange.first)
+                                    playerEventInfo.epicenterRange.last + diff
+                                }
+                                else -> {
+                                    val diff = abs(state.position - playerEventInfo.epicenterRange.last)
+                                    playerEventInfo.epicenterRange.first - diff
+                                }
                             }.coerceIn(GlobalState.BOARD_RANGE),
                             effects = state.effects + LostLeg.create(),
                         )
@@ -122,18 +127,18 @@ data class GlobalEvent(
                     when (playerEventInfo.damageType) {
                         DamageType.None -> state
                         DamageType.Light -> state.copy(
-                            position = if (playerEventInfo.isEpicenterForward) {
-                                state.position - Nuke.LIGHT_DAMAGE_SHIFT
-                            } else {
-                                state.position + Nuke.LIGHT_DAMAGE_SHIFT
+                            position = when {
+                                state.effects.any { it is ConcreteBoots } -> state.position
+                                playerEventInfo.isEpicenterForward -> state.position - Nuke.LIGHT_DAMAGE_SHIFT
+                                else -> state.position + Nuke.LIGHT_DAMAGE_SHIFT
                             }.coerceIn(GlobalState.BOARD_RANGE),
                             effects = state.effects + LostFoot.create(),
                         )
                         DamageType.Heavy -> state.copy(
-                            position = if (playerEventInfo.isEpicenterForward) {
-                                state.position - Nuke.HEAVY_DAMAGE_SHIFT
-                            } else {
-                                state.position + Nuke.HEAVY_DAMAGE_SHIFT
+                            position = when {
+                                state.effects.any { it is ConcreteBoots } -> state.position
+                                playerEventInfo.isEpicenterForward -> state.position - Nuke.HEAVY_DAMAGE_SHIFT
+                                else -> state.position + Nuke.HEAVY_DAMAGE_SHIFT
                             }.coerceIn(GlobalState.BOARD_RANGE),
                             effects = state.effects + LostLeg.create(),
                         )

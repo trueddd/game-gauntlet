@@ -15,7 +15,7 @@ class RelocationItemTest : EventGateTest() {
 
     @Test
     fun `relocate backward`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Relocation.create()
         handleAction(BoardMove(user, diceValue = 6))
         handleAction(ItemReceive(user, item))
@@ -26,7 +26,7 @@ class RelocationItemTest : EventGateTest() {
 
     @Test
     fun `relocate forward`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Relocation.create()
         handleAction(BoardMove(user, diceValue = 5))
         handleAction(ItemReceive(user, item))
@@ -49,7 +49,7 @@ class RelocationItemTest : EventGateTest() {
             }
             return@runTest
         }
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = Relocation.create()
         eventGate.stateHolder.update {
             updatePlayer(user) { it.copy(position = superposition) }

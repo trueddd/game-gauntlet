@@ -9,8 +9,10 @@ import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
@@ -97,6 +99,17 @@ class HttpClient {
                     parameter("first", pageSize)
                     after?.let { parameter("after", it) }
                 }.body<PaginatedTwitchResponse<List<RewardRedemption>>>().let { Result.success(it) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun proxyImageLoading(url: String): Result<ByteArray> {
+        return withContext(Dispatchers.IO) {
+            try {
+                client.get(url).bodyAsChannel().toByteArray().let { Result.success(it) }
             } catch (e: Exception) {
                 e.printStackTrace()
                 Result.failure(e)

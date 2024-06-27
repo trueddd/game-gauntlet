@@ -16,7 +16,7 @@ class FewLettersItemTest : EventGateTest() {
 
     @Test
     fun `roll game with debuff - fail`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, FewLetters.create()))
         handleAction(BoardMove(user, diceValue = 5))
         handleAction(GameRoll(user, Game.Id(1)))
@@ -26,7 +26,7 @@ class FewLettersItemTest : EventGateTest() {
 
     @Test
     fun `roll game with debuff - success`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(ItemReceive(user, FewLetters.create()))
         handleAction(BoardMove(user, diceValue = 5))
         handleAction(GameRoll(user, Game.Id(0)))

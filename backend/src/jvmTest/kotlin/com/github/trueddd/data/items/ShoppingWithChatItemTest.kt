@@ -11,7 +11,7 @@ class ShoppingWithChatItemTest : EventGateTest() {
 
     @Test
     fun `basic test`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val previousState = eventGate.stateHolder.current
         handleAction(ItemReceive(user, ShoppingWithChat.create()))
         assertEquals(previousState, eventGate.stateHolder.current)

@@ -17,7 +17,7 @@ class WillOfChanceItemTest : EventGateTest() {
 
     @Test
     fun `receive on odd`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(BoardMove(user, diceValue = 3))
         handleAction(ItemReceive(user, WillOfChance.create()))
         assertEquals(expected = -2, effectsOf(user).filterIsInstance<DiceRollModifier>().sumOf { it.modifier })
@@ -30,7 +30,7 @@ class WillOfChanceItemTest : EventGateTest() {
 
     @Test
     fun `receive on even`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         handleAction(BoardMove(user, diceValue = 4))
         handleAction(ItemReceive(user, WillOfChance.create()))
         assertEquals(expected = 2, effectsOf(user).filterIsInstance<DiceRollModifier>().sumOf { it.modifier })

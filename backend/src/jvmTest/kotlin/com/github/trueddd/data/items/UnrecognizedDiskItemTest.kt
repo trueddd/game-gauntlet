@@ -13,7 +13,7 @@ class UnrecognizedDiskItemTest : EventGateTest() {
 
     @Test
     fun `single stream completion`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = UnrecognizedDisk.create()
         handleAction(ItemReceive(user, item))
         handleAction(BoardMove(user, diceValue = 4))
@@ -26,7 +26,7 @@ class UnrecognizedDiskItemTest : EventGateTest() {
 
     @Test
     fun `not single stream completion`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = UnrecognizedDisk.create()
         handleAction(ItemReceive(user, item))
         handleAction(BoardMove(user, diceValue = 4))

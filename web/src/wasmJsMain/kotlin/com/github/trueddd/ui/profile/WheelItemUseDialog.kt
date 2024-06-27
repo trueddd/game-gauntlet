@@ -8,6 +8,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.github.trueddd.data.Game
@@ -53,7 +55,11 @@ fun WheelItemUseDialog(
         properties = DialogProperties(),
         title = { Text("Использовать ${item.name}") },
         dismissButton = {
-            TextButton(onClick = onDialogDismiss) {
+            TextButton(
+                onClick = onDialogDismiss,
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand)
+            ) {
                 Text("Отмена")
             }
         },
@@ -67,7 +73,9 @@ fun WheelItemUseDialog(
                     }
                     onItemUse(item, arguments)
                 },
-                enabled = canUse.value
+                enabled = canUse.value,
+                modifier = Modifier
+                    .pointerHoverIcon(if (canUse.value) PointerIcon.Hand else PointerIcon.Default)
             ) {
                 Text("Использовать")
             }
@@ -87,7 +95,7 @@ fun WheelItemUseDialog(
                             is ParameterType.Int -> IntParameter(parameter) {
                                 parameters = parameters.updateParametersMap(parameter, it.toString())
                             }
-                            is ParameterType.Player -> PlayerParameter(parameter, gameConfig) {
+                            is ParameterType.Player -> PlayerParameter(parameter, gameConfig, stateSnapshot) {
                                 parameters = parameters.updateParametersMap(parameter, it.name)
                             }
                             is ParameterType.ForeignItem -> ForeignItemParameter(parameter, stateSnapshot, gameConfig, player) {
@@ -158,11 +166,22 @@ private fun IntParameter(
 private fun PlayerParameter(
     parameter: ParameterType.Player,
     gameConfig: GameConfig,
+    stateSnapshot: StateSnapshot,
     onParameterUpdated: (Participant) -> Unit
 ) {
     var value by remember { mutableStateOf<Participant?>(null) }
     var expanded by remember { mutableStateOf(false) }
-    val values = remember { gameConfig.players.filter(parameter.predicate).map { it.displayName } }
+    val values by remember {
+        derivedStateOf {
+            stateSnapshot.playersState.mapNotNull { (name, state) ->
+                if (parameter.predicate(name, state)) {
+                    gameConfig.players.firstOrNull { it.name == name }?.displayName
+                } else {
+                    null
+                }
+            }
+        }
+    }
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },

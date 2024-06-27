@@ -2,7 +2,7 @@ package com.github.trueddd.items
 
 import com.benasher44.uuid.uuid4
 import com.github.trueddd.data.GlobalState
-import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.Rollable
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
@@ -67,7 +67,7 @@ sealed class WheelItem : Rollable {
     sealed class Event : WheelItem() {
         override val color: Long
             get() = Colors.EVENT
-        abstract suspend fun invoke(globalState: GlobalState, rolledBy: Participant): GlobalState
+        abstract suspend fun invoke(globalState: GlobalState, triggeredBy: PlayerName): GlobalState
     }
 
     @Serializable
@@ -157,6 +157,9 @@ sealed class WheelItem : Rollable {
         const val Radio = 61
         const val LostFoot = 62
         const val LostLeg = 63
+        const val ConcreteBoots = 64
+        const val Sledgehammer = 65
+        const val SledgehammerDebuff = 66
     }
 }
 

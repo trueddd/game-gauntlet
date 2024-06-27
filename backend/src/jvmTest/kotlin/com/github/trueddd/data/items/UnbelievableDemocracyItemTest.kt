@@ -13,48 +13,48 @@ class UnbelievableDemocracyItemTest : EventGateTest() {
 
     @Test
     fun `get buff after poll`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = UnbelievableDemocracy.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("1")))
         assertTrue(pendingEventsOf(user).isEmpty())
-        requireParticipants().forEach { player ->
+        getPlayerNames().forEach { player ->
             assertEquals(expected = 1, stateOf(player).modifiersSum)
         }
     }
 
     @Test
     fun `get debuff after poll`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = UnbelievableDemocracy.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("0")))
         assertTrue(pendingEventsOf(user).isEmpty())
-        requireParticipants().forEach { player ->
+        getPlayerNames().forEach { player ->
             assertEquals(expected = -1, stateOf(player).modifiersSum)
         }
     }
 
     @Test
     fun `validation fail - 1`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = UnbelievableDemocracy.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid))
         assertTrue(pendingEventsOf(user).isNotEmpty())
-        requireParticipants().forEach { player ->
+        getPlayerNames().forEach { player ->
             assertEquals(expected = 0, stateOf(player).modifiersSum)
         }
     }
 
     @Test
     fun `validation fail - 2`() = runTest {
-        val user = requireRandomParticipant()
+        val user = getRandomPlayerName()
         val item = UnbelievableDemocracy.create()
         handleAction(ItemReceive(user, item))
         handleAction(ItemUse(user, item.uid, listOf("q")))
         assertTrue(pendingEventsOf(user).isNotEmpty())
-        requireParticipants().forEach { player ->
+        getPlayerNames().forEach { player ->
             assertEquals(expected = 0, stateOf(player).modifiersSum)
         }
     }
