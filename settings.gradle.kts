@@ -34,6 +34,7 @@ dependencyResolutionManagement {
             val koinKsp = version("koin-ksp", "1.3.1")
             val kotlinPoet = version("kotlinpoet", "1.16.0")
             val serialization = version("serialization", "1.7.1")
+            val coil = version("coil", "3.0.0-alpha07")
 
             library("logging", "ch.qos.logback", "logback-classic").version("1.5.6")
 
@@ -87,6 +88,10 @@ dependencyResolutionManagement {
             library("datetime", "org.jetbrains.kotlinx", "kotlinx-datetime").versionRef(datetime)
 
             library("mongodb-driver", "org.mongodb", "mongodb-driver-kotlin-coroutine").version("5.1.0")
+
+            library("coil-core", "io.coil-kt.coil3", "coil-core").versionRef(coil)
+            library("coil-compose", "io.coil-kt.coil3", "coil-compose").versionRef(coil)
+            library("coil-network", "io.coil-kt.coil3", "coil-network-ktor").versionRef(coil)
         }
     }
 }

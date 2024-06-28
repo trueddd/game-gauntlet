@@ -41,6 +41,9 @@ kotlin {
                 implementation("io.ktor:ktor-client-js:3.0.0-wasm2")
                 implementation("io.ktor:ktor-client-content-negotiation:3.0.0-wasm2")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.0-wasm2")
+                implementation(libs.coil.core)
+                implementation(libs.coil.compose)
+                implementation(libs.coil.network)
             }
         }
     }
