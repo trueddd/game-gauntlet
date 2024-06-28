@@ -20,10 +20,10 @@ import com.github.trueddd.core.SocketState
 @Composable
 fun GlobalStateManagement(
     socketState: SocketState,
-    onSaveRequested: () -> Unit,
-    onRestoreRequested: () -> Unit,
-    onResetRequested: () -> Unit,
-    modifier: Modifier
+    onSaveRequest: () -> Unit,
+    onRestoreRequest: () -> Unit,
+    onResetRequest: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -33,21 +33,21 @@ fun GlobalStateManagement(
             .padding(16.dp)
     ) {
         Button(
-            onClick = onSaveRequested,
+            onClick = onSaveRequest,
             enabled = socketState is SocketState.Connected,
             modifier = Modifier
                 .pointerHoverIcon(PointerIcon.Hand),
             content = { Text(text = "Save") }
         )
         Button(
-            onClick = onRestoreRequested,
+            onClick = onRestoreRequest,
             enabled = socketState is SocketState.Connected,
             modifier = Modifier
                 .pointerHoverIcon(PointerIcon.Hand),
             content = { Text(text = "Load") }
         )
         Button(
-            onClick = onResetRequested,
+            onClick = onResetRequest,
             enabled = socketState is SocketState.Connected,
             modifier = Modifier
                 .pointerHoverIcon(PointerIcon.Hand),

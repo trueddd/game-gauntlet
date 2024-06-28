@@ -37,8 +37,8 @@ fun ActionsBoard(
     gameConfig: GameConfig,
     socketState: SocketState,
     participant: Participant?,
-    sendAction: (String) -> Unit = {},
     modifier: Modifier = Modifier,
+    sendAction: (String) -> Unit = {},
 ) {
     var user by remember(participant) { mutableStateOf(if (isDevEnvironment()) participant else null) }
     var action by remember { mutableStateOf(Action.Key.BoardMove) }

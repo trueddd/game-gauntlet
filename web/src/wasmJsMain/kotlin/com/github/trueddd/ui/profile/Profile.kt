@@ -212,6 +212,7 @@ private fun WheelItemView(
         Box(
             modifier = Modifier
                 .size(72.dp)
+                .background(Color(item.color), RoundedCornerShape(16.dp))
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -221,7 +222,6 @@ private fun WheelItemView(
                         }
                     }
                 )
-                .background(Color(item.color), RoundedCornerShape(16.dp))
                 .pointerHoverIcon(PointerIcon.Hand)
         ) {
             AsyncImage(
@@ -340,7 +340,7 @@ private fun Profile(
                         .padding(start = leftSideBarWidth + leftSideBarPadding)
                         .fillMaxWidth()
                 ) {
-                    var undercoverHeight by remember { mutableStateOf(0) }
+                    var undercoverHeight by remember { mutableIntStateOf(0) }
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -593,7 +593,7 @@ private fun Profile(
                     onDialogDismiss = { visibleDialog = ProfileDialogs.None }
                 )
                 is ProfileDialogs.BoardMove -> BoardMoveDialog(
-                    onMoveRequested = {
+                    onMoveRequest = {
                         commandSender.sendCommand(Command.Action.boardMove(currentPlayer, it))
                         visibleDialog = ProfileDialogs.None
                     },
@@ -602,7 +602,7 @@ private fun Profile(
                 is ProfileDialogs.GameStatusChange -> GameStatusChangeDialog(
                     player = currentPlayer,
                     stateSnapshot = stateSnapshot,
-                    onStatusChangeRequested = { statusChangeRequest ->
+                    onStatusChangeRequest = { statusChangeRequest ->
                         Log.info(TAG, "setting new status: $statusChangeRequest")
                         val command = when (statusChangeRequest) {
                             is StatusChangeRequest.Dropped -> Command.Action.gameDrop(

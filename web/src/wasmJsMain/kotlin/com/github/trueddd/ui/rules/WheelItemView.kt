@@ -41,12 +41,13 @@ sealed class WheelItemView(
 fun WheelItemChip(
     view: WheelItemView,
     selected: Boolean,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
     val shape = RoundedCornerShape(8.dp)
     val interactionSource = remember { MutableInteractionSource() }
     Box(
-        modifier = Modifier
+        modifier = modifier
             .background(if (selected) view.color.copy(alpha = 0.2f) else Color.Transparent, shape)
             .border(
                 width = 1.dp,

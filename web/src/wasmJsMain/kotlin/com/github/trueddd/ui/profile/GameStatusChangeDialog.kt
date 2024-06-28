@@ -36,7 +36,7 @@ sealed class StatusChangeRequest {
 fun GameStatusChangeDialog(
     player: Participant,
     stateSnapshot: StateSnapshot,
-    onStatusChangeRequested: (StatusChangeRequest) -> Unit,
+    onStatusChangeRequest: (StatusChangeRequest) -> Unit,
     onDialogDismiss: () -> Unit,
 ) {
     val appStorage = remember { get<AppStorage>() }
@@ -60,7 +60,7 @@ fun GameStatusChangeDialog(
                         Game.Status.Dropped -> StatusChangeRequest.Dropped(diceValue)
                         else -> return@click
                     }
-                    onStatusChangeRequested(request)
+                    onStatusChangeRequest(request)
                 },
                 enabled = status in allowedStatuses
             ) {

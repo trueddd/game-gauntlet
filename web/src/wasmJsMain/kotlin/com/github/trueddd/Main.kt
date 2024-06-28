@@ -88,7 +88,7 @@ private fun App(
         TopPanel(
             currentDestination = destination,
             destinations = destinations,
-            onDestinationChanged = { destination = it },
+            onDestinationChange = { destination = it },
             participant = user,
             modifier = Modifier
                 .fillMaxWidth()
@@ -161,7 +161,7 @@ private fun TopPanel(
     destinations: List<Destination>,
     participant: Participant?,
     modifier: Modifier = Modifier,
-    onDestinationChanged: (Destination) -> Unit = {},
+    onDestinationChange: (Destination) -> Unit = {},
 ) {
     val padding = 24.dp
     Row(
@@ -187,7 +187,7 @@ private fun TopPanel(
                     )
                     .clip(RoundedCornerShape(50))
                     .clickable(enabled = !destination.requireAuth || participant != null) {
-                        onDestinationChanged(destination)
+                        onDestinationChange(destination)
                     }
                     .pointerHoverIcon(
                         if (!destination.requireAuth || participant != null) {

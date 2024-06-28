@@ -17,7 +17,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun BoardMoveDialog(
-    onMoveRequested: (Int) -> Unit,
+    onMoveRequest: (Int) -> Unit,
     onDialogDismiss: () -> Unit,
 ) {
     val appStorage = remember { get<AppStorage>() }
@@ -37,7 +37,7 @@ fun BoardMoveDialog(
         },
         confirmButton = {
             FilledTonalButton(
-                onClick = { onMoveRequested(diceValue) },
+                onClick = { onMoveRequest(diceValue) },
                 modifier = Modifier
                     .pointerHoverIcon(PointerIcon.Hand)
             ) {

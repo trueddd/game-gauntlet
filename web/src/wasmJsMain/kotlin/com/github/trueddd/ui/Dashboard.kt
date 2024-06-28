@@ -44,9 +44,9 @@ fun Dashboard(
             )
             GlobalStateManagement(
                 socketState = socketState,
-                onSaveRequested = { commandSender.sendCommand(Command.Save) },
-                onRestoreRequested = { commandSender.sendCommand(Command.Restore) },
-                onResetRequested = { commandSender.sendCommand(Command.Reset) },
+                onSaveRequest = { commandSender.sendCommand(Command.Save) },
+                onRestoreRequest = { commandSender.sendCommand(Command.Restore) },
+                onResetRequest = { commandSender.sendCommand(Command.Reset) },
                 modifier = Modifier
             )
         }
