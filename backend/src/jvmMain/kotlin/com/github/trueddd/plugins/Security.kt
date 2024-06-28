@@ -1,32 +1,20 @@
 package com.github.trueddd.plugins
 
 import com.auth0.jwt.JWT
-import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.github.trueddd.core.StateHolder
+import com.github.trueddd.plugins.security.Jwt
 import com.github.trueddd.utils.Environment
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
+import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.auth.authentication
+import io.ktor.server.auth.principal
+import io.ktor.server.auth.jwt.jwt
+import io.ktor.server.auth.jwt.JWTPrincipal
 import kotlinx.datetime.Clock
 import kotlinx.datetime.toJavaInstant
 import org.koin.ktor.ext.inject
 import kotlin.time.Duration.Companion.days
-
-object Jwt {
-    const val AUDIENCE = "JWT_AUDIENCE"
-    const val REALM = "JWT_REALM"
-    const val SECRET = "JWT_SECRET"
-    const val DOMAIN = "JWT_DOMAIN"
-    val Verifier: JWTVerifier by lazy {
-        val config = Environment.resolveConfig()
-        JWT
-            .require(Algorithm.HMAC256(config.getProperty(SECRET)))
-            .withAudience(config.getProperty(AUDIENCE))
-            .withIssuer(config.getProperty(DOMAIN))
-            .build()
-    }
-}
 
 fun createJwtToken(claim: String): String {
     val config = Environment.resolveConfig()

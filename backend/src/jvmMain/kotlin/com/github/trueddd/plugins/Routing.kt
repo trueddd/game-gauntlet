@@ -1,21 +1,36 @@
 package com.github.trueddd.plugins
 
-import com.github.trueddd.core.*
+import com.github.trueddd.core.EventGate
+import com.github.trueddd.core.GamesProvider
+import com.github.trueddd.core.HttpClient
+import com.github.trueddd.core.ItemRoller
+import com.github.trueddd.core.Router
 import com.github.trueddd.data.AuthResponse
 import com.github.trueddd.data.Game
 import com.github.trueddd.data.repository.TwitchUsersRepository
 import com.github.trueddd.utils.Environment
-import io.ktor.http.*
-import io.ktor.http.content.*
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.http.content.*
-import io.ktor.server.plugins.cachingheaders.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.util.pipeline.*
+import io.ktor.http.CacheControl
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.CachingOptions
+import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.call
+import io.ktor.server.application.install
+import io.ktor.server.auth.authenticate
+import io.ktor.server.http.content.staticResources
+import io.ktor.server.plugins.cachingheaders.caching
+import io.ktor.server.plugins.cachingheaders.CachingHeaders
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondBytes
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.routing
+import io.ktor.util.pipeline.PipelineContext
+import kotlinx.coroutines.flow.firstOrNull
 import org.koin.ktor.ext.inject
 
+@Suppress("CyclomaticComplexMethod")
 fun Application.configureRouting() {
     val eventGate by inject<EventGate>()
     val httpClient by inject<HttpClient>()
@@ -50,10 +65,12 @@ fun Application.configureRouting() {
                 call.respond(HttpStatusCode.NotFound)
                 return@post
             }
-            val participant = eventGate.stateHolder.participants.firstOrNull { it.name == twitchUser.login } ?: run {
-                call.respond(HttpStatusCode.NotFound)
-                return@post
-            }
+            val participant = eventGate.stateHolder.participants
+                .firstOrNull { player -> player.name == twitchUser.login }
+                ?: run {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@post
+                }
             twitchUsersRepository.saveUser(twitchUser.id, twitchUser.login, userToken)
             val token = createJwtToken(twitchUser.login)
             call.respond(HttpStatusCode.OK, AuthResponse(participant, token))
@@ -88,24 +105,28 @@ fun Application.configureRouting() {
                 call.respond(itemRoller.pick())
             }
             get(Router.Wheels.ROLL_GAMES) {
-                val genre = call.parameters["genre"]?.toIntOrNull()?.let { Game.Genre.entries.getOrNull(it) }
+                val genre = call.parameters["genre"]?.toIntOrNull()?.let { raw -> Game.Genre.entries.getOrNull(raw) }
                 call.respond(gamesProvider.roll(genre))
             }
             get(Router.Wheels.ROLL_PLAYERS) {
-                val user = call.userLogin!!
-                call.respond(eventGate.stateHolder.participants.filter { it.name != user }.random())
+                val user = call.userLogin
+                call.respond(eventGate.stateHolder.participants.filter { player -> player.name != user }.random())
             }
             get(Router.REWARD) {
-                val user = call.userLogin!!
-                val hasReward = twitchUsersRepository.getUsers().firstOrNull { it.playerName == user }?.rewardId != null
+                val requester = call.userLogin
+                val hasReward = twitchUsersRepository.getUsersFlow()
+                    .firstOrNull { user -> user.playerName == requester }
+                    ?.rewardId != null
                 call.respond(if (hasReward) HttpStatusCode.OK else HttpStatusCode.NotFound)
             }
             post(Router.REWARD) {
-                val user = call.userLogin!!
-                val twitchUser = twitchUsersRepository.getUsers().firstOrNull { it.playerName == user } ?: run {
-                    call.respond(HttpStatusCode.NotFound)
-                    return@post
-                }
+                val requester = call.userLogin
+                val twitchUser = twitchUsersRepository.getUsersFlow()
+                    .firstOrNull { user -> user.playerName == requester }
+                    ?: run {
+                        call.respond(HttpStatusCode.NotFound)
+                        return@post
+                    }
                 val hasReward = twitchUser.rewardId != null
                 if (hasReward) {
                     call.respond(HttpStatusCode.OK)

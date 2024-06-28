@@ -46,7 +46,7 @@ class InputParserImpl(
         val action = try {
             generator.generate(user.name, arguments)
         } catch (error: ActionCreationException) {
-            error.printStackTrace()
+            Log.error(TAG, error.message ?: "Unknown error")
             return null
         }
         Log.info(TAG, "Input parsed | `$input` -> `$action`")

@@ -6,12 +6,14 @@ object Environment {
 
     private val appConfig by lazy { System.getenv().toProperties() }
 
+    private const val DEFAULT_PORT = 8081
+
     fun resolveConfig(): Properties {
         return appConfig
     }
 
     val Port by lazy {
-        System.getenv("PORT")?.toIntOrNull() ?: 8081
+        System.getenv("PORT")?.toIntOrNull() ?: DEFAULT_PORT
     }
 
     val IsDev: Boolean by lazy {

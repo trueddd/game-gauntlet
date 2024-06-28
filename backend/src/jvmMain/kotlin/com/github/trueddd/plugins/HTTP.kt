@@ -1,13 +1,15 @@
 package com.github.trueddd.plugins
 
 import com.github.trueddd.utils.Environment
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.autohead.*
-import io.ktor.server.plugins.conditionalheaders.*
-import io.ktor.server.plugins.cors.routing.*
-import io.ktor.server.plugins.defaultheaders.*
-import io.ktor.server.plugins.partialcontent.*
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.autohead.AutoHeadResponse
+import io.ktor.server.plugins.conditionalheaders.ConditionalHeaders
+import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.plugins.defaultheaders.DefaultHeaders
+import io.ktor.server.plugins.partialcontent.PartialContent
 
 fun Application.configureHTTP() {
     install(DefaultHeaders) {

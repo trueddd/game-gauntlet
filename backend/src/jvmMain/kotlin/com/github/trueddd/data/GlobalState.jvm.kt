@@ -1,7 +1,10 @@
 package com.github.trueddd.data
 
 import com.github.trueddd.utils.DefaultTimeZone
-import kotlinx.datetime.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -9,7 +12,7 @@ fun globalState(
     genreDistribution: GameGenreDistribution = GameGenreDistribution.generateRandom(GlobalState.STINT_COUNT),
     startDateTime: LocalDateTime = Clock.System.now().toLocalDateTime(DefaultTimeZone),
     activePeriod: Duration = 365.days,
-    radioCoverage: RadioCoverage = RadioCoverage.generateRandom(GlobalState.PLAYABLE_BOARD_RANGE, GlobalState.STINT_SIZE),
+    radioCoverage: RadioCoverage = RadioCoverage.generateRandom(),
     raisedAmountOfPoints: Long = 0L,
 ): GlobalState {
     val startDateTimeInstant = startDateTime.toInstant(DefaultTimeZone)

@@ -1,7 +1,20 @@
 package com.github.trueddd.core
 
-import com.github.trueddd.actions.*
-import com.github.trueddd.data.*
+import com.github.trueddd.actions.Action
+import com.github.trueddd.actions.BoardMove
+import com.github.trueddd.actions.GameDrop
+import com.github.trueddd.actions.GameSet
+import com.github.trueddd.actions.GameStatusChange
+import com.github.trueddd.actions.GameRoll
+import com.github.trueddd.actions.GlobalEvent
+import com.github.trueddd.actions.ItemReceive
+import com.github.trueddd.actions.ItemUse
+import com.github.trueddd.data.Game
+import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.PlayerName
+import com.github.trueddd.data.PlayerTurnsHistory
+import com.github.trueddd.data.PlayersHistory
+import com.github.trueddd.data.Turn
 import com.github.trueddd.items.DontWannaPlayThis
 
 object PlayersHistoryCalculator {
@@ -19,6 +32,7 @@ object PlayersHistoryCalculator {
         }
     }
 
+    @Suppress("CyclomaticComplexMethod")
     fun calculate(
         currentHistory: PlayersHistory,
         action: Action,

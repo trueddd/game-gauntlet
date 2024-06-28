@@ -17,7 +17,10 @@ data class RadioCoverage(
     }
 
     companion object {
-        fun generateRandom(playableRange: IntRange, stintLength: Int): RadioCoverage {
+        fun generateRandom(
+            playableRange: IntRange = GlobalState.PLAYABLE_BOARD_RANGE,
+            stintLength: Int = GlobalState.STINT_SIZE,
+        ): RadioCoverage {
             val stationsOrder = RadioStation.entries.shuffled()
             val array = ArrayList<RadioStation>(playableRange.count() + 1)
             array.add(0, stationsOrder.first())

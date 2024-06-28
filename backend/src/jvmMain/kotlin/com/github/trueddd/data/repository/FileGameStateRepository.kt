@@ -1,6 +1,6 @@
 package com.github.trueddd.data.repository
 
-import kotlinx.coroutines.Dispatchers
+import com.github.trueddd.di.CoroutineDispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
@@ -10,6 +10,7 @@ import java.io.File
 @Single(binds = [GameStateRepository::class])
 class FileGameStateRepository(
     private val file: File,
+    private val dispatchers: CoroutineDispatchers,
 ) : BaseGameStateRepository() {
 
     companion object {
@@ -21,13 +22,13 @@ class FileGameStateRepository(
     }
 
     override suspend fun writeData(data: List<String>) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatchers.io) {
             file.writeText(data.joinToString("\n"))
         }
     }
 
     override suspend fun readData(): List<String> {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.io) {
             file.readLines()
         }
     }

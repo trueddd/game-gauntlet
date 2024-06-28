@@ -120,6 +120,6 @@ detekt {
 tasks.withType<Detekt>().configureEach {
     reports {
         html.required.set(true)
-        html.outputLocation.set(file("web/build/reports/detekt.html"))
+        html.outputLocation.set(file("build/reports/detekt.html"))
     }
 }

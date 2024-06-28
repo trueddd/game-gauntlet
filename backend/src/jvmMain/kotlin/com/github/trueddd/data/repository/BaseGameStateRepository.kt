@@ -60,7 +60,7 @@ abstract class BaseGameStateRepository : GameStateRepository {
         val radioCoverage = records.firstOrNull { it.startsWith("radio:") }
             ?.removePrefix("radio:")
             ?.let { serialization.decodeFromString(RadioCoverage.serializer(), it) }
-            ?: RadioCoverage.generateRandom(GlobalState.PLAYABLE_BOARD_RANGE, GlobalState.STINT_SIZE)
+            ?: RadioCoverage.generateRandom()
         val pointsCollected = records.firstOrNull { it.startsWith("points:") }
             ?.removePrefix("points:")
             ?.toLongOrNull() ?: 0L

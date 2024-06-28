@@ -1,19 +1,22 @@
 package com.github.trueddd.data.repository
 
 import com.github.trueddd.data.model.SavedTwitchUserData
+import com.github.trueddd.di.CoroutineDispatchers
 import com.github.trueddd.utils.serialization
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import org.bson.Document
 import org.koin.core.annotation.Single
 
 @Single
 class TwitchUsersRepository(
     private val mongoDatabase: MongoDatabase,
+    private val dispatchers: CoroutineDispatchers,
 ) {
 
     private val userCollection by lazy {
@@ -38,9 +41,9 @@ class TwitchUsersRepository(
         )
     }
 
-    suspend fun getUsers(): List<SavedTwitchUserData> {
+    fun getUsersFlow(): Flow<SavedTwitchUserData> {
         return userCollection.find(Filters.empty())
             .map { serialization.decodeFromString(SavedTwitchUserData.serializer(), it.toJson()) }
-            .toList()
+            .flowOn(dispatchers.io)
     }
 }

@@ -1,0 +1,17 @@
+complexity:
+  active: true
+  LongMethod:
+    active: false
+style:
+  active: true
+  MaxLineLength:
+    active: true
+    excludes: ['**/build/generated/**']
+  NewLineAtEndOfFile:
+    active: true
+    excludes: ['**/build/generated/**']
+  ReturnCount:
+    active: false
+  WildcardImport:
+    active: true
+    excludes: ['**/build/generated/**']
