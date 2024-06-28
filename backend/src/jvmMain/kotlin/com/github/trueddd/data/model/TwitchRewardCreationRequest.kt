@@ -5,9 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class TwitchRewardCreationRequest(
+    @SerialName("title")
     val title: String,
+    @SerialName("cost")
     val cost: Int,
-//    val prompt: String?,
     @SerialName("background_color")
     val backgroundColor: String = "#9147FF",
 )
