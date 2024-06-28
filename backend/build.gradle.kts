@@ -27,6 +27,7 @@ kotlin {
         val jvmMain by getting {
             kotlin.srcDir("build/generated/ksp/jvm/jvmMain/kotlin")
             dependencies {
+                implementation(project(":annotations"))
                 implementation(project(":common"))
                 implementation(libs.logging)
                 implementation(libs.ktor.server.core)

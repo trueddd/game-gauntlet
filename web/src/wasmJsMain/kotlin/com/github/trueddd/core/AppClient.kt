@@ -7,9 +7,7 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.util.*
 import io.ktor.websocket.*
 import kotlinx.browser.window
 import kotlinx.coroutines.*
@@ -80,32 +78,6 @@ class AppClient(
 
     private suspend fun loadActions(): List<Action> =
         getJsonData(router.http(Router.ACTIONS), sendBearerToken = true) ?: emptyList()
-
-    suspend fun loadPlayerBackground(participant: Participant): ByteArray? {
-        return withContext(coroutineContext) {
-            try {
-                httpClient.get(router.http(Router.REMOTE)) {
-                    parameter("player", participant.name)
-                }.bodyAsChannel().toByteArray()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-    }
-
-    suspend fun loadImage(url: String): ByteArray? {
-        return withContext(coroutineContext) {
-            try {
-                httpClient.get(url) {
-                    accept(ContentType.Image.Any)
-                }.bodyAsChannel().toByteArray()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-    }
 
     suspend fun verifyUser(token: String): Result<AuthResponse> {
         return withContext(coroutineContext) {

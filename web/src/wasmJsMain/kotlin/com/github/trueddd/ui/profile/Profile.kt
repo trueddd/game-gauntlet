@@ -32,14 +32,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import coil3.PlatformContext
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.github.trueddd.core.*
 import com.github.trueddd.data.*
 import com.github.trueddd.di.get
 import com.github.trueddd.items.Usable
 import com.github.trueddd.items.WheelItem
 import com.github.trueddd.theme.Colors
-import com.github.trueddd.ui.widget.AsyncImage
-import com.github.trueddd.ui.widget.AsyncProfileBackgroundImage
 import com.github.trueddd.util.*
 import com.github.trueddd.utils.DefaultTimeZone
 import com.github.trueddd.utils.Log
@@ -184,7 +186,11 @@ private fun WheelItemView(
                         }
                     )
                 },
-                text = { Text(item.description.applyModifiersDecoration()) },
+                text = {
+                    Text(
+                        text = item.description.applyModifiersDecoration(),
+                    )
+                },
                 action = if (item is Usable && onUse != null) { {
                     TextButton(
                         onClick = {
@@ -219,7 +225,11 @@ private fun WheelItemView(
                 .pointerHoverIcon(PointerIcon.Hand)
         ) {
             AsyncImage(
-                model = router.wheelItemIconUrl(item.iconId),
+                model = ImageRequest.Builder(PlatformContext.INSTANCE)
+                    .data(router.wheelItemIconUrl(item.iconId))
+                    .crossfade(true)
+                    .build(),
+                contentDescription = item.name,
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxSize()
@@ -239,8 +249,10 @@ private fun Profile(
     turnsHistory: PlayerTurnsHistory,
     modifier: Modifier = Modifier,
 ) {
-    val selectedPlayerState = stateSnapshot.playersState[selectedPlayer.name]!!
     val commandSender = remember { get<CommandSender>() }
+    val serverRouter = remember { get<ServerRouter>() }
+
+    val selectedPlayerState = stateSnapshot.playersState[selectedPlayer.name]!!
     var visibleDialog by remember { mutableStateOf<ProfileDialogs>(ProfileDialogs.None) }
     val lazyListState = rememberLazyListState()
     val leftSidePanelTopPadding by remember {
@@ -258,6 +270,7 @@ private fun Profile(
                     .let { RelativeDate.from(it) }
             }
     }
+
     Box(
         modifier = modifier
             .padding(horizontal = 24.dp)
@@ -277,8 +290,12 @@ private fun Profile(
                 .fillMaxSize()
         ) {
             item(contentType = ProfileContentType.Background) {
-                AsyncProfileBackgroundImage(
-                    participant = selectedPlayer,
+                AsyncImage(
+                    model = ImageRequest.Builder(PlatformContext.INSTANCE)
+                        .data("${serverRouter.http(Router.REMOTE)}?player=${selectedPlayer.name}")
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = selectedPlayer.displayName,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
