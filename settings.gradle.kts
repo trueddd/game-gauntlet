@@ -27,15 +27,15 @@ dependencyResolutionManagement {
             val datetime = version("datetime", "0.6.0")
             val coroutines = version("coroutines", "1.8.0")
             val ksp = version("ksp", "2.0.0-1.0.21")
-            val ktor = version("ktor", "2.3.11")
+            val ktor = version("ktor", "2.3.12")
             val jupiter = version("jupiter", "5.10.0")
             val compose = version("compose", "1.6.11")
             val koin = version("koin", "3.6.0-wasm-alpha2")
             val koinKsp = version("koin-ksp", "1.3.1")
             val kotlinPoet = version("kotlinpoet", "1.16.0")
-            val serialization = version("serialization", "1.7.0-RC")
+            val serialization = version("serialization", "1.7.1")
 
-            library("logging", "ch.qos.logback", "logback-classic").version("1.4.1")
+            library("logging", "ch.qos.logback", "logback-classic").version("1.5.6")
 
             plugin("ktor", "io.ktor.plugin").versionRef(ktor)
             library("ktor-client-core", "io.ktor", "ktor-client-core").versionRef(ktor)
