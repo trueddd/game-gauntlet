@@ -1,12 +1,14 @@
 package com.github.trueddd.plugins
 
-import com.github.trueddd.core.EventHistoryHolderImpl
 import com.github.trueddd.core.EventHistoryHolder
+import com.github.trueddd.core.EventHistoryHolderImpl
 import com.github.trueddd.data.repository.FileGameStateRepository
 import com.github.trueddd.data.repository.GameStateRepository
 import com.github.trueddd.data.repository.MongoGameStateRepository
 import com.github.trueddd.data.repository.TwitchUsersRepository
+import com.github.trueddd.di.ActionIssueDateComponentHolder
 import com.github.trueddd.di.CoroutineDispatchers
+import com.github.trueddd.di.TimedIssueDateManager
 import com.github.trueddd.di.getActionGeneratorsSet
 import com.github.trueddd.di.getActionHandlersMap
 import com.github.trueddd.di.getItemFactoriesSet
@@ -77,6 +79,7 @@ private val commonModule = module {
 }
 
 fun Application.configureDI() {
+    ActionIssueDateComponentHolder.set(TimedIssueDateManager())
     install(Koin) {
         modules(defaultModule, commonModule)
     }

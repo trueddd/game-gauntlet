@@ -3,6 +3,8 @@ package com.github.trueddd
 import com.github.trueddd.actions.Action
 import com.github.trueddd.core.EventGate
 import com.github.trueddd.data.PlayerName
+import com.github.trueddd.di.ActionIssueDateComponentHolder
+import com.github.trueddd.di.TimedIssueDateManager
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
@@ -53,8 +55,13 @@ abstract class EventGateTest {
             .collect()
     }
 
+    protected fun setupTimedIssueDateManager() {
+        ActionIssueDateComponentHolder.set(TimedIssueDateManager())
+    }
+
     @BeforeEach
     open fun startEventGate() {
+        setupTimedIssueDateManager()
         eventGate.startNoLoad()
     }
 

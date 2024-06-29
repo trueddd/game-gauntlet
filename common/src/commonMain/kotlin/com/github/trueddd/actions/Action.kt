@@ -2,8 +2,8 @@ package com.github.trueddd.actions
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.PlayerName
+import com.github.trueddd.di.ActionIssueDateComponentHolder
 import com.github.trueddd.utils.StateModificationException
-import kotlinx.datetime.Clock
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -16,9 +16,8 @@ import kotlinx.serialization.Serializable
 sealed class Action(
     @SerialName("id")
     open val id: Int,
-    // TODO: refactor to use atomic int for testing purposes (StateRecoverabilityTest.kt)
     @SerialName("ia")
-    val issuedAt: Long = Clock.System.now().toEpochMilliseconds(),
+    val issuedAt: Long = ActionIssueDateComponentHolder.get().getIssueDate(),
 ) {
 
     @Suppress("ConstPropertyName")
