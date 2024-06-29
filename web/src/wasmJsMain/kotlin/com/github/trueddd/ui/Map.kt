@@ -37,11 +37,12 @@ data class MapCellState(
 @Composable
 fun Map(
     gameConfig: GameConfig,
-    stateSnapshot: StateSnapshot?
+    stateSnapshot: StateSnapshot?,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier
+        modifier = modifier
             .padding(32.dp)
             .fillMaxWidth()
     ) {
@@ -103,7 +104,10 @@ fun Map(
 }
 
 @Composable
-private fun GlobalEventAnnouncement(scheduledEvent: ScheduledEvent, modifier: Modifier) {
+private fun GlobalEventAnnouncement(
+    scheduledEvent: ScheduledEvent,
+    modifier: Modifier = Modifier,
+) {
     var timer by remember { mutableStateOf("") }
     LaunchedEffect(scheduledEvent) {
         while (isActive) {
@@ -140,7 +144,11 @@ private fun GlobalEventAnnouncement(scheduledEvent: ScheduledEvent, modifier: Mo
 }
 
 @Composable
-private fun GlobalEventCounter(pointsAmount: Long, pointsCap: Long, modifier: Modifier) {
+private fun GlobalEventCounter(
+    pointsAmount: Long,
+    pointsCap: Long,
+    modifier: Modifier = Modifier,
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
         modifier = modifier

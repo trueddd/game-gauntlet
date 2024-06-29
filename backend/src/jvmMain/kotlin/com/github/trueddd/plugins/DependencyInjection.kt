@@ -1,11 +1,14 @@
 package com.github.trueddd.plugins
 
-import com.github.trueddd.core.EventHistoryHolderImpl
 import com.github.trueddd.core.EventHistoryHolder
+import com.github.trueddd.core.EventHistoryHolderImpl
 import com.github.trueddd.data.repository.FileGameStateRepository
 import com.github.trueddd.data.repository.GameStateRepository
 import com.github.trueddd.data.repository.MongoGameStateRepository
 import com.github.trueddd.data.repository.TwitchUsersRepository
+import com.github.trueddd.di.ActionIssueDateComponentHolder
+import com.github.trueddd.di.CoroutineDispatchers
+import com.github.trueddd.di.TimedIssueDateManager
 import com.github.trueddd.di.getActionGeneratorsSet
 import com.github.trueddd.di.getActionHandlersMap
 import com.github.trueddd.di.getItemFactoriesSet
@@ -16,7 +19,9 @@ import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
 import com.trueddd.github.annotations.ItemFactory
-import io.ktor.server.application.*
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import kotlinx.coroutines.Dispatchers
 import org.koin.core.logger.Level
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -25,6 +30,12 @@ import org.koin.ktor.plugin.Koin
 import java.io.File
 
 private val commonModule = module {
+
+    @Suppress("InjectDispatcher")
+    single { CoroutineDispatchers(
+        io = Dispatchers.IO,
+        default = Dispatchers.Default,
+    ) }
 
     single(named(ActionGenerator.TAG)) {
         getActionGeneratorsSet(gamesProvider = get(), itemRoller = get())
@@ -64,10 +75,11 @@ private val commonModule = module {
         )
     }
 
-    single { TwitchUsersRepository(mongoDatabase = get()) }
+    single { TwitchUsersRepository(mongoDatabase = get(), dispatchers = get()) }
 }
 
 fun Application.configureDI() {
+    ActionIssueDateComponentHolder.set(TimedIssueDateManager())
     install(Koin) {
         modules(defaultModule, commonModule)
     }

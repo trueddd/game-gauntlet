@@ -121,7 +121,7 @@ fun WheelItemUseDialog(
 @Composable
 private fun BoolParameter(
     parameter: ParameterType.Bool,
-    onParameterUpdated: (Boolean) -> Unit = {}
+    onParameterUpdate: (Boolean) -> Unit = {}
 ) {
     var checked by remember { mutableStateOf(false) }
     Row(
@@ -136,7 +136,7 @@ private fun BoolParameter(
             checked = checked,
             onCheckedChange = {
                 checked = it
-                onParameterUpdated(it)
+                onParameterUpdate(it)
             },
         )
     }
@@ -145,15 +145,15 @@ private fun BoolParameter(
 @Composable
 private fun IntParameter(
     parameter: ParameterType.Int,
-    onParameterUpdated: (Int) -> Unit
+    onParameterUpdate: (Int) -> Unit
 ) {
-    var value by remember { mutableStateOf(0) }
+    var value by remember { mutableIntStateOf(0) }
     OutlinedTextField(
         value = value.toString(),
         onValueChange = { newValue ->
             newValue.toIntOrNull()?.let {
                 value = it
-                onParameterUpdated(it)
+                onParameterUpdate(it)
             }
         },
         label = { Text(text = parameter.name) },
@@ -167,7 +167,7 @@ private fun PlayerParameter(
     parameter: ParameterType.Player,
     gameConfig: GameConfig,
     stateSnapshot: StateSnapshot,
-    onParameterUpdated: (Participant) -> Unit
+    onParameterUpdate: (Participant) -> Unit
 ) {
     var value by remember { mutableStateOf<Participant?>(null) }
     var expanded by remember { mutableStateOf(false) }
@@ -208,7 +208,7 @@ private fun PlayerParameter(
                         value = gameConfig.players.firstNotNullOfOrNull { key->
                             if (key.displayName == it) key else null
                         }
-                        value?.let(onParameterUpdated)
+                        value?.let(onParameterUpdate)
                         expanded = false
                     },
                 )
@@ -224,7 +224,7 @@ private fun ForeignItemParameter(
     stateSnapshot: StateSnapshot,
     gameConfig: GameConfig,
     player: Participant,
-    onParameterUpdated: (WheelItem) -> Unit
+    onParameterUpdate: (WheelItem) -> Unit
 ) {
     var value by remember { mutableStateOf<WheelItem?>(null) }
     var itemExpanded by remember { mutableStateOf(false) }
@@ -293,7 +293,7 @@ private fun ForeignItemParameter(
                         text = { Text(item.name) },
                         onClick = {
                             value = item
-                            onParameterUpdated(item)
+                            onParameterUpdate(item)
                             itemExpanded = false
                         },
                     )
@@ -309,7 +309,7 @@ private fun MyItemParameter(
     parameter: ParameterType.MyItem,
     stateSnapshot: StateSnapshot,
     player: Participant,
-    onParameterUpdated: (WheelItem) -> Unit
+    onParameterUpdate: (WheelItem) -> Unit
 ) {
     var value by remember { mutableStateOf<WheelItem?>(null) }
     var itemExpanded by remember { mutableStateOf(false) }
@@ -339,7 +339,7 @@ private fun MyItemParameter(
                     text = { Text(item.name) },
                     onClick = {
                         value = item
-                        onParameterUpdated(item)
+                        onParameterUpdate(item)
                         itemExpanded = false
                     },
                 )
@@ -353,7 +353,7 @@ private fun MyItemParameter(
 private fun ItemParameter(
     parameter: ParameterType.Item,
     items: List<WheelItem>,
-    onParameterUpdated: (WheelItem) -> Unit
+    onParameterUpdate: (WheelItem) -> Unit
 ) {
     var value by remember { mutableStateOf<WheelItem?>(null) }
     var itemExpanded by remember { mutableStateOf(false) }
@@ -383,7 +383,7 @@ private fun ItemParameter(
                     text = { Text(item.name) },
                     onClick = {
                         value = item
-                        onParameterUpdated(item)
+                        onParameterUpdate(item)
                         itemExpanded = false
                     },
                 )
@@ -396,7 +396,7 @@ private fun ItemParameter(
 @Composable
 private fun GenreParameter(
     parameter: ParameterType.Genre,
-    onParameterUpdated: (Game.Genre) -> Unit
+    onParameterUpdate: (Game.Genre) -> Unit
 ) {
     var value by remember { mutableStateOf<Game.Genre?>(null) }
     var expanded by remember { mutableStateOf(false) }
@@ -424,7 +424,7 @@ private fun GenreParameter(
                     text = { Text(it.name) },
                     onClick = {
                         value = it
-                        onParameterUpdated(it)
+                        onParameterUpdate(it)
                         expanded = false
                     },
                 )

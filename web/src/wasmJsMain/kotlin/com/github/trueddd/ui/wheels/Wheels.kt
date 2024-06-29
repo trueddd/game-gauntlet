@@ -308,7 +308,7 @@ fun Wheels(
                 }
                 else -> Wheel(
                     wheelState = wheelState,
-                    onRollFinished = {
+                    onRollFinish = {
                         wheelState = wheelState.copy(
                             running = false,
                             rolledItem = wheelState.items.getOrNull(
@@ -326,7 +326,7 @@ fun Wheels(
 @Composable
 private fun CoinBlock(
     wheelState: WheelState,
-    onFlipFinished: () -> Unit,
+    onFlipFinish: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -344,7 +344,7 @@ private fun CoinBlock(
                 Coin(
                     coinValue = wheelState.rolledItem,
                     shouldAnimate = wheelState.running,
-                    onFlipFinished = onFlipFinished,
+                    onFlipFinish = onFlipFinish,
                     modifier = Modifier
                         .align(Alignment.Center)
                         .size(96.dp)
@@ -357,7 +357,7 @@ private fun CoinBlock(
 @Composable
 private fun DiceBlock(
     wheelState: WheelState,
-    onRollFinished: () -> Unit,
+    onRollFinish: () -> Unit,
 ) {
     var diceAnimation by remember { mutableStateOf(DiceAnimation(
         randomChangesAmount = 0,
@@ -392,7 +392,7 @@ private fun DiceBlock(
                 diceAnimation = diceAnimation,
                 dotSize = 12.dp,
                 borderSize = 8.dp,
-                onRollFinished = onRollFinished,
+                onRollFinish = onRollFinish,
                 modifier = Modifier
                     .align(Alignment.Center)
                     .size(96.dp)
@@ -424,7 +424,7 @@ private suspend fun <T : Rollable> handleRollItems(
 @Composable
 private fun Wheel(
     wheelState: WheelState,
-    onRollFinished: () -> Unit,
+    onRollFinish: () -> Unit,
 ) {
     var rolledBefore by remember { mutableStateOf(false) }
     LaunchedEffect(wheelState.running) {
@@ -450,7 +450,7 @@ private fun Wheel(
                 val wholeItemHeight = itemHeight + itemPadding * 2
                 val wholeItemHeightPx = with(LocalDensity.current) { wholeItemHeight.toPx() }
                 val scrollState = rememberLazyListState()
-                val rotate by positionSpinAnimation(wheelState, onRollFinished)
+                val rotate by positionSpinAnimation(wheelState, onRollFinish)
                 LaunchedEffect(rotate) {
                     scrollState.animateScrollToItem(rotate)
                     if (!rolledBefore && !wheelState.running) {

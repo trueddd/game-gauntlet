@@ -6,13 +6,17 @@ import com.github.trueddd.core.EventGate
 import com.github.trueddd.core.HttpClient
 import com.github.trueddd.data.ScheduledEvent
 import com.github.trueddd.data.model.RewardRedemption
+import com.github.trueddd.data.model.SavedTwitchUserData
 import com.github.trueddd.data.repository.TwitchUsersRepository
+import com.github.trueddd.di.CoroutineDispatchers
 import com.github.trueddd.utils.Environment
 import com.github.trueddd.utils.Log
-import io.ktor.server.application.*
-import kotlinx.coroutines.Dispatchers
+import io.ktor.server.application.Application
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -28,7 +32,9 @@ fun Application.twitchIntegration() {
     val twitchUsersRepository by inject<TwitchUsersRepository>()
     val communityFundRaisingTracker by inject<CommunityFundRaisingTracker>()
     val eventGate by inject<EventGate>()
-    launch(Dispatchers.Default) {
+    val dispatchers by inject<CoroutineDispatchers>()
+
+    launch(dispatchers.default) {
         eventGate.stateHolder.currentStageFlow
             .distinctUntilChanged()
             .filter { stage ->
@@ -58,40 +64,42 @@ fun Application.twitchIntegration() {
                 }
             }
     }
-    launch(Dispatchers.Default) {
+    launch(dispatchers.default) {
         delay(10.seconds)
         while (isActive && this@twitchIntegration.isActive) {
             Log.info(TAG, "Collecting Twitch rewards redemptions...")
-            val users = twitchUsersRepository.getUsers()
-            var paginationCursor: String?
-            val redemptions = mutableListOf<RewardRedemption>()
-            for (user in users) {
-                if (user.rewardId == null) {
-                    continue
-                }
-                val token = httpClient.validateTwitchToken(user.twitchToken).getOrNull()
-                    ?.takeIf { it.expiresIn > 1.minutes.inWholeSeconds }
-                    ?.let { user.twitchToken }
-                    ?: continue
-                paginationCursor = null
-                do {
-                    val result = httpClient.fetchRedemptions(
-                        broadcasterId = user.id,
-                        rewardId = user.rewardId,
-                        token = token,
-                        after = paginationCursor,
-                        pageSize = REDEMPTIONS_PAGE_LIMIT
-                    ).getOrNull() ?: break
-                    paginationCursor = result.pagination?.cursor
-                    redemptions.addAll(result.data)
-                } while (result.data.size > REDEMPTIONS_PAGE_LIMIT)
-            }
-            val collectedPoints = redemptions
-                .sumOf { it.reward.cost.toLong() }
+            val users = twitchUsersRepository.getUsersFlow().toList()
+            val redemptions = users.flatMap { httpClient.getRedemptionsByUser(it) }
+            val collectedPoints = redemptions.sumOf { it.reward.cost.toLong() }
             Log.info(TAG, "Collected $collectedPoints points")
-            redemptions.clear() // Clear the unused memory, list might very large
             communityFundRaisingTracker.updateOverallAmountRaised(collectedPoints)
             delay(if (Environment.IsDev) 1.minutes else 30.minutes)
         }
     }
+}
+
+private suspend fun HttpClient.getRedemptionsByUser(
+    user: SavedTwitchUserData,
+): List<RewardRedemption> {
+    if (user.rewardId == null) {
+        return emptyList()
+    }
+    val token = validateTwitchToken(user.twitchToken).getOrNull()
+        ?.takeIf { it.expiresIn > 1.minutes.inWholeSeconds }
+        ?.let { user.twitchToken }
+        ?: return emptyList()
+    var paginationCursor: String? = null
+    val redemptions = mutableListOf<RewardRedemption>()
+    do {
+        val result = fetchRedemptions(
+            broadcasterId = user.id,
+            rewardId = user.rewardId,
+            token = token,
+            after = paginationCursor,
+            pageSize = REDEMPTIONS_PAGE_LIMIT
+        ).getOrNull() ?: break
+        paginationCursor = result.pagination?.cursor
+        redemptions.addAll(result.data)
+    } while (result.data.size > REDEMPTIONS_PAGE_LIMIT)
+    return redemptions
 }

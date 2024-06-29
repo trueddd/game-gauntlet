@@ -7,6 +7,7 @@ import com.github.trueddd.items.UnrealBoost
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class UnrealBoostItemTest : EventGateTest() {
 
@@ -45,7 +46,8 @@ class UnrealBoostItemTest : EventGateTest() {
         val item = UnrealBoost.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, pendingEventsOf(user).size)
-        handleAction(ItemUse(user, item.uid, listOf("3")))
-        assertEquals(expected = 1, pendingEventsOf(user).size)
+        assertFailsWith<IllegalArgumentException> {
+            handleAction(ItemUse(user, item.uid, listOf("3")))
+        }
     }
 }

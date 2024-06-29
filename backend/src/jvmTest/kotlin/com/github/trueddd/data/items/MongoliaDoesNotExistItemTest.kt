@@ -7,6 +7,7 @@ import com.github.trueddd.items.MongoliaDoesNotExist
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class MongoliaDoesNotExistItemTest : EventGateTest() {
 
@@ -40,9 +41,6 @@ class MongoliaDoesNotExistItemTest : EventGateTest() {
         val item = MongoliaDoesNotExist.create()
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 1, pendingEventsOf(user).size)
-        handleAction(ItemUse(user, item.uid))
-        assertEquals(expected = 0, stateOf(user).modifiersSum)
-        assertEquals(expected = 0, effectsOf(user).size)
-        assertEquals(expected = 1, pendingEventsOf(user).size)
+        assertFailsWith<IllegalArgumentException> { handleAction(ItemUse(user, item.uid)) }
     }
 }

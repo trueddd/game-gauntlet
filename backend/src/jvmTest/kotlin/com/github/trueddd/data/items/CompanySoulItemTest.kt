@@ -4,10 +4,10 @@ import com.github.trueddd.EventGateTest
 import com.github.trueddd.actions.ItemReceive
 import com.github.trueddd.actions.ItemUse
 import com.github.trueddd.items.CompanySoul
-import org.junit.jupiter.api.Test
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
+import kotlin.test.assertFails
 import kotlin.test.assertTrue
 
 class CompanySoulItemTest : EventGateTest() {
@@ -18,10 +18,7 @@ class CompanySoulItemTest : EventGateTest() {
         val item = CompanySoul.create()
         handleAction(ItemReceive(joker, item))
         assertEquals(expected = 1, pendingEventsOf(joker).size)
-        handleAction(ItemUse(joker, item.uid, listOf(listener.drop(1), "1")))
-        assertEquals(expected = 0, stateOf(joker).modifiersSum)
-        assertEquals(expected = 0, stateOf(listener).modifiersSum)
-        assertFalse(pendingEventsOf(joker).isEmpty())
+        assertFails { handleAction(ItemUse(joker, item.uid, listOf(listener.drop(1), "1"))) }
     }
 
     @Test

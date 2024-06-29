@@ -3,29 +3,28 @@ package com.github.trueddd.core
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.PlayersHistory
+import com.github.trueddd.di.CoroutineDispatchers
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.StateModificationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.coroutines.CoroutineContext
 
 @Single
 class EventManagerImpl(
     private val actionHandlerRegistry: ActionHandlerRegistry,
     private val stateHolder: StateHolder,
-) : EventManager, CoroutineScope {
+    dispatchers: CoroutineDispatchers,
+) : EventManager {
 
     companion object {
         const val TAG = "EventManager"
     }
 
-    override val coroutineContext by lazy {
-        SupervisorJob() + Dispatchers.Default
-    }
+    private val coroutineContext: CoroutineContext = SupervisorJob() + dispatchers.default
 
     private val isEnabled = AtomicBoolean(false)
 
@@ -89,7 +88,7 @@ class EventManagerImpl(
                 )
             }
             EventManager.HandledAction(action.id, action.issuedAt)
-        } catch (error: Exception) {
+        } catch (error: StateModificationException) {
             EventManager.HandledAction(action.id, action.issuedAt, error)
         } finally {
             eventHandlingMonitor.unlock()

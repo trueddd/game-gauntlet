@@ -19,9 +19,9 @@ import com.github.trueddd.ui.res.icons.Warning
 @Composable
 fun WarningTextBlock(
     text: String,
+    modifier: Modifier = Modifier,
     title: String = "Внимание",
-    sideLineWidth: Dp = 4.dp,
-    modifier: Modifier = Modifier
+    sideLineWidth: Dp = 4.dp
 ) {
     Column(
         modifier = modifier

@@ -25,7 +25,7 @@ import kotlinx.datetime.toLocalDateTime
 fun ActionsLog(
     actions: List<Action>,
     gameConfig: GameConfig,
-    modifier: Modifier
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         horizontalAlignment = Alignment.Start,

@@ -1,3 +1,4 @@
+import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
@@ -9,6 +10,7 @@ plugins {
     alias(libs.plugins.serialization)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.detekt)
 }
 
 kotlin {
@@ -104,4 +106,20 @@ tasks.create("mutateResources") {
 
 tasks.named("compileKotlinWasmJs") {
     dependsOn("mutateResources")
+}
+
+dependencies {
+    detektPlugins("io.nlopez.compose.rules:detekt:0.4.4")
+}
+
+detekt {
+    config.setFrom(file("detekt-config.yml"))
+    buildUponDefaultConfig = false
+}
+
+tasks.withType<Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        html.outputLocation.set(file("build/reports/detekt.html"))
+    }
 }

@@ -7,6 +7,7 @@ import com.github.trueddd.items.GreatEvent
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class GreatEventItemTest : EventGateTest() {
 
@@ -35,8 +36,6 @@ class GreatEventItemTest : EventGateTest() {
         val user = getRandomPlayerName()
         val item = GreatEvent.create()
         handleAction(ItemReceive(user, item))
-        handleAction(ItemUse(user, item.uid, listOf("-1")))
-        assertEquals(expected = 0, stateOf(user).modifiersSum)
-        assertEquals(expected = 1, pendingEventsOf(user).size)
+        assertFailsWith<IllegalArgumentException> { handleAction(ItemUse(user, item.uid, listOf("-1"))) }
     }
 }

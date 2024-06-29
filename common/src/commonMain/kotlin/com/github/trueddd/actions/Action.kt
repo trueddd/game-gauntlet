@@ -2,7 +2,8 @@ package com.github.trueddd.actions
 
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.PlayerName
-import kotlinx.datetime.Clock
+import com.github.trueddd.di.ActionIssueDateComponentHolder
+import com.github.trueddd.utils.StateModificationException
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -16,7 +17,7 @@ sealed class Action(
     @SerialName("id")
     open val id: Int,
     @SerialName("ia")
-    val issuedAt: Long = Clock.System.now().toEpochMilliseconds(),
+    val issuedAt: Long = ActionIssueDateComponentHolder.get().getIssueDate(),
 ) {
 
     @Suppress("ConstPropertyName")
@@ -43,6 +44,8 @@ sealed class Action(
      * Action handler applies changes to the global state of the game according to the passed action.
      */
     interface Handler<in A : Action> {
+
+        @Throws(StateModificationException::class)
         suspend fun handle(action: A, currentState: GlobalState): GlobalState
     }
 }

@@ -7,6 +7,7 @@ import com.github.trueddd.items.UnbelievableDemocracy
 import org.junit.jupiter.api.Test
 import kotlinx.coroutines.test.runTest
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class UnbelievableDemocracyItemTest : EventGateTest() {
@@ -40,10 +41,8 @@ class UnbelievableDemocracyItemTest : EventGateTest() {
         val user = getRandomPlayerName()
         val item = UnbelievableDemocracy.create()
         handleAction(ItemReceive(user, item))
-        handleAction(ItemUse(user, item.uid))
-        assertTrue(pendingEventsOf(user).isNotEmpty())
-        getPlayerNames().forEach { player ->
-            assertEquals(expected = 0, stateOf(player).modifiersSum)
+        assertFailsWith<IllegalArgumentException> {
+            handleAction(ItemUse(user, item.uid))
         }
     }
 
@@ -52,10 +51,8 @@ class UnbelievableDemocracyItemTest : EventGateTest() {
         val user = getRandomPlayerName()
         val item = UnbelievableDemocracy.create()
         handleAction(ItemReceive(user, item))
-        handleAction(ItemUse(user, item.uid, listOf("q")))
-        assertTrue(pendingEventsOf(user).isNotEmpty())
-        getPlayerNames().forEach { player ->
-            assertEquals(expected = 0, stateOf(player).modifiersSum)
+        assertFailsWith<IllegalArgumentException> {
+            handleAction(ItemUse(user, item.uid, listOf("q")))
         }
     }
 }

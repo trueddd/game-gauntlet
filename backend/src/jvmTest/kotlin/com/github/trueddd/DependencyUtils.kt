@@ -2,19 +2,22 @@ package com.github.trueddd
 
 import com.github.trueddd.core.*
 import com.github.trueddd.data.repository.FileGameStateRepository
+import com.github.trueddd.di.CoroutineDispatchers
 import com.github.trueddd.di.getActionGeneratorsSet
 import com.github.trueddd.di.getActionHandlersMap
 import com.github.trueddd.di.getItemFactoriesSet
+import kotlinx.coroutines.Dispatchers
 import java.io.File
 
 internal fun provideEventGate(): EventGate {
+    val dispatchers = CoroutineDispatchers(Dispatchers.Default, Dispatchers.Default)
     val stateHolder = StateHolderImpl()
     val gamesProvider = GamesProviderImpl()
     val itemRoller = ItemRollerImpl(getItemFactoriesSet())
     val actionHandlerRegistry = provideActionHandlerRegistry(gamesProvider, itemRoller)
     val inputParser = provideInputParser(stateHolder, gamesProvider, itemRoller)
-    val eventManager = EventManagerImpl(actionHandlerRegistry, stateHolder)
-    val historyHolder = provideHistoryHolder(actionHandlerRegistry)
+    val eventManager = EventManagerImpl(actionHandlerRegistry, stateHolder, dispatchers)
+    val historyHolder = provideHistoryHolder(actionHandlerRegistry, dispatchers)
     return EventGateImpl(stateHolder, inputParser, eventManager, historyHolder)
 }
 
@@ -34,7 +37,10 @@ private fun provideActionHandlerRegistry(
     handlers = getActionHandlersMap(gamesProvider, itemRoller)
 )
 
-private fun provideHistoryHolder(actionHandlerRegistry: ActionHandlerRegistry): EventHistoryHolder {
+private fun provideHistoryHolder(
+    actionHandlerRegistry: ActionHandlerRegistry,
+    dispatchers: CoroutineDispatchers,
+): EventHistoryHolder {
     val file = File(".\\src\\jvmTest\\resources\\history")
-    return EventHistoryHolderImpl(actionHandlerRegistry, FileGameStateRepository(file))
+    return EventHistoryHolderImpl(actionHandlerRegistry, FileGameStateRepository(file, dispatchers))
 }

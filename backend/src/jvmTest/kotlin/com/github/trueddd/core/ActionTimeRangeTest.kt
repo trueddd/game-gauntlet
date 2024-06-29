@@ -18,6 +18,7 @@ class ActionTimeRangeTest : EventGateTest() {
     @BeforeEach
     override fun startEventGate() {
         // Manual state refresh before each test
+        setupTimedIssueDateManager()
     }
 
     @Test

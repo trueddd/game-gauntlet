@@ -7,6 +7,7 @@ import com.github.trueddd.items.DiceBattle
 import org.junit.jupiter.api.Test
 import kotlinx.coroutines.test.runTest
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class DiceBattleItemTest : EventGateTest() {
@@ -38,9 +39,8 @@ class DiceBattleItemTest : EventGateTest() {
         val (user1, user2) = getPlayerNames()
         val item = DiceBattle.create()
         handleAction(ItemReceive(user1, item))
-        handleAction(ItemUse(user1, item.uid, listOf(user2, "4", "4")))
-        assertEquals(expected = 0, stateOf(user1).modifiersSum)
-        assertEquals(expected = 0, stateOf(user2).modifiersSum)
-        assertTrue(pendingEventsOf(user1).isNotEmpty())
+        assertFailsWith<IllegalArgumentException> {
+            handleAction(ItemUse(user1, item.uid, listOf(user2, "4", "4")))
+        }
     }
 }

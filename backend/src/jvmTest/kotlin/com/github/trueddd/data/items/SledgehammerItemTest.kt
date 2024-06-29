@@ -9,6 +9,7 @@ import com.github.trueddd.items.Sledgehammer
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class SledgehammerItemTest : EventGateTest() {
 
@@ -17,9 +18,9 @@ class SledgehammerItemTest : EventGateTest() {
         val (user1, user2) = getPlayerNames()
         val sledgehammer = Sledgehammer.create()
         handleAction(ItemReceive(user1, sledgehammer))
-        val state = eventGate.stateHolder.current
-        handleAction(ItemUse(user1, sledgehammer.uid, listOf(user2, "1")))
-        assertEquals(expected = state, actual = eventGate.stateHolder.current)
+        assertFailsWith<IllegalStateException> {
+            handleAction(ItemUse(user1, sledgehammer.uid, listOf(user2, "1")))
+        }
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.github.trueddd.core
 import com.github.trueddd.data.Game
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.serialization
+import kotlinx.serialization.SerializationException
 import org.koin.core.annotation.Single
 
 @Single
@@ -15,7 +16,11 @@ class GamesProviderImpl : GamesProvider {
     private fun decodeGenreOrNull(input: String): Game.Genre? {
         return try {
             serialization.decodeFromString<Game.Genre>("\"$input\"")
-        } catch (e: Exception) {
+        } catch (e: SerializationException) {
+            Log.error(TAG, "Failed to decode genre ($input): ${e.message}")
+            null
+        } catch (e: IllegalArgumentException) {
+            Log.error(TAG, "Decoded value is not valid ($input): ${e.message}")
             null
         }
     }
@@ -24,7 +29,7 @@ class GamesProviderImpl : GamesProvider {
         val fileContent = Thread.currentThread().contextClassLoader
             .getResourceAsStream("games")
             ?.bufferedReader()?.readLines()
-            ?: throw IllegalStateException("No `games` file was found")
+            ?: error("No `games` file was found")
         var parsedGamesCount = 0
         var corruptedGamesCount = 0
         val games = fileContent.mapNotNull { content ->

@@ -1,9 +1,12 @@
+import io.gitlab.arturbosch.detekt.Detekt
+
 plugins {
     kotlin("multiplatform")
     application
     alias(libs.plugins.ktor)
     alias(libs.plugins.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.detekt)
 }
 
 group = "com.trueddd.github"
@@ -81,4 +84,16 @@ tasks.named("build") {
 
 tasks.create("stage") {
     dependsOn("buildFatJar")
+}
+
+detekt {
+    config.setFrom(file("detekt-config.yml"))
+    buildUponDefaultConfig = true
+}
+
+tasks.withType<Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        html.outputLocation.set(file("build/reports/detekt.html"))
+    }
 }

@@ -1,8 +1,17 @@
 package com.github.trueddd.core
 
-import com.github.trueddd.data.*
+import com.github.trueddd.data.globalState
+import com.github.trueddd.data.GlobalState
+import com.github.trueddd.data.Participant
+import com.github.trueddd.data.PlayersHistory
+import com.github.trueddd.data.PlayerState
 import com.github.trueddd.utils.GlobalEventConstants
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import org.koin.core.annotation.Single
 
 @Single(binds = [
@@ -30,7 +39,7 @@ class StateHolderImpl : StateHolder {
     }
 
     override fun get(participant: Participant): PlayerState {
-        return current.stateSnapshot.playersState[participant.name]!!
+        return current.stateSnapshot.playersState.getValue(participant.name)
     }
 
     private val _playersTurnsStateFlow: MutableStateFlow<PlayersHistory> = MutableStateFlow(

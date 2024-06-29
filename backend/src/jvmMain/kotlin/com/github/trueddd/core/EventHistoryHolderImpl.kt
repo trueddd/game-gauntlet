@@ -69,12 +69,8 @@ class EventHistoryHolderImpl(
                 val state = globalState()
                 LoadedGameState(state, state.defaultPlayersHistory())
             }
-            is SavedState.MapLayoutParsingError -> {
-                throw IllegalStateException("Distribution must be read")
-            }
-            is SavedState.TimeRangeParsingError -> {
-                throw IllegalArgumentException("Error while parsing game time range")
-            }
+            is SavedState.MapLayoutParsingError -> error("Distribution must be read")
+            is SavedState.TimeRangeParsingError -> error("Error while parsing game time range")
             is SavedState.Success -> {
                 val initialState = globalState(
                     genreDistribution = savedState.mapLayout,

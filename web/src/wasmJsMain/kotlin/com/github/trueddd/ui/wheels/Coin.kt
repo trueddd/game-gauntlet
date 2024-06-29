@@ -32,10 +32,12 @@ fun Coin(
     coinValue: CoinValue,
     shouldAnimate: Boolean,
     modifier: Modifier = Modifier,
-    onFlipFinished: () -> Unit = {},
+    onFlipFinish: () -> Unit = {},
 ) {
     val color = MaterialTheme.colorScheme.primary
     var animationState by remember { mutableStateOf(CoinAnimationState(null, 0f)) }
+    val latestOnFlipFinish by rememberUpdatedState(onFlipFinish)
+
     LaunchedEffect(coinValue, shouldAnimate) {
         val repeatTimes = when {
             !shouldAnimate -> 1
@@ -52,7 +54,7 @@ fun Coin(
                 animationState = animationState.copy(rotate = value, value = newValue)
             }
         }
-        onFlipFinished()
+        latestOnFlipFinish()
     }
     Box(
         modifier = modifier

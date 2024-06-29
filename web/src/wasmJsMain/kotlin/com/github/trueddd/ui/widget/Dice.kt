@@ -83,15 +83,17 @@ private fun rollNotEqual(previous: Int, next: Int?): Int {
 @Composable
 fun DiceD6(
     value: Int,
+    modifier: Modifier = Modifier,
     diceAnimation: DiceAnimation = DiceAnimation(),
     dotSize: Dp = 4.dp,
     borderSize: Dp = 2.dp,
-    modifier: Modifier = Modifier,
-    onRollFinished: () -> Unit = {},
+    onRollFinish: () -> Unit = {},
 ) {
     val color = MaterialTheme.colorScheme.primary
     val dotSizePx = with(LocalDensity.current) { Size(dotSize.toPx(), dotSize.toPx()) }
     var animationState by remember { mutableStateOf(DiceAnimationState(value)) }
+    val latestOnRollFinish by rememberUpdatedState(onRollFinish)
+
     LaunchedEffect(value, diceAnimation.randomChangesAmount) {
         repeat(diceAnimation.randomChangesAmount + 1) { index ->
             val next = value.takeIf { index == diceAnimation.randomChangesAmount - 1 }
@@ -119,7 +121,7 @@ fun DiceD6(
                 animationState = animationState.copy(shift = value)
             }
         }
-        onRollFinished()
+        latestOnRollFinish()
     }
     val dots = remember(animationState, diceAnimation.dotsMoveEnabled) {
         val shift = if (diceAnimation.dotsMoveEnabled) animationState.shift.absoluteValue else 1f

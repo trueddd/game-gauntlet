@@ -7,10 +7,12 @@ import com.github.trueddd.ui.wheels.WheelState
 @Composable
 fun positionSpinAnimation(
     state: WheelState,
-    onFinished: () -> Unit = {},
+    onFinish: () -> Unit = {},
 ): State<Int> {
-    var playTime by remember { mutableStateOf(0L) }
-    val rotate = remember { mutableStateOf(0) }
+    var playTime by remember { mutableLongStateOf(0L) }
+    val rotate = remember { mutableIntStateOf(0) }
+    val latestOnFinish by rememberUpdatedState(onFinish)
+
     val anim = remember(state) {
         if (!state.running) return@remember null
         val startPosition = when {
@@ -28,6 +30,7 @@ fun positionSpinAnimation(
             },
         )
     }
+
     LaunchedEffect(anim) {
         if (anim == null) return@LaunchedEffect
         val startTime = withFrameNanos { it }
@@ -35,7 +38,7 @@ fun positionSpinAnimation(
             playTime = withFrameNanos { it } - startTime
             rotate.value = anim.getValueFromNanos(playTime)
         } while (!anim.isFinishedFromNanos(playTime))
-        onFinished()
+        latestOnFinish()
     }
     return rotate
 }
@@ -45,11 +48,13 @@ fun positionSpinAnimation(
 fun offsetSpinAnimation(
     state: WheelState,
     positionOffsetPx: Float,
-    onFinished: () -> Unit = {},
+    onFinish: () -> Unit = {},
 ): State<Float> {
-    var playTime by remember { mutableStateOf(0L) }
-    val targetPixelsOffset = remember { mutableStateOf(0f) }
-    val pixelsShift = remember { mutableStateOf(0f) }
+    var playTime by remember { mutableLongStateOf(0L) }
+    val targetPixelsOffset = remember { mutableFloatStateOf(0f) }
+    val pixelsShift = remember { mutableFloatStateOf(0f) }
+    val latestOnFinish by rememberUpdatedState(onFinish)
+
     val anim = remember(state) {
         if (!state.running) return@remember null
         TargetBasedAnimation(
@@ -63,6 +68,7 @@ fun offsetSpinAnimation(
             },
         )
     }
+
     LaunchedEffect(anim) {
         if (anim == null) return@LaunchedEffect
         val startTime = withFrameNanos { it }
@@ -72,7 +78,7 @@ fun offsetSpinAnimation(
             pixelsShift.value = newTarget - targetPixelsOffset.value
             targetPixelsOffset.value = newTarget
         } while (!anim.isFinishedFromNanos(playTime))
-        onFinished()
+        latestOnFinish()
     }
     return pixelsShift
 }
