@@ -10,6 +10,7 @@ import com.github.trueddd.items.RatMove
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
@@ -51,9 +52,9 @@ class EasterCakeBangItemTest : EventGateTest() {
         val moderatorItem = LoyalModerator.create()
         handleAction(ItemReceive(user, bangItem))
         handleAction(ItemReceive(user, moderatorItem))
-        handleAction(ItemUse(user, moderatorItem.uid, listOf(bangItem.uid)))
-        assertIs<EasterCakeBang>(effectsOf(user).first())
-        assertIs<LoyalModerator>(inventoryOf(user).first())
+        assertFailsWith<IllegalArgumentException> {
+            handleAction(ItemUse(user, moderatorItem.uid, listOf(bangItem.uid)))
+        }
     }
 
     @Test

@@ -8,6 +8,7 @@ import com.github.trueddd.items.Teleport
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 
 class TeleportItemTest : EventGateTest() {
 
@@ -77,7 +78,6 @@ class TeleportItemTest : EventGateTest() {
         handleAction(BoardMove(user3, diceValue = 3))
         handleAction(ItemReceive(user1, item))
         assertEquals(expected = 1, pendingEventsOf(user1).size)
-        handleAction(ItemUse(user1, item.uid))
-        assertEquals(expected = 1, pendingEventsOf(user1).size)
+        assertFails { handleAction(ItemUse(user1, item.uid)) }
     }
 }

@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
 sealed class Action(
     @SerialName("id")
     open val id: Int,
+    // TODO: refactor to use atomic int for testing purposes (StateRecoverabilityTest.kt)
     @SerialName("ia")
     val issuedAt: Long = Clock.System.now().toEpochMilliseconds(),
 ) {

@@ -10,6 +10,7 @@ import com.github.trueddd.items.WannaSwap
 import org.junit.jupiter.api.Test
 import kotlinx.coroutines.test.runTest
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class WannaSwapItemTest : EventGateTest() {
@@ -53,9 +54,8 @@ class WannaSwapItemTest : EventGateTest() {
         handleAction(GameRoll(user2, Game.Id(1)))
         val item = WannaSwap.create()
         handleAction(ItemReceive(user1, item))
-        handleAction(ItemUse(user1, item.uid))
-        assertEquals(Game.Id(0), lastGameOf(user1)?.game?.id)
-        assertEquals(Game.Id(1), lastGameOf(user2)?.game?.id)
-        assertTrue(pendingEventsOf(user1).isNotEmpty())
+        assertFailsWith<IllegalArgumentException> {
+            handleAction(ItemUse(user1, item.uid))
+        }
     }
 }
