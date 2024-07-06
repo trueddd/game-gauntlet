@@ -1,10 +1,11 @@
 package com.github.trueddd
 
 import com.github.trueddd.plugins.configureRouting
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.server.auth.*
-import io.ktor.server.testing.*
+import io.ktor.client.request.get
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.auth.authentication
+import io.ktor.server.auth.basic
+import io.ktor.server.testing.testApplication
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

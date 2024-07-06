@@ -1,6 +1,8 @@
 package com.github.trueddd.data
 
 import com.github.trueddd.actions.Action
+import com.github.trueddd.map.Genre
+import com.github.trueddd.map.MapConfig
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.roundToInt
@@ -19,29 +21,31 @@ data class GlobalState(
     val stateSnapshot: StateSnapshot,
     @SerialName("gh")
     val gameHistory: Map<PlayerName, List<GameHistoryEntry>>,
-    @SerialName("gd")
-    val gameGenreDistribution: GameGenreDistribution,
     @SerialName("sd")
     val startDate: Long,
     @SerialName("ed")
     val endDate: Long,
-    @SerialName("rc")
-    val radioCoverage: RadioCoverage,
-) {
+    @SerialName("mc")
+    val mapConfig: MapConfig,
+) : GameGenreDistribution {
 
     companion object {
         const val START_POSITION = 0
         const val STINT_COUNT = 25
-        val STINT_SIZE = Game.Genre.entries.size
+        val STINT_SIZE = Genre.entries.size
         val PLAYABLE_BOARD_RANGE = 1..STINT_SIZE * STINT_COUNT
         val BOARD_RANGE = 0..STINT_SIZE * STINT_COUNT
+    }
+
+    override val genres: List<Genre> by lazy {
+        mapConfig.sectors.mapNotNull { it.genre }
     }
 
     val boardLength: Int
         get() = STINT_SIZE * STINT_COUNT
 
     val gameConfig: GameConfig
-        get() = GameConfig(players, gameGenreDistribution, startDate, endDate, radioCoverage)
+        get() = GameConfig(players, startDate, endDate, mapConfig)
 
     fun stateOf(playerName: PlayerName) = stateSnapshot.playersState[playerName]!!
     fun effectsOf(playerName: PlayerName) = stateOf(playerName).effects

@@ -1,9 +1,9 @@
 package com.github.trueddd.items
 
-import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
+import com.github.trueddd.map.Genre
 import com.github.trueddd.utils.removeTabs
 import com.trueddd.github.annotations.ItemFactory
 import kotlinx.serialization.SerialName
@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("${WheelItem.Relocation}")
 class Relocation private constructor(override val uid: String) : WheelItem.PendingEvent(),
-    Parametrized<Parameters.One<Game.Genre>> {
+    Parametrized<Parameters.One<Genre>> {
 
     companion object {
         fun create() = Relocation(uid = generateWheelItemUid())
@@ -29,17 +29,17 @@ class Relocation private constructor(override val uid: String) : WheelItem.Pendi
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Genre(name = "Жанр"))
 
-    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Game.Genre> {
-        return Parameters.One(rawArguments.getIntParameter().let { Game.Genre.entries[it] })
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Genre> {
+        return Parameters.One(rawArguments.getIntParameter().let { Genre.entries[it] })
     }
 
     override suspend fun use(usedBy: PlayerName, globalState: GlobalState, arguments: List<String>): GlobalState {
         val genre = getParameters(arguments, globalState).parameter1
-        require(genre != Game.Genre.Special)
+        require(genre != Genre.Special)
         return globalState.updatePlayer(usedBy) { playerState ->
             playerState.copy(
                 pendingEvents = playerState.pendingEvents.without(uid),
-                position = globalState.gameGenreDistribution.closestPositionToGenre(playerState.position, genre),
+                position = globalState.closestPositionToGenre(playerState.position, genre),
             )
         }
     }

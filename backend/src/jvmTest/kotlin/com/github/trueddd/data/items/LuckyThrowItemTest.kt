@@ -4,9 +4,9 @@ import com.github.trueddd.EventGateTest
 import com.github.trueddd.actions.BoardMove
 import com.github.trueddd.actions.ItemReceive
 import com.github.trueddd.actions.ItemUse
-import com.github.trueddd.data.Game
 import com.github.trueddd.items.LuckyThrow
 import com.github.trueddd.items.WheelItem
+import com.github.trueddd.map.Genre
 import com.github.trueddd.utils.rollDice
 import com.github.trueddd.utils.serialization
 import kotlinx.coroutines.test.runTest
@@ -32,10 +32,10 @@ class LuckyThrowItemTest : EventGateTest() {
         val user = getRandomPlayerName()
         val item = LuckyThrow.create()
         val diceValue = rollDice()
-        val genre = eventGate.stateHolder.current.gameGenreDistribution.genreAtPosition(diceValue)
+        val genre = genreAtPosition(diceValue)
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 0, effectsOf(user).size)
-        handleAction(ItemUse(user, item.uid, listOf(serialization.encodeToString(Game.Genre.serializer(), genre))))
+        handleAction(ItemUse(user, item.uid, listOf(serialization.encodeToString(Genre.serializer(), genre))))
         assertEquals(expected = 1, effectsOf(user).size)
         assertIs<WheelItem.Effect.Buff>(effectsOf(user).first())
     }
@@ -45,15 +45,15 @@ class LuckyThrowItemTest : EventGateTest() {
         val user = getRandomPlayerName()
         val item = LuckyThrow.create()
         val diceValue = rollDice()
-        val genre = eventGate.stateHolder.current.gameGenreDistribution.genreAtPosition(diceValue)
+        val genre = genreAtPosition(diceValue)
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 0, effectsOf(user).size)
-        handleAction(ItemUse(user, item.uid, listOf(serialization.encodeToString(Game.Genre.serializer(), genre))))
+        handleAction(ItemUse(user, item.uid, listOf(serialization.encodeToString(Genre.serializer(), genre))))
         assertEquals(expected = 1, effectsOf(user).size)
         assertIs<WheelItem.Effect.Buff>(effectsOf(user).first())
         handleAction(BoardMove(user, diceValue))
         assertEquals(expected = 0, effectsOf(user).size)
-        assertEquals(genre, eventGate.stateHolder.current.gameGenreDistribution.genreAtPosition(positionOf(user)))
+        assertEquals(genre, genreAtPosition(positionOf(user)))
         assertTrue(stateOf(user).boardMoveAvailable)
     }
 
@@ -62,10 +62,10 @@ class LuckyThrowItemTest : EventGateTest() {
         val user = getRandomPlayerName()
         val item = LuckyThrow.create()
         val diceValue = 3
-        val genre = eventGate.stateHolder.current.gameGenreDistribution.genreAtPosition(2)
+        val genre = genreAtPosition(2)
         handleAction(ItemReceive(user, item))
         assertEquals(expected = 0, effectsOf(user).size)
-        handleAction(ItemUse(user, item.uid, listOf(serialization.encodeToString(Game.Genre.serializer(), genre))))
+        handleAction(ItemUse(user, item.uid, listOf(serialization.encodeToString(Genre.serializer(), genre))))
         assertEquals(expected = 1, effectsOf(user).size)
         assertIs<WheelItem.Effect.Buff>(effectsOf(user).first())
         handleAction(BoardMove(user, diceValue))

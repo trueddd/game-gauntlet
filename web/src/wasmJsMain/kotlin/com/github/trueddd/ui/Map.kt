@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.sp
 import com.github.trueddd.actions.GlobalEvent
 import com.github.trueddd.data.*
 import com.github.trueddd.items.BoardTrap
+import com.github.trueddd.map.Genre
+import com.github.trueddd.map.RadioStation
 import com.github.trueddd.theme.Colors
 import com.github.trueddd.util.localized
 import com.github.trueddd.utils.GlobalEventConstants
@@ -27,10 +29,10 @@ import kotlin.math.roundToInt
 @Immutable
 data class MapCellState(
     val index: Int,
-    val genre: Game.Genre?,
+    val genre: Genre?,
     val players: List<Participant>,
     val traps: List<BoardTrap>,
-    val radioStation: RadioStation,
+    val radioStation: RadioStation?,
 )
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -48,29 +50,19 @@ fun Map(
     ) {
         val mapState = remember(stateSnapshot, gameConfig) {
             buildList {
-                add(
-                    MapCellState(
-                        index = 0,
-                        genre = null,
-                        players = stateSnapshot?.playersState
-                            ?.filterValues { it.position == 0 }?.keys
-                            ?.let { names -> gameConfig.players.filter { it.name in names } }
-                            ?: emptyList(),
-                        traps = stateSnapshot?.boardTraps?.filterKeys { it == 0 }?.values?.toList() ?: emptyList(),
-                        radioStation = gameConfig.radioCoverage.stationAt(position = 0),
-                    )
-                )
-                gameConfig.gameGenreDistribution.genres.forEachIndexed { index, genre ->
+                gameConfig.mapConfig.sectors.forEach { sector ->
                     add(
                         MapCellState(
-                            index = index + 1,
-                            genre = genre,
+                            index = sector.index,
+                            genre = sector.genre,
                             players = stateSnapshot?.playersState
-                                ?.filterValues { it.position == index + 1 }?.keys
+                                ?.filterValues { it.position == sector.index }?.keys
                                 ?.let { names -> gameConfig.players.filter { it.name in names } }
                                 ?: emptyList(),
-                            traps = stateSnapshot?.boardTraps?.filterKeys { it == index + 1 }?.values?.toList() ?: emptyList(),
-                            radioStation = gameConfig.radioCoverage.stationAt(position = index + 1),
+                            traps = stateSnapshot?.boardTraps?.filterKeys { it == sector.index }
+                                ?.values?.toList()
+                                ?: emptyList(),
+                            radioStation = sector.radio,
                         )
                     )
                 }
@@ -187,7 +179,7 @@ private fun MapCell(state: MapCellState) {
                 text = {
                     Column {
                         when (state.genre) {
-                            Game.Genre.Special -> Text("Специальный сектор")
+                            Genre.Special -> Text("Специальный сектор")
                             null -> {}
                             else -> Text("Жанр: ${state.genre.localized}")
                         }
@@ -197,7 +189,9 @@ private fun MapCell(state: MapCellState) {
                         if (state.traps.isNotEmpty()) {
                             Text("Ловушки: ${state.traps.joinToString { it.name }}")
                         }
-                        Text("Радиостанция: ${state.radioStation.localized}")
+                        if (state.radioStation != null) {
+                            Text("Радиостанция: ${state.radioStation.localized}")
+                        }
                     }
                 }
             )

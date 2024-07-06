@@ -32,6 +32,7 @@ kotlin {
             dependencies {
                 implementation(project(":annotations"))
                 implementation(project(":common"))
+                implementation(project(":map"))
                 implementation(libs.logging)
                 implementation(libs.ktor.server.core)
                 implementation(libs.ktor.server.netty)

@@ -1,10 +1,10 @@
 package com.github.trueddd.items
 
-import com.github.trueddd.data.Game
 import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.PlayerName
 import com.github.trueddd.data.without
 import com.github.trueddd.items.LuckyThrow.Buff
+import com.github.trueddd.map.Genre
 import com.github.trueddd.utils.removeTabs
 import com.github.trueddd.utils.serialization
 import com.trueddd.github.annotations.ItemFactory
@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("${WheelItem.LuckyThrow}")
 class LuckyThrow private constructor(override val uid: String) : WheelItem.PendingEvent(),
-    Parametrized<Parameters.One<Game.Genre>> {
+    Parametrized<Parameters.One<Genre>> {
 
     companion object {
         fun create() = LuckyThrow(uid = generateWheelItemUid())
@@ -32,7 +32,7 @@ class LuckyThrow private constructor(override val uid: String) : WheelItem.Pendi
     override val parametersScheme: List<ParameterType>
         get() = listOf(ParameterType.Genre(name = "Жанр"))
 
-    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Game.Genre> {
+    override fun getParameters(rawArguments: List<String>, currentState: GlobalState): Parameters.One<Genre> {
         return Parameters.One(rawArguments.getStringParameter().let { serialization.decodeFromString(it) })
     }
 
@@ -55,11 +55,11 @@ class LuckyThrow private constructor(override val uid: String) : WheelItem.Pendi
     @Serializable
     class Buff private constructor(
         override val uid: String,
-        val genre: Game.Genre
+        val genre: Genre
     ) : Effect.Buff() {
 
         companion object {
-            fun create(genre: Game.Genre) = Buff(uid = generateWheelItemUid(), genre)
+            fun create(genre: Genre) = Buff(uid = generateWheelItemUid(), genre)
         }
 
         override val id = Id(LuckyThrow)

@@ -4,6 +4,7 @@ import com.github.trueddd.items.DiceRollModifier
 import com.github.trueddd.items.DontCare
 import com.github.trueddd.items.DontUnderstand
 import com.github.trueddd.items.WheelItem
+import com.github.trueddd.map.Genre
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -81,6 +82,6 @@ fun <T : WheelItem> List<T>.without(itemUid: String): List<T> {
 inline val PlayerState.canSetNextGame: Boolean
     get() = effects.any { it is DontCare || it is DontUnderstand }
 
-fun PlayerState.genreOfCurrentPosition(gameConfig: GameConfig): Game.Genre {
-    return gameConfig.gameGenreDistribution.genreAtPosition(position)
+fun PlayerState.genreOfCurrentPosition(gameConfig: GameConfig): Genre {
+    return gameConfig.genreAtPosition(position)
 }

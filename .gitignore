@@ -6,6 +6,8 @@ build/
 kotlin-js-store/
 backend/src/**/resources/history
 web/src/wasmJsMain/resources/env.js
+**/resources/*.backup
+**/resources/save/*
 
 ### STS ###
 .apt_generated

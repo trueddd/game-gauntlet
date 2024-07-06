@@ -1,5 +1,5 @@
 rootProject.name = "game-gauntlet"
-include("annotations", "di", "common", "backend", "web")
+include("annotations", "di", "common", "backend", "web", "map")
 
 pluginManagement {
     repositories {
@@ -57,7 +57,7 @@ dependencyResolutionManagement {
             library("ktor-server-auth-core", "io.ktor", "ktor-server-auth").versionRef(ktor)
             library("ktor-server-auth-jwt", "io.ktor", "ktor-server-auth-jwt").versionRef(ktor)
             library("ktor-server-caching", "io.ktor", "ktor-server-caching-headers").versionRef(ktor)
-            library("ktor-server-tests", "io.ktor", "ktor-server-tests").versionRef(ktor)
+            library("ktor-server-tests", "io.ktor", "ktor-server-test-host").versionRef(ktor)
             library("ktor-serialization", "io.ktor", "ktor-serialization-kotlinx-json").versionRef(ktor)
 
             library("test-kotlin", "org.jetbrains.kotlin", "kotlin-test").versionRef(kotlin)

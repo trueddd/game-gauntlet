@@ -34,6 +34,7 @@ kotlin {
         val wasmJsMain by getting {
             dependencies {
                 implementation(project(":common"))
+                implementation(project(":map"))
                 implementation(compose.components.resources)
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.material)

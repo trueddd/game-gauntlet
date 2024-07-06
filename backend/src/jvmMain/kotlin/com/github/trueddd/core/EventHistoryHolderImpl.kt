@@ -73,13 +73,12 @@ class EventHistoryHolderImpl(
             is SavedState.TimeRangeParsingError -> error("Error while parsing game time range")
             is SavedState.Success -> {
                 val initialState = globalState(
-                    genreDistribution = savedState.mapLayout,
-                    startDateTime = Instant.fromEpochMilliseconds(savedState.timeRange.first)
+                    startDateTime = Instant.fromEpochMilliseconds(savedState.gameConfig.startTime)
                         .toLocalDateTime(DefaultTimeZone),
-                    activePeriod = (savedState.timeRange.last - savedState.timeRange.first)
+                    activePeriod = (savedState.gameConfig.endTime - savedState.gameConfig.startTime)
                         .toDuration(DurationUnit.MILLISECONDS),
-                    radioCoverage = savedState.radioCoverage,
-                    raisedAmountOfPoints = savedState.pointsCollected,
+                    raisedAmountOfPoints = savedState.gameConfig.pointsCollected,
+                    mapConfig = savedState.mapConfig,
                 )
                 var playersHistory = initialState.defaultPlayersHistory()
                 val globalState = savedState.actions

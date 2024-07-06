@@ -23,6 +23,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":annotations"))
+                implementation(project(":map"))
                 implementation(libs.serialization)
                 implementation(libs.uuid)
                 api(libs.datetime)

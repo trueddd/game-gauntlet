@@ -1,6 +1,7 @@
 package com.github.trueddd
 
 import com.github.trueddd.core.*
+import com.github.trueddd.data.model.save.GameSaveFileStructure
 import com.github.trueddd.data.repository.FileGameStateRepository
 import com.github.trueddd.di.CoroutineDispatchers
 import com.github.trueddd.di.getActionGeneratorsSet
@@ -41,6 +42,7 @@ private fun provideHistoryHolder(
     actionHandlerRegistry: ActionHandlerRegistry,
     dispatchers: CoroutineDispatchers,
 ): EventHistoryHolder {
-    val file = File(".\\src\\jvmTest\\resources\\history")
-    return EventHistoryHolderImpl(actionHandlerRegistry, FileGameStateRepository(file, dispatchers))
+    val parentFolder = File(".\\src\\jvmTest\\resources\\save")
+    val gameSaveFileStructure = GameSaveFileStructure(parentFolder)
+    return EventHistoryHolderImpl(actionHandlerRegistry, FileGameStateRepository(gameSaveFileStructure, dispatchers))
 }

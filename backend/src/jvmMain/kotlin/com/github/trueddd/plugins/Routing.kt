@@ -6,8 +6,8 @@ import com.github.trueddd.core.HttpClient
 import com.github.trueddd.core.ItemRoller
 import com.github.trueddd.core.Router
 import com.github.trueddd.data.AuthResponse
-import com.github.trueddd.data.Game
 import com.github.trueddd.data.repository.TwitchUsersRepository
+import com.github.trueddd.map.Genre
 import com.github.trueddd.utils.Environment
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
@@ -19,8 +19,8 @@ import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.http.content.staticResources
-import io.ktor.server.plugins.cachingheaders.caching
 import io.ktor.server.plugins.cachingheaders.CachingHeaders
+import io.ktor.server.plugins.cachingheaders.caching
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
 import io.ktor.server.routing.get
@@ -105,7 +105,7 @@ fun Application.configureRouting() {
                 call.respond(itemRoller.pick())
             }
             get(Router.Wheels.ROLL_GAMES) {
-                val genre = call.parameters["genre"]?.toIntOrNull()?.let { raw -> Game.Genre.entries.getOrNull(raw) }
+                val genre = call.parameters["genre"]?.toIntOrNull()?.let { raw -> Genre.entries.getOrNull(raw) }
                 call.respond(gamesProvider.roll(genre))
             }
             get(Router.Wheels.ROLL_PLAYERS) {

@@ -1,5 +1,6 @@
 package com.github.trueddd.data
 
+import com.github.trueddd.map.MapConfig
 import com.github.trueddd.utils.DefaultTimeZone
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
@@ -9,10 +10,9 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
 fun globalState(
-    genreDistribution: GameGenreDistribution = GameGenreDistribution.generateRandom(GlobalState.STINT_COUNT),
     startDateTime: LocalDateTime = Clock.System.now().toLocalDateTime(DefaultTimeZone),
     activePeriod: Duration = 365.days,
-    radioCoverage: RadioCoverage = RadioCoverage.generateRandom(),
+    mapConfig: MapConfig = MapConfig.generate(GlobalState.STINT_COUNT, GlobalState.STINT_SIZE),
     raisedAmountOfPoints: Long = 0L,
 ): GlobalState {
     val startDateTimeInstant = startDateTime.toInstant(DefaultTimeZone)
@@ -26,7 +26,6 @@ fun globalState(
         startDate = startDateTimeInstant.toEpochMilliseconds(),
         endDate = (startDateTimeInstant + activePeriod).toEpochMilliseconds(),
         players = players,
-        gameGenreDistribution = genreDistribution,
         actions = emptyList(),
         stateSnapshot = StateSnapshot(
             playersState = players.associate { it.name to PlayerState.default() },
@@ -36,6 +35,6 @@ fun globalState(
             scheduledEvent = null,
         ),
         gameHistory = players.associate { it.name to emptyList() },
-        radioCoverage = radioCoverage,
+        mapConfig = mapConfig,
     )
 }
