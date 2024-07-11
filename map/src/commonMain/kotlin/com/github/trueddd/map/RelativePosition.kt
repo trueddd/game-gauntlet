@@ -9,6 +9,6 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class RelativePosition(
-    val x: Float,
-    val y: Float,
+    val x: Double,
+    val y: Double,
 )

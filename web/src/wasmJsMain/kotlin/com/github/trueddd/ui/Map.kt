@@ -35,6 +35,7 @@ data class MapCellState(
     val radioStation: RadioStation?,
 )
 
+// TODO: Put sectors according to positions
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Map(

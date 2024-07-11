@@ -95,6 +95,8 @@ dependencyResolutionManagement {
             library("coil-network", "io.coil-kt.coil3", "coil-network-ktor").versionRef(coil)
 
             plugin("detekt", "io.gitlab.arturbosch.detekt").versionRef(detekt)
+
+            plugin("kover", "org.jetbrains.kotlinx.kover").version("0.8.2")
         }
     }
 }

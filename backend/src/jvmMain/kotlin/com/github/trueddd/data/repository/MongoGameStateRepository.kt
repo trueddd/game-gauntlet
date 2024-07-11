@@ -5,7 +5,6 @@ import com.github.trueddd.data.GlobalState
 import com.github.trueddd.data.model.SavedState
 import com.github.trueddd.data.model.save.GameConfig
 import com.github.trueddd.di.CoroutineDispatchers
-import com.github.trueddd.map.MapConfig
 import com.github.trueddd.utils.Log
 import com.github.trueddd.utils.serialization
 import com.mongodb.client.model.Filters
@@ -35,10 +34,6 @@ class MongoGameStateRepository(
         mongoDb.getCollection<Document>("main_config")
     }
 
-    private val mapConfigCollection by lazy {
-        mongoDb.getCollection<Document>("map_config")
-    }
-
     private val actionsCollection by lazy {
         mongoDb.getCollection<Document>("game_state")
     }
@@ -49,23 +44,18 @@ class MongoGameStateRepository(
             endTime = globalState.endDate,
             pointsCollected = globalState.stateSnapshot.overallAmountOfPointsRaised,
         )
-        val mapConfig = globalState.mapConfig
 
         coroutineScope {
             val mainConfigSaveJob = async(dispatchers.io) {
                 mainConfigCollection.deleteMany(Filters.empty())
                 mainConfigCollection.insertOne(Document.parse(serialization.encodeToString(gameConfig)))
             }
-            val mapConfigSaveJob = async(dispatchers.io) {
-                mapConfigCollection.deleteMany(Filters.empty())
-                mapConfigCollection.insertOne(Document.parse(serialization.encodeToString(mapConfig)))
-            }
             val actionsSaveJob = async(dispatchers.io) {
                 val serializedActions = actions.map { Document.parse(serialization.encodeToString(it)) }
                 actionsCollection.deleteMany(Filters.empty())
                 actionsCollection.insertMany(serializedActions)
             }
-            awaitAll(mainConfigSaveJob, mapConfigSaveJob, actionsSaveJob)
+            awaitAll(mainConfigSaveJob, actionsSaveJob)
         }
     }
 
@@ -75,10 +65,6 @@ class MongoGameStateRepository(
                 val document = mainConfigCollection.find<Document>(Filters.empty()).first()
                 serialization.decodeFromString(GameConfig.serializer(), document.toJson())
             }
-            val mapConfigDeferred = async(dispatchers.io) {
-                val document = mapConfigCollection.find<Document>(Filters.empty()).first()
-                serialization.decodeFromString(MapConfig.serializer(), document.toJson())
-            }
             val actionsDeferred = async(dispatchers.io) {
                 actionsCollection.find<Document>(Filters.empty())
                     .toList()
@@ -86,13 +72,10 @@ class MongoGameStateRepository(
             }
             val gameConfig = mainConfigDeferred.await()
             Log.info(TAG, "Loaded game config: $gameConfig")
-            val mapConfig = mapConfigDeferred.await()
-            Log.info(TAG, "Loaded map config, size: ${mapConfig.sectors.size}")
             val actions = actionsDeferred.await()
             Log.info(TAG, "Loaded actions config, size: ${actionsDeferred.await().size}")
             SavedState.Success(
                 gameConfig = gameConfig,
-                mapConfig = mapConfig,
                 actions = actions,
             )
         }

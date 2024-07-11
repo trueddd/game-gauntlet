@@ -1,6 +1,6 @@
 package com.github.trueddd.data
 
-import com.github.trueddd.map.MapConfig
+import com.github.trueddd.map.default.GameMapConfig
 import com.github.trueddd.utils.DefaultTimeZone
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
@@ -12,7 +12,6 @@ import kotlin.time.Duration.Companion.days
 fun globalState(
     startDateTime: LocalDateTime = Clock.System.now().toLocalDateTime(DefaultTimeZone),
     activePeriod: Duration = 365.days,
-    mapConfig: MapConfig = MapConfig.generate(GlobalState.STINT_COUNT, GlobalState.STINT_SIZE),
     raisedAmountOfPoints: Long = 0L,
 ): GlobalState {
     val startDateTimeInstant = startDateTime.toInstant(DefaultTimeZone)
@@ -35,6 +34,6 @@ fun globalState(
             scheduledEvent = null,
         ),
         gameHistory = players.associate { it.name to emptyList() },
-        mapConfig = mapConfig,
+        mapConfig = GameMapConfig,
     )
 }

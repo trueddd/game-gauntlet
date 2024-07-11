@@ -78,7 +78,6 @@ class EventHistoryHolderImpl(
                     activePeriod = (savedState.gameConfig.endTime - savedState.gameConfig.startTime)
                         .toDuration(DurationUnit.MILLISECONDS),
                     raisedAmountOfPoints = savedState.gameConfig.pointsCollected,
-                    mapConfig = savedState.mapConfig,
                 )
                 var playersHistory = initialState.defaultPlayersHistory()
                 val globalState = savedState.actions

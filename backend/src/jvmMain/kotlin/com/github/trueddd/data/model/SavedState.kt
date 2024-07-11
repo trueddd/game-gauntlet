@@ -2,12 +2,10 @@ package com.github.trueddd.data.model
 
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.model.save.GameConfig
-import com.github.trueddd.map.MapConfig
 
 sealed class SavedState {
     class Success(
         val gameConfig: GameConfig,
-        val mapConfig: MapConfig,
         val actions: List<Action>,
     ) : SavedState()
     data object NoRecords : SavedState()

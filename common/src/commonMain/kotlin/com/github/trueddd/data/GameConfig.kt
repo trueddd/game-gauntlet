@@ -6,6 +6,10 @@ import com.github.trueddd.map.RadioStation
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Contains information about static game state that is not intended to be changed.
+ * This config is transferred to frontend on first load of page.
+ */
 @Serializable
 data class GameConfig(
     @SerialName("pl")

@@ -41,8 +41,11 @@ data class GlobalState(
         mapConfig.sectors.mapNotNull { it.genre }
     }
 
+    /**
+     * Playable board length (without start/zero position)
+     */
     val boardLength: Int
-        get() = STINT_SIZE * STINT_COUNT
+        get() = mapConfig.sectors.size - 1
 
     val gameConfig: GameConfig
         get() = GameConfig(players, startDate, endDate, mapConfig)
