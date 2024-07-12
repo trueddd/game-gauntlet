@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.kover)
 }
 
 group = "com.trueddd.github"
@@ -32,6 +33,7 @@ kotlin {
             dependencies {
                 implementation(project(":annotations"))
                 implementation(project(":common"))
+                implementation(project(":map"))
                 implementation(libs.logging)
                 implementation(libs.ktor.server.core)
                 implementation(libs.ktor.server.netty)

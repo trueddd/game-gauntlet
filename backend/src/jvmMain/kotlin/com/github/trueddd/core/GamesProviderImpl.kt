@@ -1,7 +1,9 @@
 package com.github.trueddd.core
 
 import com.github.trueddd.data.Game
+import com.github.trueddd.map.Genre
 import com.github.trueddd.utils.Log
+import com.github.trueddd.utils.getResourceFile
 import com.github.trueddd.utils.serialization
 import kotlinx.serialization.SerializationException
 import org.koin.core.annotation.Single
@@ -13,9 +15,9 @@ class GamesProviderImpl : GamesProvider {
         const val TAG = "GamesProvider"
     }
 
-    private fun decodeGenreOrNull(input: String): Game.Genre? {
+    private fun decodeGenreOrNull(input: String): Genre? {
         return try {
-            serialization.decodeFromString<Game.Genre>("\"$input\"")
+            serialization.decodeFromString<Genre>("\"$input\"")
         } catch (e: SerializationException) {
             Log.error(TAG, "Failed to decode genre ($input): ${e.message}")
             null
@@ -26,9 +28,9 @@ class GamesProviderImpl : GamesProvider {
     }
 
     private val games = run {
-        val fileContent = Thread.currentThread().contextClassLoader
-            .getResourceAsStream("games")
-            ?.bufferedReader()?.readLines()
+        val fileContent = getResourceFile("games")
+            ?.bufferedReader()
+            ?.readLines()
             ?: error("No `games` file was found")
         var parsedGamesCount = 0
         var corruptedGamesCount = 0
@@ -44,7 +46,7 @@ class GamesProviderImpl : GamesProvider {
         return@run games
     }
 
-    override fun roll(genre: Game.Genre?): Game {
+    override fun roll(genre: Genre?): Game {
         val gamesList = when (genre) {
             null -> games
             else -> games.filter { it.genre == genre }

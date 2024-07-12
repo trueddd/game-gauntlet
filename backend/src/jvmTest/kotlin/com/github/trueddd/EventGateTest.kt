@@ -19,8 +19,8 @@ import org.junit.jupiter.api.TestInstance
 abstract class EventGateTest {
 
     protected val eventGate: EventGate = provideEventGate()
-    protected val genreDistribution
-        get() = eventGate.stateHolder.current.gameGenreDistribution
+
+    protected fun genreAtPosition(position: Int) = eventGate.stateHolder.current.genreAtPosition(position)
 
     protected fun getRandomPlayerName() = eventGate.stateHolder.participants.random().name
     protected fun getPlayerNames() = eventGate.stateHolder.participants.toList().map { it.name }

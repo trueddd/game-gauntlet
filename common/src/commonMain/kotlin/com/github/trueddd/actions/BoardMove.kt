@@ -71,7 +71,7 @@ data class BoardMove(
                 val modifiersToDiscard = modifiers.filterIsInstance<WheelItem.Effect>().map { it.uid }
                 val luckyThrowActivated = playerState.effects
                     .filterIsInstance<LuckyThrow.Buff>()
-                    .any { it.genre == currentState.gameGenreDistribution.genreAtPosition(finalPosition) }
+                    .any { it.genre == currentState.genreAtPosition(finalPosition) }
                 playerState.copy(
                     position = finalPosition,
                     stepsCount = playerState.stepsCount + 1,

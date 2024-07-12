@@ -1,7 +1,11 @@
 package com.github.trueddd.plugins
 
+import com.github.trueddd.core.ActionHandlerRegistry
 import com.github.trueddd.core.EventHistoryHolder
 import com.github.trueddd.core.EventHistoryHolderImpl
+import com.github.trueddd.core.GamesProvider
+import com.github.trueddd.core.ItemRoller
+import com.github.trueddd.data.model.save.GameSaveFileStructure
 import com.github.trueddd.data.repository.FileGameStateRepository
 import com.github.trueddd.data.repository.GameStateRepository
 import com.github.trueddd.data.repository.MongoGameStateRepository
@@ -16,6 +20,7 @@ import com.github.trueddd.utils.Environment
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.kotlin.client.coroutine.MongoClient
+import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import com.trueddd.github.annotations.ActionGenerator
 import com.trueddd.github.annotations.ActionHandler
 import com.trueddd.github.annotations.ItemFactory
@@ -38,11 +43,17 @@ private val commonModule = module {
     ) }
 
     single(named(ActionGenerator.TAG)) {
-        getActionGeneratorsSet(gamesProvider = get(), itemRoller = get())
+        getActionGeneratorsSet(
+            gamesProvider = get<GamesProvider>(),
+            itemRoller = get<ItemRoller>(),
+        )
     }
 
     single(named(ActionHandler.TAG)) {
-        getActionHandlersMap(gamesProvider = get(), itemRoller = get())
+        getActionHandlersMap(
+            gamesProvider = get<GamesProvider>(),
+            itemRoller = get<ItemRoller>(),
+        )
     }
 
     single(named(ItemFactory.TAG)) {
@@ -61,7 +72,9 @@ private val commonModule = module {
     }
 
     // File for FileGameStateRepository to store game state in
-    factory { File(".\\src\\jvmMain\\resources\\history") }
+    factory {
+        GameSaveFileStructure(parentFolder = File(".\\src\\jvmMain\\resources\\history"))
+    }
 
     single<EventHistoryHolder> {
         val gameStateRepository = if (Environment.IsDev) {
@@ -70,12 +83,17 @@ private val commonModule = module {
             get<GameStateRepository>(qualifier = named(MongoGameStateRepository.TAG))
         }
         EventHistoryHolderImpl(
-            actionHandlerRegistry = get(),
+            actionHandlerRegistry = get<ActionHandlerRegistry>(),
             gameStateRepository = gameStateRepository,
         )
     }
 
-    single { TwitchUsersRepository(mongoDatabase = get(), dispatchers = get()) }
+    single {
+        TwitchUsersRepository(
+            mongoDatabase = get<MongoDatabase>(),
+            dispatchers = get<CoroutineDispatchers>(),
+        )
+    }
 }
 
 fun Application.configureDI() {

@@ -34,6 +34,7 @@ import com.github.trueddd.data.*
 import com.github.trueddd.di.get
 import com.github.trueddd.items.NoClownery
 import com.github.trueddd.items.WheelItem
+import com.github.trueddd.map.Genre
 import com.github.trueddd.ui.res.icons.Star
 import com.github.trueddd.ui.widget.DiceAnimation
 import com.github.trueddd.ui.widget.DiceD6
@@ -136,7 +137,7 @@ fun Wheels(
                         .width(IntrinsicSize.Max)
                         .pointerHoverIcon(PointerIcon.Hand)
                 ) {
-                    Game.Genre.entries.forEach {
+                    Genre.entries.forEach {
                         DropdownMenuItem(
                             text = { Row {
                                 val current = currentPlayerState?.genreOfCurrentPosition(gameConfig) == it

@@ -3,6 +3,7 @@ package com.github.trueddd.core
 import com.github.trueddd.actions.Action
 import com.github.trueddd.data.*
 import com.github.trueddd.items.WheelItem
+import com.github.trueddd.map.Genre
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.websocket.*
@@ -136,14 +137,14 @@ class AppClient(
     suspend fun getPlayersHistory(): PlayersHistory? =
         getJsonData(router.http(Router.TURNS), sendBearerToken = true)
 
-    suspend fun getGames(genre: Game.Genre): List<Game> =
+    suspend fun getGames(genre: Genre): List<Game> =
         getJsonData<List<Game>>(router.http(Router.Wheels.GAMES), sendBearerToken = true)
             ?.filter { it.genre == genre } ?: emptyList()
 
     suspend fun rollItem(): WheelItem? =
         getJsonData(router.http(Router.Wheels.ROLL_ITEMS), sendBearerToken = true)
 
-    suspend fun rollGame(genre: Game.Genre): Game? = withContext(coroutineContext) {
+    suspend fun rollGame(genre: Genre): Game? = withContext(coroutineContext) {
         try {
             httpClient.get(router.http(Router.Wheels.ROLL_GAMES)) {
                 parameter("genre", genre.ordinal)

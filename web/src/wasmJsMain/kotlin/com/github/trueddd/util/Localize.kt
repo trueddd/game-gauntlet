@@ -2,8 +2,9 @@ package com.github.trueddd.util
 
 import androidx.compose.runtime.Stable
 import com.github.trueddd.data.Game
-import com.github.trueddd.data.RadioStation
 import com.github.trueddd.items.WheelItem
+import com.github.trueddd.map.Genre
+import com.github.trueddd.map.RadioStation
 import com.github.trueddd.ui.res.StringResources
 import kotlinx.datetime.LocalDate
 
@@ -18,15 +19,15 @@ val WheelItem.typeLocalized: String
     }
 
 @Stable
-val Game.Genre.localized: String
+val Genre.localized: String
     get() = when (this) {
-        Game.Genre.Runner -> StringResources.GameGenre.Runner
-        Game.Genre.Business -> StringResources.GameGenre.Business
-        Game.Genre.Puzzle -> StringResources.GameGenre.Puzzle
-        Game.Genre.PointAndClick -> StringResources.GameGenre.PointAndClick
-        Game.Genre.Shooter -> StringResources.GameGenre.Shooter
-        Game.Genre.ThreeInRow -> StringResources.GameGenre.ThreeInRow
-        Game.Genre.Special -> StringResources.GameGenre.Special
+        Genre.Runner -> StringResources.GameGenre.Runner
+        Genre.Business -> StringResources.GameGenre.Business
+        Genre.Puzzle -> StringResources.GameGenre.Puzzle
+        Genre.PointAndClick -> StringResources.GameGenre.PointAndClick
+        Genre.Shooter -> StringResources.GameGenre.Shooter
+        Genre.ThreeInRow -> StringResources.GameGenre.ThreeInRow
+        Genre.Special -> StringResources.GameGenre.Special
     }
 
 @Stable

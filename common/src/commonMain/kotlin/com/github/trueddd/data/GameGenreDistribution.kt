@@ -1,22 +1,16 @@
 package com.github.trueddd.data
 
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import com.github.trueddd.map.Genre
 
-@Serializable(with = GameGenreDistribution.Serializer::class)
-data class GameGenreDistribution(
-    val genres: List<Game.Genre>,
-) {
+interface GameGenreDistribution {
 
-    fun genreAtPosition(position: Int): Game.Genre {
+    val genres: List<Genre>
+
+    fun genreAtPosition(position: Int): Genre {
         return genres[position - 1]
     }
 
-    fun closestPositionToGenre(anchorPosition: Int, genre: Game.Genre): Int {
+    fun closestPositionToGenre(anchorPosition: Int, genre: Genre): Int {
         var shift = 1
         while (anchorPosition + shift in genres.indices || anchorPosition - shift in genres.indices) {
             if (genreAtPosition(anchorPosition + shift) == genre) {
@@ -30,36 +24,7 @@ data class GameGenreDistribution(
         throw IllegalStateException("No genres were found")
     }
 
-    companion object {
-
-        private val Genres = Game.Genre.entries
-
-        fun generateRandom(stintCount: Int): GameGenreDistribution {
-            val defaultGenres = Genres - Game.Genre.Special
-            return GameGenreDistribution(
-                List(stintCount) {
-                    defaultGenres.shuffled() + Game.Genre.Special
-                }.flatten()
-            )
-        }
-    }
-
-    class Serializer : KSerializer<GameGenreDistribution> {
-
-        override val descriptor = PrimitiveSerialDescriptor("GameGenreDistribution", PrimitiveKind.STRING)
-
-        override fun deserialize(decoder: Decoder): GameGenreDistribution {
-            return decoder.decodeString()
-                .map { ordinal -> ordinal.digitToInt().let { Game.Genre.entries[it] } }
-                .let { GameGenreDistribution(it) }
-        }
-
-        override fun serialize(encoder: Encoder, value: GameGenreDistribution) {
-            encoder.encodeString(value.genres.joinToString("") { it.ordinal.toString() })
-        }
-    }
-
-    fun getStint(index: Int): List<Game.Genre> {
-        return genres.subList(index * Genres.size, (index + 1) * Genres.size)
+    fun getStint(index: Int): List<Genre> {
+        return genres.subList(index * Genre.entries.size, (index + 1) * Genre.entries.size)
     }
 }
